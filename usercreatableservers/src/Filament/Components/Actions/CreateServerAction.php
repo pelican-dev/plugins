@@ -9,12 +9,12 @@ use App\Models\Egg;
 use App\Services\Servers\RandomWordService;
 use Boy132\UserCreatableServers\Models\UserResourceLimits;
 use Exception;
-use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 
-class CreateServerAction extends CreateAction
+class CreateServerAction extends Action
 {
     public static function getDefaultName(): ?string
     {
@@ -27,9 +27,16 @@ class CreateServerAction extends CreateAction
 
         $this->visible(fn () => UserResourceLimits::where('user_id', auth()->user()->id)->exists());
 
-        $this->createAnother(false);
+        $this->disabled(function () {
+            /** @var ?UserResourceLimits $userResourceLimits */
+            $userResourceLimits = UserResourceLimits::where('user_id', auth()->user()->id)->first();
 
-        $this->model(UserResourceLimits::class);
+            if (!$userResourceLimits) {
+                return true;
+            }
+
+            return !$userResourceLimits->canCreateServer(1, 1, 1);
+        });
 
         $this->form(function () {
             /** @var UserResourceLimits $userResourceLimits */
