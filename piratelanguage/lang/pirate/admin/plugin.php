@@ -20,6 +20,7 @@ return [
     'no_plugins' => 'Nay Add-ons in Sight',
     'from_file' => 'From the Captain\'s Log',
     'from_url' => 'From the Sea o\' URLs',
+    'all' => 'All Hands',
 
     'status_enum' => [
         'not_installed' => 'Ain\'t Been Hoisted Yet',
@@ -27,6 +28,12 @@ return [
         'enabled' => 'Sails Be Raised',
         'errored' => 'Cursed with Errors',
         'incompatible' => 'Don\'t Belong on This Ship',
+    ],
+
+    'category_enum' => [
+        'plugin' => 'Trinket',
+        'theme' => 'Colors o\' the Ship',
+        'language' => 'Tongue o\' the Seas',
     ],
 
     'notifications' => [
