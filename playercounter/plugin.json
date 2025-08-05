@@ -1,0 +1,25 @@
+{
+    "meta": {
+        "status": "enabled",
+        "status_message": null,
+        "load_order": 0
+    },
+    "id": "playercounter",
+    "name": "Player Counter",
+    "author": "Boy132",
+    "version": "1.0.0",
+    "description": "Show the amount of connected players to the server",
+    "category": "plugin",
+    "url": "https://github.com/Boy132/player-counter",
+    "update_url": null,
+    "namespace": "Boy132\\PlayerCounter",
+    "class": "PlayerCounterPlugin",
+    "panels": [
+        "admin",
+        "server"
+    ],
+    "panel_version": null,
+    "composer_packages": [
+        "krymosoftware/gameq"
+    ]
+}
