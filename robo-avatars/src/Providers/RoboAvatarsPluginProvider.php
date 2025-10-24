@@ -12,6 +12,6 @@ class RoboAvatarsPluginProvider extends ServiceProvider
 
     public function boot(): void
     {
-        app(AvatarService::class)->register(new RoboAvatarsSchema());
+        $this->app->make(AvatarService::class)->register(new RoboAvatarsSchema());
     }
 }

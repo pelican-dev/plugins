@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static ?string getMinecraftLoader(Server $server)
  * @method static ?ModrinthProjectType getModrinthProjectType(Server $server)
  * @method static array{hits: array<int, array<string, mixed>>, total_hits: int} getModrinthProjects(Server $server, int $page = 1, ?string $search = null)
- * @method static array<string, mixed> getModrinthVersions(string $projectId, Server $server)
+ * @method static array<int, mixed> getModrinthVersions(string $projectId, Server $server)
  *
  * @see \Boy132\MinecraftModrinth\MinecraftModrinthService
  */

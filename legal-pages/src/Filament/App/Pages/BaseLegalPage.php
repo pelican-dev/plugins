@@ -4,6 +4,7 @@ namespace Boy132\LegalPages\Filament\App\Pages;
 
 use Boy132\LegalPages\Enums\LegalPageType;
 use Boy132\LegalPages\LegalPagesPlugin;
+use Exception;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists\Components\TextEntry;
@@ -39,7 +40,9 @@ abstract class BaseLegalPage extends SimplePage implements HasForms
         abort_if(!$this->content, 404);
     }
 
-    /** @return Component[]
+    /**
+     * @return Component[]
+     *
      * @throws Exception
      */
     protected function getFormSchema(): array

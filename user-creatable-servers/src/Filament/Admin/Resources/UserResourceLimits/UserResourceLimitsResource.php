@@ -46,7 +46,7 @@ class UserResourceLimitsResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count() ?: null;
+        return (string) static::getEloquentQuery()->count() ?: null;
     }
 
     public static function table(Table $table): Table

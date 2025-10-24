@@ -11,6 +11,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -61,6 +62,11 @@ class LegalPages extends Page
         $this->form->fill($data);
     }
 
+    /**
+     * @return Component[]
+     *
+     * @throws Exception
+     */
     public function getFormSchema(): array
     {
         $schema = [];

@@ -162,40 +162,34 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
     protected function getHeaderActions(): array
     {
+        /** @var Server $server */
+        $server = Filament::getTenant();
+
         return [
             Action::make('open_folder')
-                ->label(function () {
-                    /** @var Server $server */
-                    $server = Filament::getTenant();
-
-                    return 'Open ' . MinecraftModrinth::getModrinthProjectType($server)->getFolder() . ' folder';
-                })
-                ->url(function () {
-                    /** @var Server $server */
-                    $server = Filament::getTenant();
-
-                    return ListFiles::getUrl(['path' => MinecraftModrinth::getModrinthProjectType($server)->getFolder()]);
-                }, true),
+                ->label(fn () => 'Open ' . MinecraftModrinth::getModrinthProjectType($server)->getFolder() . ' folder')
+                ->url(fn () => ListFiles::getUrl(['path' => MinecraftModrinth::getModrinthProjectType($server)->getFolder()]), true),
         ];
     }
 
     public function content(Schema $schema): Schema
     {
+        /** @var Server $server */
+        $server = Filament::getTenant();
+
         return $schema
             ->components([
                 Grid::make(3)
                     ->schema([
                         TextEntry::make('Minecraft Version')
-                            ->state(fn () => MinecraftModrinth::getMinecraftVersion(Filament::getTenant()) ?? 'Unknown')
+                            ->state(fn () => MinecraftModrinth::getMinecraftVersion($server) ?? 'Unknown')
                             ->badge(),
                         TextEntry::make('Loader')
-                            ->state(fn () => str(MinecraftModrinth::getMinecraftLoader(Filament::getTenant()) ?? 'Unknown')->title())
+                            ->state(fn () => str(MinecraftModrinth::getMinecraftLoader($server) ?? 'Unknown')->title())
                             ->badge(),
-                        TextEntry::make('Installed ' . MinecraftModrinth::getModrinthProjectType(Filament::getTenant())->getLabel())
-                            ->state(function (DaemonFileRepository $fileRepository) {
-                                /** @var Server $server */
-                                $server = Filament::getTenant();
-
+                        TextEntry::make('installed')
+                            ->label(fn () => 'Installed ' . MinecraftModrinth::getModrinthProjectType($server)->getLabel())
+                            ->state(function (DaemonFileRepository $fileRepository) use ($server) {
                                 try {
                                     return collect($fileRepository->setServer($server)->getDirectory(MinecraftModrinth::getModrinthProjectType($server)->getFolder()))
                                         ->filter(fn ($file) => $file['mimetype'] === 'application/jar' || str($file['name'])->endsWith('.jar'))

@@ -6,7 +6,7 @@ use App\Models\Server;
 use App\Models\User;
 use Boy132\Tickets\Enums\TicketCategory;
 use Boy132\Tickets\Enums\TicketPriority;
-use Boy132\Tickets\Filament\Server\Resources\TicketResource\Pages\ManageTickets;
+use Boy132\Tickets\Filament\Server\Resources\Tickets\Pages\ManageTickets;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -76,7 +76,7 @@ class Ticket extends Model
         $this->save();
 
         // Send notification to author if exisiting and is the owner or a subuser of the server
-        if ($this->author && $this->author->directAccessibleServers()->pluck('id')->contains($this->server->id)) {
+        if ($this->author && $this->author->directAccessibleServers()->where('id', $this->server->id)->exists()) {
             Notification::make()
                 ->title(trans('tickets::tickets.notifications.answered'))
                 ->body(Markdown::inline($this->answer))

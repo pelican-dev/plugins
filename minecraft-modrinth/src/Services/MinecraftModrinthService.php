@@ -99,7 +99,7 @@ class MinecraftModrinthService
         });
     }
 
-    /** @return array<string, mixed> */
+    /** @return array<int, mixed> */
     public function getModrinthVersions(string $projectId, Server $server): array
     {
         $data = [

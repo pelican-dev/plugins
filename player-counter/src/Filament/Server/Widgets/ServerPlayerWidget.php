@@ -43,7 +43,7 @@ class ServerPlayerWidget extends StatsOverviewWidget
         ];
     }
 
-    private static function getGameQuery(): HasOneThrough
+    protected static function getGameQuery(): HasOneThrough
     {
         /** @var Server $server */
         $server = Filament::getTenant();
