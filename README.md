@@ -54,7 +54,7 @@ Adds a button to the console for uploading console logs to [mclo.gs](https://mcl
 
 Allows to easily download minecraft mods & plugins from modrinth.
 
-Add `modrinth_mod` or `modrinth_plugins` to the features of your egg to enable the mod/ plugins page. Also make sure your egg has the `minecraft` tag and a tag for the mod loader, e.g. `paper` or `forge` or `fabric`.
+Add `modrinth_mods` or `modrinth_plugins` to the features of your egg to enable the mod/ plugins page. Also make sure your egg has the `minecraft` tag and a tag for the mod loader, e.g. `paper` or `forge` or `fabric`.
 
 ---
 
