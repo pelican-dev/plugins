@@ -11,7 +11,13 @@ class MinecraftModrinthService
 {
     public function getMinecraftVersion(Server $server): ?string
     {
-        return $server->variables()->where(fn ($builder) => $builder->where('env_variable', 'MINECRAFT_VERSION')->orWhere('env_variable', 'MC_VERSION'))->first()?->server_value;
+        $version = $server->variables()->where(fn ($builder) => $builder->where('env_variable', 'MINECRAFT_VERSION')->orWhere('env_variable', 'MC_VERSION'))->first()?->server_value;
+
+        if ($version === 'latest') {
+            return config('minecraft-modrinth.latest_minecraft_version');
+        }
+
+        return $version;
     }
 
     public function getMinecraftLoader(Server $server): ?string
