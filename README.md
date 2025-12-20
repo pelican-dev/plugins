@@ -48,6 +48,9 @@ Adds some legal pages (like an Imprint) to the panel.
 
 Adds a button to the console for uploading console logs to [mclo.gs](https://mclo.gs/).
 
+> [!IMPORTANT]
+> Add `mclogs` to the features of your egg to enable the upload logs button.
+
 ---
 
 ### [Minecraft Modrinth](/minecraft-modrinth) <sup><sub>by Boy132</sub></sup>
