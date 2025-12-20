@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool removeMod(Server $server, DaemonFileRepository $fileRepository, string $modId)
  * @method static string getModWorkshopUrl(string $modId)
  * @method static array<string, mixed> getModDetails(string $modId)
+ * @method static array{mods: array, total: int, page: int, perPage: int} browseWorkshop(string $search = '', int $page = 1)
+ * @method static bool isModInstalled(Server $server, DaemonFileRepository $fileRepository, string $modId)
  *
  * @see ArmaReforgerWorkshopService
  */

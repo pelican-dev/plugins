@@ -213,4 +213,113 @@ class ArmaReforgerWorkshopService
             }
         });
     }
+
+    /**
+     * Search/browse mods from the Bohemia Workshop
+     *
+     * @return array{mods: array, total: int, page: int, perPage: int}
+     */
+    public function browseWorkshop(string $search = '', int $page = 1): array
+    {
+        $cacheKey = "arma_reforger_browse:" . md5($search) . ":$page";
+
+        return cache()->remember($cacheKey, now()->addMinutes(15), function () use ($search, $page) {
+            try {
+                $url = self::WORKSHOP_URL . '?' . http_build_query([
+                    'search' => $search,
+                    'page' => $page,
+                ]);
+
+                $response = Http::timeout(15)
+                    ->connectTimeout(5)
+                    ->get($url);
+
+                if (!$response->successful()) {
+                    return ['mods' => [], 'total' => 0, 'page' => $page, 'perPage' => 24];
+                }
+
+                $html = $response->body();
+                $mods = [];
+                $total = 0;
+
+                // Extract data from __NEXT_DATA__ JSON
+                if (preg_match('/<script[^>]*id="__NEXT_DATA__"[^>]*>(.+?)<\/script>/s', $html, $jsonMatch)) {
+                    $jsonData = json_decode($jsonMatch[1], true);
+
+                    if ($jsonData && isset($jsonData['props']['pageProps']['assets'])) {
+                        $assets = $jsonData['props']['pageProps']['assets'];
+                        $total = $assets['count'] ?? 0;
+
+                        foreach ($assets['rows'] ?? [] as $asset) {
+                            $mod = [
+                                'modId' => $asset['id'] ?? '',
+                                'name' => $asset['name'] ?? 'Unknown',
+                                'summary' => $asset['summary'] ?? '',
+                                'author' => $asset['author']['username'] ?? 'Unknown',
+                                'version' => $asset['currentVersionNumber'] ?? '',
+                                'subscribers' => $asset['subscriberCount'] ?? 0,
+                                'rating' => isset($asset['averageRating']) ? (int) round($asset['averageRating'] * 100) : null,
+                                'thumbnail' => $this->extractThumbnail($asset['previews'] ?? []),
+                                'type' => $asset['type'] ?? 'addon',
+                                'tags' => collect($asset['tags'] ?? [])->pluck('name')->toArray(),
+                            ];
+
+                            if (!empty($mod['modId'])) {
+                                $mods[] = $mod;
+                            }
+                        }
+                    }
+                }
+
+                return [
+                    'mods' => $mods,
+                    'total' => $total,
+                    'page' => $page,
+                    'perPage' => 24, // Workshop uses 24 per page
+                ];
+            } catch (Exception $exception) {
+                report($exception);
+                return ['mods' => [], 'total' => 0, 'page' => $page, 'perPage' => 24];
+            }
+        });
+    }
+
+    /**
+     * Extract the best thumbnail URL from previews
+     */
+    protected function extractThumbnail(array $previews): ?string
+    {
+        if (empty($previews)) {
+            return null;
+        }
+
+        $preview = $previews[0];
+
+        // Try to get a smaller thumbnail for performance
+        if (isset($preview['thumbnails']['image/jpeg'])) {
+            $thumbnails = $preview['thumbnails']['image/jpeg'];
+            // Get the smallest thumbnail (usually last one)
+            if (!empty($thumbnails)) {
+                return end($thumbnails)['url'] ?? $preview['url'] ?? null;
+            }
+        }
+
+        return $preview['url'] ?? null;
+    }
+
+    /**
+     * Check if a mod is already installed on the server
+     */
+    public function isModInstalled(Server $server, DaemonFileRepository $fileRepository, string $modId): bool
+    {
+        $installedMods = $this->getInstalledMods($server, $fileRepository);
+
+        foreach ($installedMods as $mod) {
+            if (strtoupper($mod['modId']) === strtoupper($modId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

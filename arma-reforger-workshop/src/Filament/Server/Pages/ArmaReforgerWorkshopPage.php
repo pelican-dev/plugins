@@ -239,6 +239,10 @@ class ArmaReforgerWorkshopPage extends Page implements HasTable
                 }),
             Action::make('browse_workshop')
                 ->label('Browse Workshop')
+                ->icon('tabler-world-search')
+                ->url(fn () => BrowseWorkshopPage::getUrl()),
+            Action::make('open_workshop_external')
+                ->label('Open in Browser')
                 ->icon('tabler-external-link')
                 ->url(ArmaReforgerWorkshopService::WORKSHOP_URL, true),
             Action::make('open_config')
