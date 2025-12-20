@@ -25,7 +25,18 @@ class UploadLogsAction extends Action
             /** @var Server $server */
             $server = Filament::getTenant();
 
-            return $server->retrieveStatus()->isOffline();
+            // Hide if server is offline
+            if ($server->retrieveStatus()->isOffline()) {
+                return true;
+            }
+
+            // Hide if egg doesn't have mclogs feature
+            $features = $server->egg->features ?? [];            
+            if (!in_array('mclogs', $features)) {
+                return true;
+            }
+
+            return false;
         });
 
         $this->label(fn () => trans('mclogs-uploader::upload.upload_logs'));
