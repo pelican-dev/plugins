@@ -1,0 +1,19 @@
+{
+    "id": "snowflakesjs",
+    "name": "SnowflakesJs",
+    "author": "notCharles",
+    "version": "1.0.0",
+    "description": "Let it snow, let it snow, let it snow, now with Javascript & options!",
+    "category": "plugin",
+    "url": "https://github.com/pelican-dev/plugins/tree/main/snowflakesjs",
+    "update_url": null,
+    "namespace": "notCharles\\SnowflakesJs",
+    "class": "SnowflakesJsPlugin",
+    "panels": null,
+    "panel_version": null,
+    "composer_packages": null,
+    "meta": {
+        "status": "enabled",
+        "status_message": null
+    }
+}
