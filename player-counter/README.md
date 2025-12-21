@@ -2,6 +2,12 @@
 
 Show the amount of connected players to game servers with real-time querying capabilities.
 
+> [!IMPORTANT]
+> You need to have the bz2 php extension and zip/7zip installed!
+
+> [!IMPORTANT]
+> For Minecraft servers you need to set `enable-query` to true and the `query-port` to your server port! (in `server.properties`)
+
 ## Metadata
 
 | Property | Value |

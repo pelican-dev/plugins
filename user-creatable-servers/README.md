@@ -2,6 +2,9 @@
 
 Allow users to create their own servers within defined resource limits set by administrators.
 
+> [!IMPORTANT]
+> Add `user_creatable_servers` as tag to the nodes that should be used for creating servers.
+
 ## Metadata
 
 | Property | Value |

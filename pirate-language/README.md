@@ -2,6 +2,9 @@
 
 Turns yer site's lingo into pirate talk, matey! A fun language pack that transforms the entire panel interface into pirate speak.
 
+> [!WARNING]
+> Only the server pages, the Admin Dashboard, Profile page & Health page are currently translated.
+
 ## Metadata
 
 | Property | Value |

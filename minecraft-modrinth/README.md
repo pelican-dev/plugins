@@ -2,6 +2,9 @@
 
 Easily download and install Minecraft mods and plugins directly from Modrinth within the server panel.
 
+> [!IMPORTANT]
+> Add `modrinth_mods` or `modrinth_plugins` to the features of your egg to enable the mod/plugins page. Also make sure your egg has the `minecraft` tag and a tag for the mod loader, e.g. `paper` or `forge` or `fabric`.
+
 ## Metadata
 
 | Property | Value |
