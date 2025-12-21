@@ -49,8 +49,8 @@ class DeleteServerAction extends DeleteAction
                 $service->handle($record);
 
                 Notification::make()
-                    ->title('Server Deleted')
-                    ->body('The server has been successfully deleted.')
+                    ->title(trans('user-creatable-servers::strings.server_deleted'))
+                    ->body(trans('user-creatable-servers::strings.server_deleted_success'))
                     ->success()
                     ->send();
 
