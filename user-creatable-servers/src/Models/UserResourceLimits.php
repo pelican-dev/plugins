@@ -43,10 +43,6 @@ class UserResourceLimits extends Model
     {
         if ($this->cpu > 0) {
             $user = $this->user;
-            if (!$user) {
-                return 0;
-            }
-
             $sum_cpu = $user->servers()->sum('cpu');
 
             return max(0, $this->cpu - $sum_cpu);
