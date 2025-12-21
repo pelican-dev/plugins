@@ -20,46 +20,6 @@ Easily download and install Rust plugins directly from uMod (formerly Oxide) wit
 - Search and filter plugins by name
 - View plugin descriptions and documentation
 
-## Technical Details
-
-### Services
-
-- `RustUModService` - Handles API communication with uMod
-
-### Facades
-
-- `RustUMod` - Static access to the uMod service
-
-### Filament Pages
-
-| Panel | Page |
-|-------|------|
-| Server | `RustUModPluginsPage` - Browse and install Rust plugins |
-
-### Plugin Structure
-
-```
-rust-umod/
-├── plugin.json
-└── src/
-    ├── RustUModPlugin.php
-    ├── Facades/
-    │   └── RustUMod.php
-    ├── Services/
-    │   └── RustUModService.php
-    └── Filament/
-        └── Server/
-            └── Pages/
-                └── RustUModPluginsPage.php
-```
-
-### Integration
-
-The plugin connects to the uMod API to:
-1. Fetch available Rust plugins
-2. Display plugin information (name, description, author)
-3. Download and install plugins to the server's plugin directory
-
 ## Dependencies
 
 None
