@@ -18,72 +18,134 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Find plugins and create zips
+      - name: Find plugins, validate and create zips
         id: create-zips
         run: |
+          set -e
           mkdir -p dist
 
-          # Find all directories containing plugin.json
-          plugins=""
+          plugins=()
           for dir in */; do
             dir_name="${dir%/}"
             if [ -f "$dir_name/plugin.json" ]; then
               echo "Found plugin: $dir_name"
 
+              # Validate plugin.json
+              echo "Validating $dir_name/plugin.json..."
+              if ! python3 -m json.tool "$dir_name/plugin.json" > /dev/null 2>&1; then
+                echo "::error::Invalid JSON in $dir_name/plugin.json"
+                exit 1
+              fi
+              echo "Valid JSON: $dir_name/plugin.json"
+
               # Create zip file for the plugin
               zip -r "dist/${dir_name}.zip" "$dir_name"
 
-              # Add to plugins list
-              if [ -n "$plugins" ]; then
-                plugins="$plugins,$dir_name"
-              else
-                plugins="$dir_name"
-              fi
+              # Add to plugins array
+              plugins+=("$dir_name")
             fi
           done
 
-          echo "plugins=$plugins" >> $GITHUB_OUTPUT
-          echo "Found plugins: $plugins"
+          # Output plugins as JSON array
+          plugins_json=$(printf '%s\n' "${plugins[@]}" | jq -R . | jq -s -c .)
+          echo "plugins=$plugins_json" >> $GITHUB_OUTPUT
+          echo "Found plugins: $plugins_json"
 
       - name: Create manifest.json
+        env:
+          PLUGINS: ${{ steps.create-zips.outputs.plugins }}
+          VERSION: ${{ inputs.version }}
+          REPO: ${{ github.repository }}
         run: |
-          # Initialize manifest
-          echo '{"version":"${{ inputs.version }}","plugins":[' > dist/manifest.json
+          set -e
 
-          first=true
-          for dir in */; do
-            dir_name="${dir%/}"
-            if [ -f "$dir_name/plugin.json" ]; then
-              if [ "$first" = true ]; then
-                first=false
-              else
-                echo ',' >> dist/manifest.json
-              fi
+          python3 << 'PYTHON_SCRIPT'
+          import json
+          import hashlib
+          import os
+          import sys
 
-              # Read plugin.json content
-              plugin_json=$(cat "$dir_name/plugin.json")
+          def compute_checksum(filepath):
+              """Compute SHA256 checksum of a file."""
+              sha256_hash = hashlib.sha256()
+              with open(filepath, "rb") as f:
+                  for byte_block in iter(lambda: f.read(4096), b""):
+                      sha256_hash.update(byte_block)
+              return sha256_hash.hexdigest()
 
-              # Calculate SHA256 checksum of the zip file
-              checksum=$(sha256sum "dist/${dir_name}.zip" | awk '{print $1}')
+          def main():
+              plugins_json = os.environ.get('PLUGINS', '[]')
+              version = os.environ.get('VERSION', '')
+              repo = os.environ.get('REPO', '')
 
-              # Create plugin entry with download URL, checksum, and metadata
-              cat >> dist/manifest.json << EOF
-          {
-            "download": "https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/${dir_name}.zip",
-            "checksum": "$checksum",
-            "metadata": $plugin_json
-          }
-          EOF
-            fi
-          done
+              try:
+                  plugins = json.loads(plugins_json)
+              except json.JSONDecodeError as e:
+                  print(f"::error::Failed to parse plugins list: {e}")
+                  sys.exit(1)
 
-          echo ']}' >> dist/manifest.json
+              manifest = {
+                  "version": version,
+                  "plugins": []
+              }
 
-          # Pretty print the manifest
-          cat dist/manifest.json | python3 -m json.tool > dist/manifest_pretty.json
-          mv dist/manifest_pretty.json dist/manifest.json
+              for plugin_name in plugins:
+                  plugin_json_path = f"{plugin_name}/plugin.json"
+                  zip_path = f"dist/{plugin_name}.zip"
 
-          echo "Created manifest.json:"
+                  # Validate and load plugin.json
+                  try:
+                      with open(plugin_json_path, 'r') as f:
+                          metadata = json.load(f)
+                  except json.JSONDecodeError as e:
+                      print(f"::error::Invalid JSON in {plugin_json_path}: {e}")
+                      sys.exit(1)
+                  except FileNotFoundError:
+                      print(f"::error::File not found: {plugin_json_path}")
+                      sys.exit(1)
+
+                  # Compute checksum
+                  try:
+                      checksum = compute_checksum(zip_path)
+                  except FileNotFoundError:
+                      print(f"::error::Zip file not found: {zip_path}")
+                      sys.exit(1)
+
+                  # Build plugin entry
+                  plugin_entry = {
+                      "download": f"https://github.com/{repo}/releases/download/v{version}/{plugin_name}.zip",
+                      "checksum": checksum,
+                      "metadata": metadata
+                  }
+
+                  manifest["plugins"].append(plugin_entry)
+                  print(f"Processed: {plugin_name} (checksum: {checksum[:16]}...)")
+
+              # Write manifest
+              try:
+                  with open('dist/manifest.json', 'w') as f:
+                      json.dump(manifest, f, indent=2)
+              except Exception as e:
+                  print(f"::error::Failed to write manifest.json: {e}")
+                  sys.exit(1)
+
+              print(f"\nCreated manifest.json with {len(manifest['plugins'])} plugins")
+
+              # Validate output by re-parsing
+              try:
+                  with open('dist/manifest.json', 'r') as f:
+                      json.load(f)
+                  print("Manifest validation: OK")
+              except json.JSONDecodeError as e:
+                  print(f"::error::Generated manifest is invalid JSON: {e}")
+                  sys.exit(1)
+
+          if __name__ == "__main__":
+              main()
+          PYTHON_SCRIPT
+
+          echo ""
+          echo "=== manifest.json ==="
           cat dist/manifest.json
 
       - name: Create draft release
