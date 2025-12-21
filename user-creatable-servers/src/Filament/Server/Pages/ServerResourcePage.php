@@ -117,8 +117,11 @@ class ServerResourcePage extends ServerFormPage
                 ->keyBindings(['mod+s']),
         ];
 
-        // Add delete action if enabled and user owns the server
-        if (config('user-creatable-servers.can_users_delete_servers') && $server->owner_id === auth()->user()->id) {
+        // Add delete action if enabled and (user owns the server OR user is admin)
+        $canDelete = config('user-creatable-servers.can_users_delete_servers') &&
+            ($server->owner_id === auth()->user()->id || auth()->user()->isRootAdmin());
+
+        if ($canDelete) {
             $actions[] = Action::make('delete')
                 ->label(trans('user-creatable-servers::strings.delete_server'))
                 ->color('danger')
