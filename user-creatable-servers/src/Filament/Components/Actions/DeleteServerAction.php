@@ -29,7 +29,12 @@ class DeleteServerAction extends DeleteAction
                 return false;
             }
 
-            return UserResourceLimits::where('user_id', auth()->user()->id)->exists();
+            $user = auth()->user();
+            if (!$user) {
+                return false;
+            }
+
+            return UserResourceLimits::where('user_id', $user->id)->exists();
         });
 
         $this->authorize(function (Server $record) {
