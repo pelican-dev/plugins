@@ -144,7 +144,7 @@ class ServerResourcePage extends ServerFormPage
                             ->send();
 
                         // Redirect to app panel home instead of ListServers
-                        return redirect()->to('/');
+                        return redirect()->to(Filament::getDefaultPanel()->getUrl());
                     } catch (Exception $exception) {
                         report($exception);
 
