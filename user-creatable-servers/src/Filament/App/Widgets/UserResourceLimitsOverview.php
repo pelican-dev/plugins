@@ -40,9 +40,6 @@ class UserResourceLimitsOverview extends StatsOverviewWidget
     public static function canView(): bool
     {
         $user = auth()->user();
-        if (!$user) {
-            return false;
-        }
 
         return UserResourceLimits::where('user_id', $user->id)->exists();
     }
