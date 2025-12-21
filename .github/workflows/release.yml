@@ -1,0 +1,98 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find plugins and create zips
+        id: create-zips
+        run: |
+          mkdir -p dist
+
+          # Find all directories containing plugin.json
+          plugins=""
+          for dir in */; do
+            dir_name="${dir%/}"
+            if [ -f "$dir_name/plugin.json" ]; then
+              echo "Found plugin: $dir_name"
+
+              # Create zip file for the plugin
+              zip -r "dist/${dir_name}.zip" "$dir_name"
+
+              # Add to plugins list
+              if [ -n "$plugins" ]; then
+                plugins="$plugins,$dir_name"
+              else
+                plugins="$dir_name"
+              fi
+            fi
+          done
+
+          echo "plugins=$plugins" >> $GITHUB_OUTPUT
+          echo "Found plugins: $plugins"
+
+      - name: Create manifest.json
+        run: |
+          # Initialize manifest
+          echo '{"version":"${{ inputs.version }}","plugins":[' > dist/manifest.json
+
+          first=true
+          for dir in */; do
+            dir_name="${dir%/}"
+            if [ -f "$dir_name/plugin.json" ]; then
+              if [ "$first" = true ]; then
+                first=false
+              else
+                echo ',' >> dist/manifest.json
+              fi
+
+              # Read plugin.json content
+              plugin_json=$(cat "$dir_name/plugin.json")
+
+              # Calculate SHA256 checksum of the zip file
+              checksum=$(sha256sum "dist/${dir_name}.zip" | awk '{print $1}')
+
+              # Create plugin entry with download URL, checksum, and metadata
+              cat >> dist/manifest.json << EOF
+          {
+            "download": "https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/${dir_name}.zip",
+            "checksum": "$checksum",
+            "metadata": $plugin_json
+          }
+          EOF
+            fi
+          done
+
+          echo ']}' >> dist/manifest.json
+
+          # Pretty print the manifest
+          cat dist/manifest.json | python3 -m json.tool > dist/manifest_pretty.json
+          mv dist/manifest_pretty.json dist/manifest.json
+
+          echo "Created manifest.json:"
+          cat dist/manifest.json
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Release v${{ inputs.version }}
+          draft: true
+          generate_release_notes: true
+          files: |
+            dist/*.zip
+            dist/manifest.json
