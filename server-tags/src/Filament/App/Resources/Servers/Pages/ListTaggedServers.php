@@ -2,6 +2,7 @@
 
 namespace Boy132\ServerTags\Filament\App\Resources\Servers\Pages;
 
+use App\Filament\App\Resources\Servers\Pages\ListServers;
 use App\Filament\App\Resources\Servers\ServerResource;
 use Boy132\ServerTags\Models\ServerTag;
 use Filament\Resources\Pages\ListRecords;
@@ -9,11 +10,9 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListTaggedServers extends ListServer
+class ListTaggedServers extends ListServers
 {
     protected static string $resource = ServerResource::class;
-
-    protected static string $view = 'filament.resources.pages.list-server';
 
     public function getTabs(): array
     {
