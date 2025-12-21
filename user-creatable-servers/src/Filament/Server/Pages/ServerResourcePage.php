@@ -119,7 +119,7 @@ class ServerResourcePage extends ServerFormPage
 
         // Add delete action if enabled and (user owns the server OR user is admin)
         $canDelete = config('user-creatable-servers.can_users_delete_servers') &&
-            ($server->owner_id === auth()->user()->id || auth()->user()->isRootAdmin());
+            ($server->owner_id === auth()->user()->id || auth()->user()->can('delete servers'));
 
         if ($canDelete) {
             $actions[] = Action::make('delete')
