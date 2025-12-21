@@ -2,11 +2,14 @@
 
 namespace Boy132\UserCreatableServers\Filament\Server\Pages;
 
+use App\Filament\App\Resources\Servers\Pages\ListServers;
 use App\Filament\Server\Pages\ServerFormPage;
 use App\Models\Server;
 use App\Repositories\Daemon\DaemonServerRepository;
+use App\Services\Servers\ServerDeletionService;
 use Boy132\UserCreatableServers\Filament\App\Widgets\UserResourceLimitsOverview;
 use Boy132\UserCreatableServers\Models\UserResourceLimits;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
@@ -103,13 +106,57 @@ class ServerResourcePage extends ServerFormPage
 
     protected function getHeaderActions(): array
     {
-        return [
+        /** @var Server $server */
+        $server = Filament::getTenant();
+
+        $actions = [
             Action::make('save')
                 ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->submit('save')
                 ->formId('form')
                 ->keyBindings(['mod+s']),
         ];
+
+        // Add delete action if enabled and user owns the server
+        if (config('user-creatable-servers.can_users_delete_servers') && $server->owner_id === auth()->user()->id) {
+            $actions[] = Action::make('delete')
+                ->label(trans('user-creatable-servers::strings.delete_server'))
+                ->color('danger')
+                ->icon('tabler-trash')
+                ->requiresConfirmation()
+                ->modalHeading(trans('user-creatable-servers::strings.delete_server'))
+                ->modalDescription(trans('user-creatable-servers::strings.delete_server_warning'))
+                ->modalSubmitActionLabel(trans('user-creatable-servers::strings.delete_server'))
+                ->action(function () use ($server) {
+                    try {
+                        /** @var ServerDeletionService $service */
+                        $service = app(ServerDeletionService::class);
+
+                        $service->handle($server);
+
+                        Notification::make()
+                            ->title(trans('user-creatable-servers::strings.server_deleted'))
+                            ->body(trans('user-creatable-servers::strings.server_deleted_success'))
+                            ->success()
+                            ->send();
+
+                        // Redirect to app panel home instead of ListServers
+                        return redirect()->to('/');
+                    } catch (Exception $exception) {
+                        report($exception);
+
+                        Notification::make()
+                            ->title(trans('user-creatable-servers::strings.server_delete_error'))
+                            ->body(trans('user-creatable-servers::strings.server_delete_error_message'))
+                            ->danger()
+                            ->send();
+
+                        return null;
+                    }
+                });
+        }
+
+        return $actions;
     }
 
     public function save(): void

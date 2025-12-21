@@ -12,8 +12,17 @@ class UserResourceLimitsOverview extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $userResourceLimits = UserResourceLimits::where('user_id', auth()->user()->id)->first();
-        $userServers = auth()->user()->servers;
+        $user = auth()->user();
+        if (!$user) {
+            return [];
+        }
+
+        $userResourceLimits = UserResourceLimits::where('user_id', $user->id)->first();
+        if (!$userResourceLimits) {
+            return [];
+        }
+
+        $userServers = $user->servers()->get();
 
         $suffix = config('panel.use_binary_prefix') ? ' MiB' : ' MB';
 
@@ -30,6 +39,11 @@ class UserResourceLimitsOverview extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        return UserResourceLimits::where('user_id', auth()->user()->id)->exists();
+        $user = auth()->user();
+        if (!$user) {
+            return false;
+        }
+
+        return UserResourceLimits::where('user_id', $user->id)->exists();
     }
 }
