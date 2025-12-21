@@ -1,0 +1,18 @@
+{
+  "id": "server-tags",
+  "name": "Server Tags",
+  "author": "zfelyx",
+  "version": "1.0.0",
+  "description": "Add custom tags to servers for better organization and filtering",
+  "category": "plugin",
+  "url": "https://github.com/pelican-dev/plugins/tree/main/server-tags",
+  "update_url": null,
+  "namespace": "Boy132\\ServerTags",
+  "class": "ServerTagsPlugin",
+  "panels": [
+    "admin",
+    "app"
+  ],
+  "panel_version": null,
+  "composer_packages": null
+}
