@@ -59,8 +59,8 @@ class DeleteServerAction extends DeleteAction
                 report($exception);
 
                 Notification::make()
-                    ->title('Could not delete server')
-                    ->body('An error occurred while deleting the server. Please contact the panel admin.')
+                    ->title(trans('user-creatable-servers::strings.server_delete_error'))
+                    ->body(trans('user-creatable-servers::strings.server_delete_error_message'))
                     ->danger()
                     ->send();
             }
