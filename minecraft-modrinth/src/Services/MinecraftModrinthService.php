@@ -11,9 +11,22 @@ class MinecraftModrinthService
 {
     public function getMinecraftVersion(Server $server): ?string
     {
-        $version = $server->variables()->where(fn ($builder) => $builder->where('env_variable', 'MINECRAFT_VERSION')->orWhere('env_variable', 'MC_VERSION'))->first()?->server_value;
+        $loader = $this->getMinecraftLoader($server);
 
-        if ($version === 'latest') {
+        if ($loader === 'velocity') {
+            return config('minecraft-modrinth.latest_minecraft_version');
+        }
+
+        $version = $server->variables()
+            ->whereIn('env_variable', [
+                'MINECRAFT_VERSION',
+                'MC_VERSION',
+                'VERSION',
+                'SERVER_VERSION',
+            ])
+            ->first()?->server_value;
+
+        if (!$version || $version === 'latest') {
             return config('minecraft-modrinth.latest_minecraft_version');
         }
 
@@ -25,6 +38,11 @@ class MinecraftModrinthService
         $tags = $server->egg->tags ?? [];
 
         if (in_array('minecraft', $tags)) {
+
+            if (in_array('velocity', $tags)) {
+                return 'velocity';
+            }
+
             if (in_array('neoforge', $tags) || in_array('neoforged', $tags)) {
                 return 'neoforge';
             }
