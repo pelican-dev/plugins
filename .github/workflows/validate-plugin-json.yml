@@ -1,0 +1,25 @@
+name: Validate plugin.json files
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate-plugin-json:
+    name: Validate plugin.json files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          coverage: none
+
+      - name: Validate plugin.json files
+        run: php .github/scripts/validatePluginJson.php
