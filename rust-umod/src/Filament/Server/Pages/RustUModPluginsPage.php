@@ -148,8 +148,14 @@ class RustUModPluginsPage extends Page implements HasTable
                             ->label(fn () => 'Installed plugins')
                             ->state(function (DaemonFileRepository $fileRepository) use ($server) {
                                 try {
-                                    return collect($fileRepository->setServer($server)->getDirectory('oxide/plugins'))
-                                        ->filter(fn ($file) => $file['mimetype'] === 'text/plain' && str($file['name'])->endsWith('.cs'))
+                                    $files = $fileRepository->setServer($server)->getDirectory('oxide/plugins');
+
+                                    if (isset($files['error'])) {
+                                        throw new Exception($files['error']);
+                                    }
+
+                                    return collect($files)
+                                        ->filter(fn ($file) => $file['mime'] === 'text/plain' && str($file['name'])->lower()->endsWith('.cs'))
                                         ->count();
                                 } catch (Exception $exception) {
                                     report($exception);

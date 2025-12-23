@@ -32,6 +32,8 @@ class PlayerCounterSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created game query types for minecraft and source');
+        if ($this->command) {
+            $this->command->info('Created game query types for minecraft and source');
+        }
     }
 }

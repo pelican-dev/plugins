@@ -23,9 +23,13 @@ class LegalPagesPlugin implements Plugin
 
     public function boot(Panel $panel): void {}
 
-    public static function Save(LegalPageType $type, ?string $contents): bool
+    public static function Save(LegalPageType|string $type, ?string $contents): bool
     {
-        $path = $type->getId() . '.md';
+        if ($type instanceof LegalPageType) {
+            $type = $type->getId();
+        }
+
+        $path = $type . '.md';
 
         if (!$contents) {
             return Storage::delete($path);
@@ -34,8 +38,12 @@ class LegalPagesPlugin implements Plugin
         return Storage::put($path, $contents);
     }
 
-    public static function Load(LegalPageType $type): ?string
+    public static function Load(LegalPageType|string $type): ?string
     {
-        return Storage::get($type->getId() . '.md');
+        if ($type instanceof LegalPageType) {
+            $type = $type->getId();
+        }
+
+        return Storage::get($type . '.md');
     }
 }

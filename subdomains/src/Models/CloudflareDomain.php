@@ -15,6 +15,7 @@ class CloudflareDomain extends Model
 {
     protected $fillable = [
         'name',
+        'cloudflare_id',
     ];
 
     protected static function boot(): void
@@ -42,7 +43,7 @@ class CloudflareDomain extends Model
 
             if (count($zones) > 0) {
                 $this->update([
-                    'cloudflare_id' => $zones[0]->id,
+                    'cloudflare_id' => $zones[0]['id'],
                 ]);
             }
         }

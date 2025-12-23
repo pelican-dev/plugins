@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('coupons', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('stripe_coupon_id')->nullable();
             $table->string('stripe_promotion_id')->nullable();
             $table->string('name');

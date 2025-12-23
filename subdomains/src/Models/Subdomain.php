@@ -24,6 +24,7 @@ class Subdomain extends Model implements HasLabel
     protected $fillable = [
         'name',
         'record_type',
+        'cloudflare_id',
         'domain_id',
         'server_id',
     ];
@@ -47,12 +48,12 @@ class Subdomain extends Model implements HasLabel
 
     public function domain(): BelongsTo
     {
-        return $this->BelongsTo(CloudflareDomain::class, 'domain_id');
+        return $this->belongsTo(CloudflareDomain::class, 'domain_id');
     }
 
     public function server(): BelongsTo
     {
-        return $this->BelongsTo(Server::class);
+        return $this->belongsTo(Server::class);
     }
 
     public function getLabel(): string|Htmlable|null
@@ -62,42 +63,46 @@ class Subdomain extends Model implements HasLabel
 
     protected function createOnCloudflare(): void
     {
-        if (!$this->server->allocation || $this->cloudflare_id) {
+        if (!$this->server->allocation || $this->server->allocation->ip === '0.0.0.0' || $this->server->allocation->ip === '::') {
             return;
         }
 
-        $response = Http::cloudflare()->post("zones/{$this->domain->cloudflare_id}/dns_records", [
-            'name' => $this->name,
-            'ttl' => 120,
-            'type' => $this->record_type,
-            'comment' => 'Created by Pelican Subdomains plugin',
-            'content' => $this->server->allocation->ip,
-            'proxied' => false,
-        ])->json();
+        if (!$this->cloudflare_id) {
+            $response = Http::cloudflare()->post("zones/{$this->domain->cloudflare_id}/dns_records", [
+                'name' => $this->name,
+                'ttl' => 120,
+                'type' => $this->record_type,
+                'comment' => 'Created by Pelican Subdomains plugin',
+                'content' => $this->server->allocation->ip,
+                'proxied' => false,
+            ])->json();
 
-        if ($response['success']) {
-            $dnsRecord = $response['result'];
+            if ($response['success']) {
+                $dnsRecord = $response['result'];
 
-            $this->updateQuietly([
-                'cloudflare_id' => $dnsRecord->id,
-            ]);
+                $this->updateQuietly([
+                    'cloudflare_id' => $dnsRecord['id'],
+                ]);
+            }
         }
     }
 
     protected function updateOnCloudflare(): void
     {
-        if (!$this->server->allocation || !$this->cloudflare_id) {
+        if (!$this->server->allocation || $this->server->allocation->ip === '0.0.0.0' || $this->server->allocation->ip === '::') {
             return;
         }
 
-        Http::cloudflare()->patch("zones/{$this->domain->cloudflare_id}/dns_records/{$this->cloudflare_id}", [
-            'name' => $this->name,
-            'ttl' => 120,
-            'type' => $this->record_type,
-            'comment' => 'Created by Pelican Subdomains plugin',
-            'content' => $this->server->allocation->ip,
-            'proxied' => false,
-        ]);
+        if ($this->cloudflare_id) {
+            Http::cloudflare()->patch("zones/{$this->domain->cloudflare_id}/dns_records/{$this->cloudflare_id}", [
+                'name' => $this->name,
+                'ttl' => 120,
+                'type' => $this->record_type,
+                'comment' => 'Created by Pelican Subdomains plugin',
+                'content' => $this->server->allocation->ip,
+                'proxied' => false,
+            ]);
+        }
     }
 
     protected function deleteOnCloudflare(): void

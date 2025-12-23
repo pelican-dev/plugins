@@ -3,6 +3,7 @@
 namespace Boy132\MinecraftModrinth\Services;
 
 use App\Models\Server;
+use Boy132\MinecraftModrinth\Enums\MinecraftLoader;
 use Boy132\MinecraftModrinth\Enums\ModrinthProjectType;
 use Exception;
 use Illuminate\Support\Facades\Http;
@@ -13,60 +14,20 @@ class MinecraftModrinthService
     {
         $version = $server->variables()->where(fn ($builder) => $builder->where('env_variable', 'MINECRAFT_VERSION')->orWhere('env_variable', 'MC_VERSION'))->first()?->server_value;
 
-        if ($version === 'latest') {
+        if (!$version || $version === 'latest') {
             return config('minecraft-modrinth.latest_minecraft_version');
         }
 
         return $version;
     }
 
-    public function getMinecraftLoader(Server $server): ?string
-    {
-        $tags = $server->egg->tags ?? [];
-
-        if (in_array('minecraft', $tags)) {
-            if (in_array('neoforge', $tags) || in_array('neoforged', $tags)) {
-                return 'neoforge';
-            }
-
-            if (in_array('forge', $tags)) {
-                return 'forge';
-            }
-
-            if (in_array('fabric', $tags)) {
-                return 'fabric';
-            }
-
-            if (in_array('spigot', $tags) || in_array('paper', $tags)) {
-                return 'paper';
-            }
-        }
-
-        return null;
-    }
-
-    public function getModrinthProjectType(Server $server): ?ModrinthProjectType
-    {
-        $features = $server->egg->features ?? [];
-        $tags = $server->egg->tags ?? [];
-
-        if (in_array('modrinth_plugins', $features) || (in_array('minecraft', $tags) && in_array('plugins', $features))) {
-            return ModrinthProjectType::Plugin;
-        }
-
-        if (in_array('modrinth_mods', $features) || (in_array('minecraft', $tags) && in_array('mods', $features))) {
-            return ModrinthProjectType::Mod;
-        }
-
-        return null;
-    }
-
     /** @return array{hits: array<int, array<string, mixed>>, total_hits: int} */
     public function getModrinthProjects(Server $server, int $page = 1, ?string $search = null): array
     {
-        $projectType = $this->getModrinthProjectType($server);
+        $projectType = ModrinthProjectType::fromServer($server)?->value;
+        $minecraftLoader = MinecraftLoader::fromServer($server)?->value;
 
-        if (!$projectType) {
+        if (!$projectType || !$minecraftLoader) {
             return [
                 'hits' => [],
                 'total_hits' => 0,
@@ -74,15 +35,14 @@ class MinecraftModrinthService
         }
 
         $minecraftVersion = $this->getMinecraftVersion($server);
-        $minecraftLoader = $this->getMinecraftLoader($server);
 
         $data = [
             'offset' => ($page - 1) * 20,
             'limit' => 20,
-            'facets' => "[[\"categories:$minecraftLoader\"],[\"versions:$minecraftVersion\"],[\"project_type:{$projectType->value}\"]]",
+            'facets' => "[[\"categories:$minecraftLoader\"],[\"versions:$minecraftVersion\"],[\"project_type:{$projectType}\"]]",
         ];
 
-        $key = "modrinth_projects:{$projectType->value}:$minecraftVersion:$minecraftLoader:$page";
+        $key = "modrinth_projects:{$projectType}:$minecraftVersion:$minecraftLoader:$page";
 
         if ($search) {
             $data['query'] = $search;
@@ -112,8 +72,13 @@ class MinecraftModrinthService
     /** @return array<int, mixed> */
     public function getModrinthVersions(string $projectId, Server $server): array
     {
+        $minecraftLoader = MinecraftLoader::fromServer($server)?->value;
+
+        if (!$minecraftLoader) {
+            return [];
+        }
+
         $minecraftVersion = $this->getMinecraftVersion($server);
-        $minecraftLoader = $this->getMinecraftLoader($server);
 
         $data = [
             'game_versions' => "[\"$minecraftVersion\"]",

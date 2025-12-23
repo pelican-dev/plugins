@@ -1,142 +1,35 @@
 # Pelican Plugins
 
-A curated list of plugins for the [pelican panel](https://pelican.dev). Feel free to add plugins that you created via a pull request!
+A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel free to add plugins that you created via a pull request!
 
 ## How to install plugins
 
 [Download the repository archive](https://github.com/pelican-dev/plugins/archive/refs/heads/main.zip) and extract the folders of the plugins you want to install to your panels `plugins` folder (`/var/www/pelican/plugins` by default). Finally, open your panel and head to the plugins page and click on "Install".
 
-## Plugin list
+## Plugins
 
-### [Announcements](/announcements) <sup><sub>by Boy132</sub></sup>
+- [Announcements](/announcements) - Create panel wide announcements to inform your users
+- [Billing](/billing) - Allows users to purchase servers via Stripe
+- [Generic OIDC Providers](/generic-oidc-providers) - Create generic OIDC providers for authentication
+- [Legal Pages](/legal-pages) - Adds legal pages (Imprint, Privacy Policy, ToS) to the panel
+- [MCLogs Uploader](/mclogs-uploader) - Upload console logs to mclo.gs
+- [Minecraft Modrinth](/minecraft-modrinth) - Download Minecraft mods & plugins from Modrinth
+- [Player Counter](/player-counter) - Show connected players count for game servers
+- [Register](/register) - Enable user self-registration on all panels
+- [Robo Avatars](/robo-avatars) - Adds RoboHash as avatar provider
+- [Rust uMod](/rust-umod) - Download Rust plugins from uMod
+- [Snowflakes](/snowflakes) - Adds CSS snowflakes to all panels
+- [Subdomains](/subdomains) - Create Cloudflare subdomains for servers
+- [Tawk.to Widget](/tawkto-widget) - Adds a Tawk.to live chat widget
+- [Theme Customizer](/theme-customizer) - Customize panel font and colors
+- [Tickets](/tickets) - Simple ticket system for user support
+- [User Creatable Servers](/user-creatable-servers) - Allow users to create their own servers
 
-Very simple announcements via AlertBanners.
+## Themes
 
-> [!WARNING]
-> Alert banners are currently bugged. See <https://github.com/pelican-dev/panel/issues/1492>
+- [Fluffy Theme](/fluffy-theme) - A super nice and super fluffy theme
+- [Pterodactyl Theme](/pterodactyl-theme) - Pterodactyl like colors and font
 
----
+## Language Packs
 
-### [Billing](/billing) <sup><sub>by Boy132</sub></sup>
-
-Allows admins to create products and users to buy them. Features automatic server creation and payment handling. Also adds a simple shop.
-
-> [!CAUTION]
-> This plugin is incomplete!
-
----
-
-### [Fluffy Theme](/fluffy-theme) <sup><sub>by Boy132</sub></sup>
-
-Simple "Theme" with silly colors and font.
-
----
-
-### [Generic OIDC Providers](/generic-oidc-providers) <sup><sub>by Boy132</sub></sup>
-
-Allows to create generic OIDC providers.
-
----
-
-### [Legal Pages](/legal-pages) <sup><sub>by Boy132</sub></sup>
-
-Adds some legal pages (like an Imprint) to the panel.
-
----
-
-### [Mclogs Uploader](/mclogs-uploader) <sup><sub>by Boy132</sub></sup>
-
-Adds a button to the console for uploading console logs to [mclo.gs](https://mclo.gs/).
-
----
-
-### [Minecraft Modrinth](/minecraft-modrinth) <sup><sub>by Boy132</sub></sup>
-
-Allows to easily download minecraft mods & plugins from modrinth.
-
-> [!IMPORTANT]
-> Add `modrinth_mods` or `modrinth_plugins` to the features of your egg to enable the mod/ plugins page. Also make sure your egg has the `minecraft` tag and a tag for the mod loader, e.g. `paper` or `forge` or `fabric`.
-
----
-
-### [Pirate Language](/pirate-language) <sup><sub>by Boy132</sub></sup>
-
-Adds a new Pirate like language to the panel.
-
-> [!WARNING]
-> Only the server pages, the Admin Dashboard, Profile page & Health page are currently translated.
-
----
-
-### [Player Counter](/player-counter) <sup><sub>by Boy132</sub></sup>
-
-Adds a simple player counter to the console and a player list page. Uses a [GameQ fork](https://github.com/krymosoftware/gameq).
-
-> [!IMPORTANT]
-> You need to have the bz2 php extension and zip/ 7zip installed!
-
-> [!IMPORTANT]
-> For Minecraft servers you need to set `enable-query` to true and the `query-port` to your server port! (in `server.properties`)
-
----
-
-### [Pterodactyl Theme](/pterodactyl-theme) <sup><sub>by Boy132</sub></sup>
-
-Simple "Theme" with Pterodactyl like colors and font.
-
----
-
-### [Register](/register) <sup><sub>by Boy132</sub></sup>
-
-Enables registration on all panels.
-
----
-
-### [Robo Avatars](/robo-avatars) <sup><sub>by Boy132</sub></sup>
-
-Adds [RoboHash](https://robohash.org/) as avatar provider.
-
----
-
-### [Rust uMod](/rust-umod) <sup><sub>by Boy132</sub></sup>
-
-Allows to easily download rust plugins from uMod.
-
----
-
-### [Snowflakes](/snowflakes) <sup><sub>by Boy132</sub></sup>
-
-Adds simple CSS snowflakes to all panels.
-
----
-
-### [Subdomains](/subdomains) <sup><sub>by Boy132</sub></sup>
-
-Allows users to create subdomains (on cloudflare) for their servers.
-
----
-
-### [Tawk.to Widget](/tawkto-widget) <sup><sub>by Boy132</sub></sup>
-
-Adds a Tawk.to widget to all panels.
-
----
-
-### [Theme Customizer](/theme-customizer) <sup><sub>by Boy132</sub></sup>
-
-Allows to customize the panel font and colors.
-
----
-
-### [Tickets](/tickets) <sup><sub>by Boy132</sub></sup>
-
-Allows users to create tickets (per server) and admins to answer them.
-
----
-
-### [User Creatable Servers](/user-creatable-servers) <sup><sub>by Boy132</sub></sup>
-
-Allows admins to assign resources to users. User can then create server themselves.
-
-> [!IMPORTANT]
-> Add `user_creatable_servers` as tag to the nodes that should be used for creating servers.
+- [Pirate Language](/pirate-language) - Turns yer site's lingo into pirate talk, matey!

@@ -26,7 +26,7 @@ enum LegalPageType: string implements HasLabel
 
     public function getUrl(): string
     {
-        return '/' . Str::slug($this->name);
+        return '/' . Str::slug($this->getId());
     }
 
     /** @return class-string */

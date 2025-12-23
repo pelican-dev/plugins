@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subdomains', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('name');
             $table->string('record_type')->default('A');
             $table->string('cloudflare_id')->nullable();
@@ -24,18 +24,10 @@ return new class extends Migration
 
             $table->unique(['name', 'domain_id']);
         });
-
-        Schema::table('servers', function (Blueprint $table) {
-            $table->unsignedInteger('subdomain_limit')->default(0)->after('backup_limit');
-        });
     }
 
     public function down(): void
     {
         Schema::dropIfExists('subdomains');
-
-        Schema::table('servers', function (Blueprint $table) {
-            $table->dropColumn('subdomain_limit');
-        });
     }
 };

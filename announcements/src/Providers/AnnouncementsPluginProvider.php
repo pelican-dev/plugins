@@ -10,6 +10,7 @@ class AnnouncementsPluginProvider extends ServiceProvider
     public function register(): void
     {
         Role::registerCustomDefaultPermissions('announcement');
+        Role::registerCustomModelIcon('announcement', 'tabler-speakerphone');
     }
 
     public function boot(): void {}

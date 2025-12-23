@@ -89,9 +89,10 @@ class UserResourceLimitsResource extends Resource
         return $schema
             ->components([
                 Select::make('user_id')
-                    ->label(trans_choice('user-creatable-serversreatableservers::strings.user', 1))
+                    ->label(trans_choice('user-creatable-servers::strings.user', 1))
                     ->required()
                     ->prefixIcon('tabler-user')
+                    ->unique()
                     ->relationship('user', 'username')
                     ->searchable(['username', 'email'])
                     ->getOptionLabelFromRecordUsing(fn (User $user) => "$user->username ($user->email)")
@@ -134,7 +135,7 @@ class UserResourceLimitsResource extends Resource
         return $schema
             ->components([
                 TextEntry::make('user.username')
-                    ->label(trans_choice('user-creatable-serversreatableservers::strings.user', 1))
+                    ->label(trans_choice('user-creatable-servers::strings.user', 1))
                     ->columnSpanFull(),
                 TextEntry::make('cpu')
                     ->label(trans('user-creatable-servers::strings.cpu'))

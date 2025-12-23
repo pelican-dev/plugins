@@ -15,7 +15,10 @@ class BillingPluginProvider extends ServiceProvider
         $this->app->bind(StripeClient::class, fn () => new StripeClient(config('billing.secret')));
 
         Role::registerCustomDefaultPermissions('customer');
+        Role::registerCustomModelIcon('customer', 'tabler-user-dollar');
+
         Role::registerCustomDefaultPermissions('product');
+        Role::registerCustomModelIcon('product', 'tabler-package');
     }
 
     public function boot(): void

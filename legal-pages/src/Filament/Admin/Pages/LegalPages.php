@@ -112,7 +112,7 @@ class LegalPages extends Page
             $data = $this->form->getState();
 
             foreach ($data as $legalPageType => $contents) {
-                LegalPagesPlugin::Save(LegalPageType::from($legalPageType), $contents);
+                LegalPagesPlugin::Save($legalPageType, $contents);
             }
 
             Notification::make()

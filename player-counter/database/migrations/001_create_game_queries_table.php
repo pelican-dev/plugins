@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('game_queries', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('query_type');
             $table->integer('query_port_offset')->nullable();
             $table->timestamps();

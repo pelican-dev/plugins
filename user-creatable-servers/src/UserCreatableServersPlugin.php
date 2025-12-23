@@ -57,6 +57,12 @@ class UserCreatableServersPlugin implements HasPluginSettings, Plugin
                 ->hintIconTooltip('If checked users can update the resource limits of theirs servers after creation.')
                 ->inline(false)
                 ->default(fn () => config('user-creatable-servers.can_users_update_servers')),
+            Toggle::make('can_users_delete_servers')
+                ->label('Can users delete servers?')
+                ->hintIcon('tabler-question-mark')
+                ->hintIconTooltip('If checked users can delete their own servers.')
+                ->inline(false)
+                ->default(fn () => config('user-creatable-servers.can_users_delete_servers')),
         ];
     }
 
@@ -66,7 +72,8 @@ class UserCreatableServersPlugin implements HasPluginSettings, Plugin
             'UCS_DEFAULT_DATABASE_LIMIT' => $data['database_limit'],
             'UCS_DEFAULT_ALLOCATION_LIMIT' => $data['allocation_limit'],
             'UCS_DEFAULT_BACKUP_LIMIT' => $data['backup_limit'],
-            'UCS_CAN_USERS_UPDATE_SERVERS' => $data['can_users_update_servers'],
+            'UCS_CAN_USERS_UPDATE_SERVERS' => $data['can_users_update_servers'] ? 'true' : 'false',
+            'UCS_CAN_USERS_DELETE_SERVERS' => $data['can_users_delete_servers'] ? 'true' : 'false',
         ]);
 
         Notification::make()

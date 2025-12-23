@@ -19,6 +19,7 @@ use Filament\Support\Markdown;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
 
 class TicketResource extends Resource
@@ -149,13 +150,28 @@ class TicketResource extends Resource
         return true;
     }
 
-    public static function canCreate(): bool
+    public static function getViewAnyAuthorizationResponse(): Response
     {
-        return true;
+        return Response::allow();
     }
 
     public static function canView(Model $record): bool
     {
         return true;
+    }
+
+    public static function getViewAuthorizationResponse(Model $record): Response
+    {
+        return Response::allow();
+    }
+
+    public static function canCreate(): bool
+    {
+        return true;
+    }
+
+    public static function getCreateAuthorizationResponse(): Response
+    {
+        return Response::allow();
     }
 }

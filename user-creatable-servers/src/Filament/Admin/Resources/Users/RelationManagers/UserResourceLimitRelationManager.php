@@ -2,9 +2,7 @@
 
 namespace Boy132\UserCreatableServers\Filament\Admin\Resources\Users\RelationManagers;
 
-use App\Models\User;
 use Boy132\UserCreatableServers\Filament\Admin\Resources\UserResourceLimits\UserResourceLimitsResource;
-use Boy132\UserCreatableServers\Models\UserResourceLimits;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -14,21 +12,11 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 class UserResourceLimitRelationManager extends RelationManager
 {
     protected static string $relationship = 'userResourceLimits';
-
-    public function getRelationship(): Relation|Builder
-    {
-        /** @var User $user */
-        $user = $this->getOwnerRecord();
-
-        return $user->hasMany(UserResourceLimits::class);
-    }
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {

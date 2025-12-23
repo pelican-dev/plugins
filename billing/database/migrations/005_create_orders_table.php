@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('stripe_checkout_id')->nullable();
             $table->string('stripe_payment_id')->nullable();
             $table->string('status')->default(OrderStatus::Pending);
