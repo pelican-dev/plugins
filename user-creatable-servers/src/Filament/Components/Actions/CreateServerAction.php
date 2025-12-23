@@ -92,20 +92,20 @@ class CreateServerAction extends Action
 
                 if ($exception instanceof NoViableNodeException) {
                     Notification::make()
-                        ->title('Could not create server')
-                        ->body('No viable node was found. Please contact the panel admin.')
+                        ->title(trans('user-creatable-servers::strings.notifications.server_creation_failed'))
+                        ->body(trans('user-creatable-servers::strings.notifications.no_viable_node_found'))
                         ->danger()
                         ->send();
                 } elseif ($exception instanceof NoViableAllocationException) {
                     Notification::make()
-                        ->title('Could not create server')
-                        ->body('No viable allocation was found. Please contact the panel admin.')
+                        ->title(trans('user-creatable-servers::strings.notifications.server_creation_failed'))
+                        ->body(trans('user-creatable-servers::strings.notifications.no_viable_allocation_found'))
                         ->danger()
                         ->send();
                 } else {
                     Notification::make()
-                        ->title('Could not create server')
-                        ->body('Unknown error. Please contact the panel admin.')
+                        ->title(trans('user-creatable-servers::strings.notifications.server_creation_failed'))
+                        ->body(trans('user-creatable-servers::strings.notifications.unknown_server_creation_error'))
                         ->danger()
                         ->send();
                 }

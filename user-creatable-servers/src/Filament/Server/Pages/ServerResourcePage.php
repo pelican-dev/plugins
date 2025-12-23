@@ -117,20 +117,20 @@ class ServerResourcePage extends ServerFormPage
             Action::make('delete_server')
                 ->visible(fn () => config('user-creatable-servers.can_users_delete_servers'))
                 ->authorize(fn () => $server->owner_id === auth()->user()->id || auth()->user()->can('delete server', $server))
-                ->label(trans('user-creatable-servers::strings.delete_server'))
+                ->label(trans('user-creatable-servers::strings.modals.delete_server'))
                 ->color('danger')
                 ->icon('tabler-trash')
                 ->requiresConfirmation()
-                ->modalHeading(trans('user-creatable-servers::strings.delete_server_confirm'))
-                ->modalDescription(trans('user-creatable-servers::strings.delete_server_warning'))
-                ->modalSubmitActionLabel(trans('user-creatable-servers::strings.delete_server'))
+                ->modalHeading(trans('user-creatable-servers::strings.modals.delete_server_confirm'))
+                ->modalDescription(trans('user-creatable-servers::strings.modals.delete_server_warning'))
+                ->modalSubmitActionLabel(trans('user-creatable-servers::strings.modals.delete_server'))
                 ->action(function (ServerDeletionService $service) use ($server) {
                     try {
                         $service->handle($server);
 
                         Notification::make()
-                            ->title(trans('user-creatable-servers::strings.server_deleted'))
-                            ->body(trans('user-creatable-servers::strings.server_deleted_success'))
+                            ->title(trans('user-creatable-servers::strings.notifications.server_deleted'))
+                            ->body(trans('user-creatable-servers::strings.notifications.server_deleted_success'))
                             ->success()
                             ->send();
 
@@ -139,7 +139,7 @@ class ServerResourcePage extends ServerFormPage
                         report($exception);
 
                         Notification::make()
-                            ->title(trans('user-creatable-servers::strings.server_delete_error'))
+                            ->title(trans('user-creatable-servers::strings.notifications.server_delete_error'))
                             ->body($exception->getMessage())
                             ->danger()
                             ->send();
@@ -168,15 +168,15 @@ class ServerResourcePage extends ServerFormPage
             $repository->setServer($server)->sync();
 
             Notification::make()
-                ->title('Server Resource Limits updated')
-                ->body('To fully use the new resource limits a server restart might be required.')
+                ->title(trans('user-creatable-servers::strings.notifications.server_resources_updated'))
+                ->body(trans('user-creatable-servers::strings.notifications.might_need_restart'))
                 ->success()
                 ->persistent()
                 ->send();
         } catch (ConnectionException) {
             Notification::make()
-                ->title('Server Resource Limits updated')
-                ->body('Please manually restart your server to apply the new resource limits.')
+                ->title(trans('user-creatable-servers::strings.notifications.server_resources_updated'))
+                ->body(trans('user-creatable-servers::strings.notifications.manual_restart_needed'))
                 ->warning()
                 ->persistent()
                 ->send();
