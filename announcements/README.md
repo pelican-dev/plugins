@@ -1,18 +1,9 @@
-# Announcements
+# Announcements (by Boy132)
 
 Create panel-wide announcements to inform your users about important updates, maintenance schedules, or any other information.
 
 > [!WARNING]
 > Alert banners are currently bugged. See https://github.com/pelican-dev/panel/issues/1492
-
-## Metadata
-
-| Property | Value |
-|----------|-------|
-| **ID** | `announcements` |
-| **Author** | Boy132 |
-| **Version** | 1.0.0 |
-| **Category** | Plugin |
 
 ## Features
 
@@ -21,7 +12,3 @@ Create panel-wide announcements to inform your users about important updates, ma
 - Target specific panels (admin, app, server) or display on all panels
 - Schedule announcements with valid from/to dates
 - Announcements are displayed as alert banners across the panel
-
-## Dependencies
-
-None
