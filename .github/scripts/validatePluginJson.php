@@ -32,30 +32,31 @@ function findPluginJsonFiles(string $dir): array
  * Validate a `plugin.json` file to ensure it does not contain a "meta" key.
  *
  * @param  string  $file  Path to the JSON file.
+ * @param  string  $relativePath  Relative path to the file for better output clarity.
  * @return string|null Error message if invalid, or null if valid.
  */
-function validateJsonFile(string $file): ?string
+function validateJsonFile(string $file, string $relativePath): ?string
 {
     $content = file_get_contents($file);
 
     if ($content === false) {
-        return "Failed to read $file.";
+        return "Failed to read $relativePath.";
     }
 
     $json = json_decode($content, true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
-        return "Invalid JSON in $file: " . json_last_error_msg();
+        return "Invalid JSON in $relativePath: " . json_last_error_msg();
     }
 
     if (array_key_exists('meta', $json)) {
-        return "$file contains a 'meta' key. Please remove it.";
+        return "$relativePath contains a 'meta' key. Please remove it.";
     }
 
     return null;
 }
 
-$root = __DIR__ . '/../../';
+$root = realpath(__DIR__ . '/../../');
 $pluginJsonFiles = findPluginJsonFiles($root);
 
 echo 'Found ' . count($pluginJsonFiles) . " plugin.json file(s) to validate.\n";
@@ -63,8 +64,10 @@ echo 'Found ' . count($pluginJsonFiles) . " plugin.json file(s) to validate.\n";
 $errors = [];
 
 foreach ($pluginJsonFiles as $file) {
-    echo "Validating $file...\n";
-    $error = validateJsonFile($file);
+    $relativePath = str_replace($root . DIRECTORY_SEPARATOR, '', $file);
+
+    echo "Validating $relativePath...\n";
+    $error = validateJsonFile($file, $relativePath);
 
     if ($error !== null) {
         $errors[] = $error;
