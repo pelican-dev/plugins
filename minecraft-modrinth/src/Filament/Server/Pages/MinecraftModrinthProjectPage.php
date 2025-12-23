@@ -6,6 +6,8 @@ use App\Filament\Server\Resources\Files\Pages\ListFiles;
 use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
 use App\Traits\Filament\BlockAccessInConflict;
+use Boy132\MinecraftModrinth\Enums\MinecraftLoader;
+use Boy132\MinecraftModrinth\Enums\ModrinthProjectType;
 use Boy132\MinecraftModrinth\Facades\MinecraftModrinth;
 use Exception;
 use Filament\Actions\Action;
@@ -41,7 +43,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return parent::canAccess() && MinecraftModrinth::getModrinthProjectType($server);
+        return parent::canAccess() && ModrinthProjectType::fromServer($server);
     }
 
     public static function getNavigationLabel(): string
@@ -49,7 +51,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return MinecraftModrinth::getModrinthProjectType($server)->getLabel();
+        return ModrinthProjectType::fromServer($server)->getLabel();
     }
 
     public static function getModelLabel(): string
@@ -151,7 +153,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                         ->visible(!is_null($primaryFile))
                                         ->action(function (DaemonFileRepository $fileRepository) use ($server, $versionData, $primaryFile) {
                                             try {
-                                                $fileRepository->setServer($server)->pull($primaryFile['url'], MinecraftModrinth::getModrinthProjectType($server)->getFolder());
+                                                $fileRepository->setServer($server)->pull($primaryFile['url'], ModrinthProjectType::fromServer($server)->getFolder());
 
                                                 Notification::make()
                                                     ->title('Download started')
@@ -181,10 +183,12 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         /** @var Server $server */
         $server = Filament::getTenant();
 
+        $folder = ModrinthProjectType::fromServer($server)->getFolder();
+
         return [
             Action::make('open_folder')
-                ->label(fn () => 'Open ' . MinecraftModrinth::getModrinthProjectType($server)->getFolder() . ' folder')
-                ->url(fn () => ListFiles::getUrl(['path' => MinecraftModrinth::getModrinthProjectType($server)->getFolder()]), true),
+                ->label(fn () => 'Open ' . $folder . ' folder')
+                ->url(fn () => ListFiles::getUrl(['path' => $folder]), true),
         ];
     }
 
@@ -201,13 +205,13 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             ->state(fn () => MinecraftModrinth::getMinecraftVersion($server) ?? 'Unknown')
                             ->badge(),
                         TextEntry::make('Loader')
-                            ->state(fn () => str(MinecraftModrinth::getMinecraftLoader($server) ?? 'Unknown')->title())
+                            ->state(fn () => MinecraftLoader::fromServer($server)?->getLabel() ?? 'Unknown')
                             ->badge(),
                         TextEntry::make('installed')
-                            ->label(fn () => 'Installed ' . MinecraftModrinth::getModrinthProjectType($server)->getLabel())
+                            ->label(fn () => 'Installed ' . ModrinthProjectType::fromServer($server)->getLabel())
                             ->state(function (DaemonFileRepository $fileRepository) use ($server) {
                                 try {
-                                    $files = $fileRepository->setServer($server)->getDirectory(MinecraftModrinth::getModrinthProjectType($server)->getFolder());
+                                    $files = $fileRepository->setServer($server)->getDirectory(ModrinthProjectType::fromServer($server)->getFolder());
 
                                     if (isset($files['error'])) {
                                         throw new Exception($files['error']);

@@ -3,6 +3,8 @@
 namespace Boy132\Subdomains\Providers;
 
 use App\Models\Role;
+use App\Models\Server;
+use Boy132\Subdomains\Models\Subdomain;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,5 +27,7 @@ class SubdomainsPluginProvider extends ServiceProvider
                 ->baseUrl('https://api.cloudflare.com/client/v4/')
                 ->throw()
         );
+
+        Server::resolveRelationUsing('subdomains', fn (Server $server) => $server->hasMany(Subdomain::class, 'server_id', 'id'));
     }
 }

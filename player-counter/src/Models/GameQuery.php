@@ -4,6 +4,7 @@ namespace Boy132\PlayerCounter\Models;
 
 use App\Models\Allocation;
 use App\Models\Egg;
+use Boy132\PlayerCounter\Enums\GameQueryType;
 use Exception;
 use GameQ\GameQ;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int $id
- * @property string $query_type
+ * @property GameQueryType $query_type
  * @property ?int $query_port_offset
  * @property Collection|Egg[] $eggs
  * @property int|null $eggs_count
@@ -28,11 +29,11 @@ class GameQuery extends Model
         'query_port_offset' => null,
     ];
 
-    protected static function booted(): void
+    protected function casts(): array
     {
-        static::saving(function (self $gameQuery) {
-            $gameQuery->query_type = mb_strtolower($gameQuery->query_type);
-        });
+        return [
+            'query_type' => GameQueryType::class,
+        ];
     }
 
     public function eggs(): BelongsToMany
@@ -51,7 +52,7 @@ class GameQuery extends Model
             $gameQ = new GameQ();
 
             $gameQ->addServer([
-                'type' => $this->query_type,
+                'type' => $this->query_type->value,
                 'host' => $host,
             ]);
 

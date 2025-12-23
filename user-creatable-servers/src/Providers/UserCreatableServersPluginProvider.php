@@ -7,9 +7,11 @@ use App\Enums\HeaderWidgetPosition;
 use App\Filament\Admin\Resources\Users\UserResource;
 use App\Filament\App\Resources\Servers\Pages\ListServers;
 use App\Models\Role;
+use App\Models\User;
 use Boy132\UserCreatableServers\Filament\Admin\Resources\Users\RelationManagers\UserResourceLimitRelationManager;
 use Boy132\UserCreatableServers\Filament\App\Widgets\UserResourceLimitsOverview;
 use Boy132\UserCreatableServers\Filament\Components\Actions\CreateServerAction;
+use Boy132\UserCreatableServers\Models\UserResourceLimits;
 use Illuminate\Support\ServiceProvider;
 
 class UserCreatableServersPluginProvider extends ServiceProvider
@@ -26,5 +28,8 @@ class UserCreatableServersPluginProvider extends ServiceProvider
         Role::registerCustomModelIcon('userResourceLimits', 'tabler-cube-plus');
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+        User::resolveRelationUsing('userResourceLimits', fn (User $user) => $user->belongsTo(UserResourceLimits::class, 'id', 'user_id'));
+    }
 }

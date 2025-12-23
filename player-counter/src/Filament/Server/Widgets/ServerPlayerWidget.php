@@ -5,7 +5,6 @@ namespace Boy132\PlayerCounter\Filament\Server\Widgets;
 use App\Filament\Server\Components\SmallStatBlock;
 use App\Models\Server;
 use Boy132\PlayerCounter\Models\GameQuery;
-use Boy132\PlayerCounter\PlayerCounterPlugin;
 use Filament\Facades\Filament;
 use Filament\Widgets\StatsOverviewWidget;
 
@@ -18,7 +17,7 @@ class ServerPlayerWidget extends StatsOverviewWidget
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return !$server->isInConflictState() && $server->allocation && PlayerCounterPlugin::getGameQuery($server)->exists() && !$server->retrieveStatus()->isOffline();
+        return !$server->isInConflictState() && $server->allocation && $server->egg->gameQuery()->exists() && !$server->retrieveStatus()->isOffline();
     }
 
     protected function getStats(): array
@@ -27,7 +26,7 @@ class ServerPlayerWidget extends StatsOverviewWidget
         $server = Filament::getTenant();
 
         /** @var ?GameQuery $gameQuery */
-        $gameQuery = PlayerCounterPlugin::getGameQuery($server)->first();
+        $gameQuery = $server->egg->gameQuery;
 
         if (!$gameQuery) {
             return [];

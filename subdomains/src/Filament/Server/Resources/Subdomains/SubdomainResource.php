@@ -8,7 +8,6 @@ use App\Traits\Filament\HasLimitBadge;
 use Boy132\Subdomains\Filament\Server\Resources\Subdomains\Pages\ListSubdomains;
 use Boy132\Subdomains\Models\CloudflareDomain;
 use Boy132\Subdomains\Models\Subdomain;
-use Boy132\Subdomains\SubdomainsPlugin;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -61,7 +60,7 @@ class SubdomainResource extends Resource
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return SubdomainsPlugin::getSubdomains($server)->count();
+        return $server->subdomains->count();
     }
 
     protected static function getBadgeLimit(): int

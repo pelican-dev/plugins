@@ -2,6 +2,7 @@
 
 namespace Boy132\PlayerCounter\Filament\Admin\Resources\GameQueries;
 
+use Boy132\PlayerCounter\Enums\GameQueryType;
 use Boy132\PlayerCounter\Filament\Admin\Resources\GameQueries\Pages\ManageGameQueries;
 use Boy132\PlayerCounter\Models\GameQuery;
 use Filament\Actions\DeleteAction;
@@ -72,9 +73,13 @@ class GameQueryResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('query_type')
+                Select::make('query_type')
                     ->label(trans('player-counter::query.type'))
-                    ->required(),
+                    ->required()
+                    ->options(GameQueryType::class)
+                    ->selectablePlaceholder(false)
+                    ->preload()
+                    ->searchable(),
                 TextInput::make('query_port_offset')
                     ->label(trans('player-counter::query.port_offset'))
                     ->placeholder(trans('player-counter::query.no_offset'))

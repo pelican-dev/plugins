@@ -7,7 +7,6 @@ use App\Repositories\Daemon\DaemonFileRepository;
 use App\Traits\Filament\BlockAccessInConflict;
 use Boy132\PlayerCounter\Filament\Server\Widgets\ServerPlayerWidget;
 use Boy132\PlayerCounter\Models\GameQuery;
-use Boy132\PlayerCounter\PlayerCounterPlugin;
 use Carbon\CarbonInterval;
 use Exception;
 use Filament\Actions\Action;
@@ -41,7 +40,7 @@ class PlayersPage extends Page implements HasTable
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return parent::canAccess() && $server->allocation && PlayerCounterPlugin::getGameQuery($server)->exists();
+        return parent::canAccess() && $server->allocation && $server->egg->gameQuery()->exists();
     }
 
     public static function getNavigationLabel(): string
@@ -73,9 +72,9 @@ class PlayersPage extends Page implements HasTable
         $server = Filament::getTenant();
 
         /** @var ?GameQuery $gameQuery */
-        $gameQuery = PlayerCounterPlugin::getGameQuery($server)->first();
+        $gameQuery = $server->egg->gameQuery;
 
-        $isMinecraft = $gameQuery?->query_type === 'minecraft';
+        $isMinecraft = $gameQuery?->query_type->isMinecraft();
 
         $whitelist = [];
         $ops = [];
@@ -106,7 +105,7 @@ class PlayersPage extends Page implements HasTable
                 $players = [];
 
                 /** @var ?GameQuery $gameQuery */
-                $gameQuery = PlayerCounterPlugin::getGameQuery($server)->first();
+                $gameQuery = $server->egg->gameQuery;
 
                 if ($gameQuery) {
                     $data = $gameQuery->runQuery($server->allocation);
