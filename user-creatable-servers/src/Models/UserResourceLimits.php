@@ -32,8 +32,6 @@ class UserResourceLimits extends Model
         'server_limit',
     ];
 
-    protected $with = ['user'];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -42,8 +40,7 @@ class UserResourceLimits extends Model
     public function getCpuLeft(): ?int
     {
         if ($this->cpu > 0) {
-            $user = $this->user;
-            $sum_cpu = $user->servers()->sum('cpu');
+            $sum_cpu = $this->user->servers()->sum('cpu');
 
             return max(0, $this->cpu - $sum_cpu);
         }
@@ -54,12 +51,7 @@ class UserResourceLimits extends Model
     public function getMemoryLeft(): ?int
     {
         if ($this->memory > 0) {
-            $user = $this->user;
-            if (!$user) {
-                return 0;
-            }
-
-            $sum_memory = $user->servers()->sum('memory');
+            $sum_memory = $this->user->servers()->sum('memory');
 
             return max(0, $this->memory - $sum_memory);
         }
@@ -70,12 +62,7 @@ class UserResourceLimits extends Model
     public function getDiskLeft(): ?int
     {
         if ($this->disk > 0) {
-            $user = $this->user;
-            if (!$user) {
-                return 0;
-            }
-
-            $sum_disk = $user->servers()->sum('disk');
+            $sum_disk = $this->user->servers()->sum('disk');
 
             return max(0, $this->disk - $sum_disk);
         }
@@ -85,12 +72,7 @@ class UserResourceLimits extends Model
 
     public function canCreateServer(int $cpu, int $memory, int $disk): bool
     {
-        $user = $this->user;
-        if (!$user) {
-            return false;
-        }
-
-        if ($this->server_limit && $user->servers()->count() >= $this->server_limit) {
+        if ($this->server_limit && $this->user->servers()->count() >= $this->server_limit) {
             return false;
         }
 
@@ -99,7 +81,7 @@ class UserResourceLimits extends Model
                 return false;
             }
 
-            $sum_cpu = $user->servers()->sum('cpu');
+            $sum_cpu = $this->user->servers()->sum('cpu');
             if ($sum_cpu + $cpu > $this->cpu) {
                 return false;
             }
@@ -110,7 +92,7 @@ class UserResourceLimits extends Model
                 return false;
             }
 
-            $sum_memory = $user->servers()->sum('memory');
+            $sum_memory = $this->user->servers()->sum('memory');
             if ($sum_memory + $memory > $this->memory) {
                 return false;
             }
@@ -121,7 +103,7 @@ class UserResourceLimits extends Model
                 return false;
             }
 
-            $sum_disk = $user->servers()->sum('disk');
+            $sum_disk = $this->user->servers()->sum('disk');
             if ($sum_disk + $disk > $this->disk) {
                 return false;
             }

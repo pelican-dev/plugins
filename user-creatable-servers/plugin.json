@@ -11,9 +11,5 @@
     "class": "UserCreatableServersPlugin",
     "panels": null,
     "panel_version": null,
-    "composer_packages": null,
-    "meta": {
-        "status": "enabled",
-        "status_message": null
-    }
+    "composer_packages": null
 }
