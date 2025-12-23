@@ -72,7 +72,7 @@ class UserResourceLimits extends Model
 
     public function canCreateServer(int $cpu, int $memory, int $disk): bool
     {
-        if ($this->server_limit && $this->user->servers()->count() >= $this->server_limit) {
+        if ($this->server_limit && $this->user->servers->count() >= $this->server_limit) {
             return false;
         }
 
