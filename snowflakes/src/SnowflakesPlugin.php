@@ -27,49 +27,49 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
     {
         $schema = [
             Slider::make('SNOWFLAKES_SIZE')
+                ->label(trans('snowflakes::strings.size'))
                 ->range(minValue: 0.5, maxValue: 4)
                 ->decimalPlaces(1)
                 ->step(0.1)
-                ->label('Size')
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('Size of the snowflakes.')
+                ->hintIconTooltip(trans('snowflakes::strings.size_help'))
                 ->default(fn () => config('snowflakes.size')),
             Slider::make('SNOWFLAKES_SPEED')
-                ->label('Speed')
+                ->label(trans('snowflakes::strings.speed'))
                 ->range(minValue: 0.5, maxValue: 3)
                 ->decimalPlaces(1)
                 ->step(0.1)
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('Speed of the snowflakes falling.')
+                ->hintIconTooltip(trans('snowflakes::strings.speed_help'))
                 ->default(fn () => config('snowflakes.speed')),
             Slider::make('SNOWFLAKES_OPACITY')
-                ->label('Opacity')
+                ->label(trans('snowflakes::strings.opacity'))
                 ->range(minValue: 0.1, maxValue: 1)
                 ->decimalPlaces(1)
                 ->step(0.1)
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('How well can you see through the snowflakes.')
+                ->hintIconTooltip(trans('snowflakes::strings.opacity_help'))
                 ->default(fn () => config('snowflakes.opacity')),
             Slider::make('SNOWFLAKES_DENSITY')
-                ->label('Density')
+                ->label(trans('snowflakes::strings.density'))
                 ->range(minValue: 0.5, maxValue: 10)
                 ->decimalPlaces(1)
                 ->step(0.1)
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('Page density of the snowflakes. More density, more snowflakes.')
+                ->hintIconTooltip(trans('snowflakes::strings.density_help'))
                 ->default(fn () => config('snowflakes.density')),
             Slider::make('SNOWFLAKES_QUALITY')
-                ->label('Quality')
+                ->label(trans('snowflakes::strings.quality'))
                 ->range(minValue: 0.1, maxValue: 1)
                 ->decimalPlaces(1)
                 ->step(0.1)
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('Higher quality may impact performance on some devices.')
+                ->hintIconTooltip(trans('snowflakes::strings.quality_help'))
                 ->default(fn () => config('snowflakes.quality')),
         ];
 
@@ -85,7 +85,7 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
         $this->writeToEnvironment($data);
 
         Notification::make()
-            ->title('Settings saved')
+            ->title(trans('admin/setting.save_success'))
             ->success()
             ->send();
     }
