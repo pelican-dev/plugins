@@ -1,0 +1,17 @@
+{
+    "id": "arma-reforger-workshop",
+    "name": "Arma Reforger Workshop",
+    "author": "spolny",
+    "version": "1.0.0",
+    "description": "Manage Arma Reforger workshop mods in server config",
+    "category": "plugin",
+    "url": "https://github.com/pelican-dev/plugins/tree/main/arma-reforger-workshop",
+    "update_url": null,
+    "namespace": "spolny\\ArmaReforgerWorkshop",
+    "class": "ArmaReforgerWorkshopPlugin",
+    "panels": [
+        "server"
+    ],
+    "panel_version": null,
+    "composer_packages": null
+}
