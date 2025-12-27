@@ -51,40 +51,33 @@ class UploadLogsAction extends Action
                 $logs = is_array($logs) ? implode(PHP_EOL, $logs) : $logs;
 
                 $apiKey = config('pastefox-share.api_key');
-                $hasApiKey = !empty($apiKey);
+				$hasApiKey = filled($apiKey);
+				
+				$headers = ['Content-Type' => 'application/json'];
 
-                // Build request payload
                 $payload = [
                     'content' => $logs,
-                    'title' => 'Console Logs: '.$server->name.' - '.now()->format('Y-m-d H:i:s'),
+                    'title' => 'Console Logs: ' . $server->name . ' - ' . now()->format('Y-m-d H:i:s'),
                     'language' => 'log',
-                    'effect' => config('pastefox-share.effect', 'NONE'),
-                    'theme' => config('pastefox-share.theme', 'dark'),
+                    'effect' => config('pastefox-share.effect'),
+                    'theme' => config('pastefox-share.theme'),
                 ];
 
-                // Only add these options if API key is present
                 if ($hasApiKey) {
-                    $payload['visibility'] = config('pastefox-share.visibility', 'PUBLIC');
+                    $headers['X-API-Key'] = $apiKey;
+                    $payload['visibility'] = config('pastefox-share.visibility');
 
                     $password = config('pastefox-share.password');
-                    if (!empty($password)) {
+                    if (filled($password)) {
                         $payload['password'] = $password;
                     }
                 }
 
-                // Build HTTP request
-                $request = Http::withHeaders(['Content-Type' => 'application/json'])
-                    ->timeout(30)
-                    ->connectTimeout(5);
-
-                // Add API key header if available
-                if ($hasApiKey) {
-                    $request = $request->withHeaders(['X-API-Key' => $apiKey]);
-                }
-
-                $response = $request
-                    ->throw()
+                $response = Http::withHeaders($headers)
                     ->post('https://pastefox.com/api/pastes', $payload)
+                    ->timeout(30)
+                    ->connectTimeout(5)
+                    ->throw()
                     ->json();
 
                 if ($response['success']) {
