@@ -21,7 +21,7 @@ See all servers in a folder with live resource monitoring (CPU, Memory, Disk) - 
 
 ## Installation
 
-1. Download the latest release ZIP file from the [Releases](https://github.com/FlexKleks/server-folders/releases) page
+1. Download the latest release ZIP file from the [Releases](https://github.com/FlexKleks/PelicanPlugins/releases) page
 2. Go to your Pelican Panel admin area
 3. Navigate to **Admin → Plugins**
 4. Click **"Import file"**
@@ -178,5 +178,5 @@ Created by [FlexKleks](https://github.com/FlexKleks)
 
 ## Support
 
-- [GitHub Issues](https://github.com/FlexKleks/server-folders/issues)
+- [GitHub Issues](https://github.com/FlexKleks/PelicanPlugins/issues)
 - [Pelican Discord](https://discord.gg/pelican-panel)

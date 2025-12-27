@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Share console logs via pastefox.com",
     "category": "plugin",
-    "url": "https://github.com/FlexKleks/PelicanPasteFox",
+    "url": "https://github.com/FlexKleks/PelicanPlugins",
     "update_url": null,
     "namespace": "FlexKleks\\PasteFoxShare",
     "class": "PasteFoxSharePlugin",
