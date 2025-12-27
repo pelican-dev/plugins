@@ -17,6 +17,8 @@ return [
     'cpu' => 'CPU',
     'memory' => 'Memory',
     'disk' => 'Disk',
+    'shared' => 'Shared',
+    'owner' => 'Owner',
 
     // Actions
     'add_server' => 'Add Server',
@@ -27,6 +29,14 @@ return [
     'create_folder' => 'Create Folder',
     'save' => 'Save',
     'cancel' => 'Cancel',
+
+    // Sharing
+    'share_folder' => 'Share Folder',
+    'share_folder_hint' => 'Allow users with specific roles to view this folder',
+    'shared_with_roles' => 'Share with Roles',
+    'shared_with_roles_hint' => 'Select which roles can view this folder and its servers',
+    'shared_folder' => 'Shared Folder',
+    'private_folder' => 'Private Folder',
 
     // Empty States
     'no_folders' => 'No folders yet',
@@ -41,6 +51,7 @@ return [
     'folder_deleted' => 'Folder deleted successfully',
     'server_added' => 'Server added to folder',
     'server_removed' => 'Server removed from folder',
+    'no_permission' => 'You do not have permission to do this',
 
     // Confirmations
     'confirm_remove' => 'Are you sure you want to remove this server from the folder?',

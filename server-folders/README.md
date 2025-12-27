@@ -1,11 +1,11 @@
 # Server Folders
 
-A plugin for [Pelican Panel](https://pelican.dev) that allows users to organize their servers into custom folders.
+A plugin for [Pelican Panel](https://pelican.dev) that allows users to organize their servers into custom folders with role-based sharing.
 
 ## Features
 
 - **Create Custom Folders** - Organize your servers into named folders with custom colors
-- **Drag & Drop Organization** - Easily add or remove servers from folders
+- **Role-Based Sharing** - Share folders with specific user roles so team members can view them
 - **Sidebar Navigation** - Quick access to folders directly from the sidebar with server count badges
 - **Live Server Stats** - View real-time CPU, Memory, and Disk usage for all servers in a folder
 - **Color Coding** - Assign colors to folders for easy visual identification
@@ -14,7 +14,7 @@ A plugin for [Pelican Panel](https://pelican.dev) that allows users to organize 
 ## Screenshots
 
 ### Folder List
-View all your folders with server counts in the sidebar navigation.
+View all your folders with server counts in the sidebar navigation. Shared folders show a different icon.
 
 ### Folder View
 See all servers in a folder with live resource monitoring (CPU, Memory, Disk) - identical to the main server list.
@@ -38,8 +38,9 @@ php artisan migrate
 ```
 
 This creates the necessary database tables:
-- `server_folders` - Stores folder information (name, color, user)
+- `server_folders` - Stores folder information (name, color, user, sharing settings)
 - `server_folder_server` - Links servers to folders (many-to-many relationship)
+- `server_folder_role` - Links folders to roles for sharing (many-to-many relationship)
 
 ### Clear Cache
 
@@ -80,6 +81,16 @@ php artisan view:clear
 3. Modify the name or color
 4. Click **"Save"**
 
+### Sharing a Folder with Roles
+
+1. Open the folder you want to share
+2. Click **"Edit"** in the top right
+3. Enable **"Share Folder"**
+4. Select the roles that should have access
+5. Click **"Save"**
+
+Users with the selected roles will now see this folder in their sidebar and can view the servers inside. Only the folder owner can edit or delete the folder.
+
 ### Deleting a Folder
 
 1. Open the folder
@@ -110,9 +121,16 @@ Stats update automatically every 15 seconds.
 
 ## Permissions
 
-- Users can only see and manage their own folders
+- Users can create and manage their own folders
 - Users can only add servers they have access to
-- Folder data is isolated per user
+- Folder owners can share folders with specific roles
+- Users with matching roles can view shared folders (read-only)
+- Only the folder owner can edit, delete, or add/remove servers
+
+### Shared Folder Icons
+
+- 📁 **Filled folder** - Your own folder
+- 📂 **Shared folder** - Folder shared with you by another user
 
 ## File Structure
 
@@ -122,7 +140,8 @@ server-folders/
 │   └── server-folders.php
 ├── database/
 │   └── migrations/
-│       └── 2024_12_27_000001_create_server_folders_table.php
+│       ├── 2024_12_27_000001_create_server_folders_table.php
+│       └── 2024_12_27_000002_add_shared_roles_to_server_folders.php
 ├── lang/
 │   ├── en/
 │   │   └── messages.php
@@ -163,6 +182,9 @@ Make sure you ran `php artisan migrate` after installing the plugin.
 
 ### Servers not displaying correctly
 Run `php artisan view:clear` to clear cached views.
+
+### Shared folders not visible
+Make sure the user has a role that was selected when sharing the folder.
 
 ## Contributing
 

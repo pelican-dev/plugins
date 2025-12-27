@@ -17,6 +17,8 @@ return [
     'cpu' => 'CPU',
     'memory' => 'Arbeitsspeicher',
     'disk' => 'Speicher',
+    'shared' => 'Geteilt',
+    'owner' => 'Besitzer',
 
     // Actions
     'add_server' => 'Server hinzufügen',
@@ -27,6 +29,14 @@ return [
     'create_folder' => 'Ordner erstellen',
     'save' => 'Speichern',
     'cancel' => 'Abbrechen',
+
+    // Sharing
+    'share_folder' => 'Ordner teilen',
+    'share_folder_hint' => 'Erlaube Benutzern mit bestimmten Rollen, diesen Ordner zu sehen',
+    'shared_with_roles' => 'Mit Rollen teilen',
+    'shared_with_roles_hint' => 'Wähle aus, welche Rollen diesen Ordner und seine Server sehen können',
+    'shared_folder' => 'Geteilter Ordner',
+    'private_folder' => 'Privater Ordner',
 
     // Empty States
     'no_folders' => 'Noch keine Ordner',
@@ -41,6 +51,7 @@ return [
     'folder_deleted' => 'Ordner erfolgreich gelöscht',
     'server_added' => 'Server zum Ordner hinzugefügt',
     'server_removed' => 'Server aus Ordner entfernt',
+    'no_permission' => 'Du hast keine Berechtigung dafür',
 
     // Confirmations
     'confirm_remove' => 'Möchtest du diesen Server wirklich aus dem Ordner entfernen?',
