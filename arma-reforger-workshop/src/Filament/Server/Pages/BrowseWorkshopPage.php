@@ -5,7 +5,6 @@ namespace spolny\ArmaReforgerWorkshop\Filament\Server\Pages;
 use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
 use App\Traits\Filament\BlockAccessInConflict;
-use spolny\ArmaReforgerWorkshop\Facades\ArmaReforgerWorkshop;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -20,6 +19,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Pagination\LengthAwarePaginator;
+use spolny\ArmaReforgerWorkshop\Facades\ArmaReforgerWorkshop;
 
 class BrowseWorkshopPage extends Page implements HasTable
 {

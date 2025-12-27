@@ -6,8 +6,6 @@ use App\Filament\Server\Resources\Files\Pages\ListFiles;
 use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
 use App\Traits\Filament\BlockAccessInConflict;
-use spolny\ArmaReforgerWorkshop\Facades\ArmaReforgerWorkshop;
-use spolny\ArmaReforgerWorkshop\Services\ArmaReforgerWorkshopService;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -23,6 +21,8 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Pagination\LengthAwarePaginator;
+use spolny\ArmaReforgerWorkshop\Facades\ArmaReforgerWorkshop;
+use spolny\ArmaReforgerWorkshop\Services\ArmaReforgerWorkshopService;
 
 class ArmaReforgerWorkshopPage extends Page implements HasTable
 {
@@ -85,6 +85,7 @@ class ArmaReforgerWorkshopPage extends Page implements HasTable
                 // Enrich with workshop details
                 $enrichedMods = collect($mods)->map(function ($mod) {
                     $details = ArmaReforgerWorkshop::getModDetails($mod['modId']);
+
                     // Merge details into mod, with details taking priority
                     return array_merge($mod, $details);
                 })->toArray();
@@ -271,9 +272,11 @@ class ArmaReforgerWorkshopPage extends Page implements HasTable
                                 try {
                                     /** @var DaemonFileRepository $fileRepository */
                                     $fileRepository = app(DaemonFileRepository::class);
+
                                     return count(ArmaReforgerWorkshop::getInstalledMods($server, $fileRepository));
                                 } catch (Exception $exception) {
                                     report($exception);
+
                                     return 'Unknown';
                                 }
                             })

@@ -4,8 +4,8 @@ namespace spolny\ArmaReforgerWorkshop\Facades;
 
 use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
-use spolny\ArmaReforgerWorkshop\Services\ArmaReforgerWorkshopService;
 use Illuminate\Support\Facades\Facade;
+use spolny\ArmaReforgerWorkshop\Services\ArmaReforgerWorkshopService;
 
 /**
  * @method static bool isArmaReforgerServer(Server $server)

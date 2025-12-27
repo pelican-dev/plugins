@@ -50,6 +50,7 @@ class ArmaReforgerWorkshopService
                 ->toArray();
         } catch (Exception $exception) {
             report($exception);
+
             return [];
         }
     }
@@ -117,6 +118,7 @@ class ArmaReforgerWorkshopService
             return true;
         } catch (Exception $exception) {
             report($exception);
+
             return false;
         }
     }
@@ -148,6 +150,7 @@ class ArmaReforgerWorkshopService
             return true;
         } catch (Exception $exception) {
             report($exception);
+
             return false;
         }
     }
@@ -209,6 +212,7 @@ class ArmaReforgerWorkshopService
                 return array_filter($details, fn ($v) => $v !== null);
             } catch (Exception $exception) {
                 report($exception);
+
                 return ['modId' => $modId];
             }
         });
@@ -221,7 +225,7 @@ class ArmaReforgerWorkshopService
      */
     public function browseWorkshop(string $search = '', int $page = 1): array
     {
-        $cacheKey = "arma_reforger_browse:" . md5($search) . ":$page";
+        $cacheKey = 'arma_reforger_browse:' . md5($search) . ":$page";
 
         return cache()->remember($cacheKey, now()->addMinutes(15), function () use ($search, $page) {
             try {
@@ -279,6 +283,7 @@ class ArmaReforgerWorkshopService
                 ];
             } catch (Exception $exception) {
                 report($exception);
+
                 return ['mods' => [], 'total' => 0, 'page' => $page, 'perPage' => 24];
             }
         });
