@@ -1,0 +1,24 @@
+<?php
+
+return [
+    'nav_title' => 'Users',
+    'model_label' => 'User',
+    'model_label_plural' => 'Users',
+    'self_delete' => 'Can\'t Delete Yerself',
+    'has_servers' => 'Pirate Has Ships',
+    'email' => 'Email',
+    'username' => 'Username',
+    'password' => 'Password',
+    'external_id' => 'External ID',
+    'is_managed_externally' => 'Be managed externally?',
+    'is_managed_externally_helper' => 'If yer users be managed by external software (e.g. a billin\' software) ye may enable this to prevent users from changin\' their username, e-mail and password from within the panel.',
+    'password_help' => 'Providin\' a user password be optional. New user email will prompt users to create a password the first time they login.',
+    'admin_roles' => 'Admin Roles',
+    'roles' => 'Roles',
+    'no_roles' => 'No Roles',
+    'servers' => 'Ships',
+    'subusers' => 'Crew Members',
+    'password_reset' => 'Reset Password',
+    'password_reset_sent' => 'Password Reset E-Mail Sent',
+    'password_reset_failed' => 'Failed to Send Password Reset E-Mail',
+];

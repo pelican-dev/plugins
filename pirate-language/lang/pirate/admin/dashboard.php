@@ -23,10 +23,10 @@ return [
             'content' => 'Ye be sailin\' with :version. Yer panel be all up-to-date, savvy!',
         ],
         'intro-first-node' => [
-            'heading' => 'No Nodes Spotted on the Horizon',
-            'content' => "Looks like ye ain't got any Nodes charted yet, but fret not — just click the action button to craft yer first one, matey!",
+            'heading' => 'No Harbors Spotted on the Horizon',
+            'content' => "Looks like ye ain't got any Harbors charted yet, but fret not — just click the action button to craft yer first one, matey!",
             'extra_note' => 'If ye be runnin\' into troubles, send word to GitHub.',
-            'button_label' => 'Forge yer First Node in Pelican',
+            'button_label' => 'Build yer First Harbor in Pelican',
         ],
         'intro-support' => [
             'heading' => 'Lend a Hand to Pelican',
