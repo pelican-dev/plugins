@@ -359,7 +359,7 @@ class ArmaReforgerWorkshopPage extends Page implements HasTable
             Action::make('open_config')
                 ->label('Edit Config')
                 ->icon('tabler-file-settings')
-                ->url(fn () => ListFiles::getUrl(['path' => dirname(ArmaReforgerWorkshop::getConfigPath($server)) ?: '/']), true),
+                ->url(fn () => ListFiles::getUrl(['path' => rtrim(dirname(ArmaReforgerWorkshop::getConfigPath($server)), '.') ?: '/']), true),
         ];
     }
 
