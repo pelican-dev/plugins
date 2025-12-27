@@ -92,7 +92,7 @@ class UploadLogsAction extends Action
 
                     $body = $url;
                     if (!$hasApiKey) {
-                    $body .= "\n".trans('pastefox-share::messages.expires_7_days');
+                        $body .= "\n".trans('pastefox-share::messages.expires_7_days');
                     }
 
                     Notification::make()
