@@ -7,6 +7,7 @@ use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
 use App\Traits\Filament\BlockAccessInConflict;
 use Exception;
+use Illuminate\Support\Facades\Http;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
@@ -82,13 +83,18 @@ class ArmaReforgerWorkshopPage extends Page implements HasTable
 
                 $mods = ArmaReforgerWorkshop::getInstalledMods($server, $fileRepository);
 
-                // Enrich with workshop details
-                $enrichedMods = collect($mods)->map(function ($mod) {
-                    $details = ArmaReforgerWorkshop::getModDetails($mod['modId']);
+                // Enrich with workshop details using concurrent requests for non-cached mods
+                $enrichedMods = $this->enrichModsWithDetails($mods);
 
-                    // Merge details into mod, with details taking priority
-                    return array_merge($mod, $details);
-                })->toArray();
+                // Apply client-side search filtering
+                if ($search) {
+                    $searchLower = strtolower($search);
+                    $enrichedMods = array_filter($enrichedMods, function ($mod) use ($searchLower) {
+                        return str_contains(strtolower($mod['name'] ?? ''), $searchLower)
+                            || str_contains(strtolower($mod['modId'] ?? ''), $searchLower);
+                    });
+                    $enrichedMods = array_values($enrichedMods);
+                }
 
                 $perPage = 20;
                 $offset = ($page - 1) * $perPage;
@@ -171,6 +177,110 @@ class ArmaReforgerWorkshopPage extends Page implements HasTable
                         }
                     }),
             ]);
+    }
+
+    /**
+     * Enrich mods with workshop details, using concurrent requests for uncached mods.
+     *
+     * @param  array<int, array{modId: string, name: string, version: string}>  $mods
+     * @return array<int, array<string, mixed>>
+     */
+    protected function enrichModsWithDetails(array $mods): array
+    {
+        $cachePrefix = 'arma_reforger_mod:';
+        $cacheTtl = now()->addHours(6);
+
+        // Separate cached and uncached mods
+        $cachedDetails = [];
+        $uncachedMods = [];
+
+        foreach ($mods as $index => $mod) {
+            $cacheKey = $cachePrefix . $mod['modId'];
+            $cached = cache()->get($cacheKey);
+
+            if ($cached !== null) {
+                $cachedDetails[$index] = $cached;
+            } else {
+                $uncachedMods[$index] = $mod;
+            }
+        }
+
+        // Fetch uncached mod details concurrently
+        if (!empty($uncachedMods)) {
+            $workshopUrl = ArmaReforgerWorkshopService::WORKSHOP_URL;
+
+            $responses = Http::pool(function ($pool) use ($uncachedMods, $workshopUrl) {
+                $requests = [];
+                foreach ($uncachedMods as $index => $mod) {
+                    $requests[$index] = $pool->as((string) $index)
+                        ->timeout(10)
+                        ->connectTimeout(5)
+                        ->get($workshopUrl . '/' . $mod['modId']);
+                }
+
+                return $requests;
+            });
+
+            foreach ($uncachedMods as $index => $mod) {
+                $response = $responses[(string) $index] ?? null;
+                $details = $this->parseModDetailsFromResponse($response, $mod['modId']);
+
+                // Cache the result
+                cache()->put($cachePrefix . $mod['modId'], $details, $cacheTtl);
+                $cachedDetails[$index] = $details;
+            }
+        }
+
+        // Merge details with original mods
+        return collect($mods)->map(function ($mod, $index) use ($cachedDetails) {
+            $details = $cachedDetails[$index] ?? ['modId' => $mod['modId']];
+
+            return array_merge($mod, $details);
+        })->toArray();
+    }
+
+    /**
+     * Parse mod details from HTTP response.
+     *
+     * @return array<string, mixed>
+     */
+    protected function parseModDetailsFromResponse($response, string $modId): array
+    {
+        try {
+            if (!$response || !$response->successful()) {
+                return ['modId' => $modId];
+            }
+
+            $html = $response->body();
+            $details = ['modId' => $modId];
+
+            // Extract data from __NEXT_DATA__ JSON
+            if (preg_match('/<script[^>]*id="__NEXT_DATA__"[^>]*>(.+?)<\/script>/s', $html, $jsonMatch)) {
+                $jsonData = json_decode($jsonMatch[1], true);
+
+                if ($jsonData && isset($jsonData['props']['pageProps']['asset'])) {
+                    $asset = $jsonData['props']['pageProps']['asset'];
+
+                    $details['name'] = $asset['name'] ?? null;
+                    $details['version'] = $asset['currentVersionNumber'] ?? null;
+                    $details['subscribers'] = $asset['subscriberCount'] ?? null;
+
+                    if (isset($asset['averageRating'])) {
+                        $details['rating'] = (int) round($asset['averageRating'] * 100);
+                    }
+                }
+
+                if (isset($jsonData['props']['pageProps']['getAssetDownloadTotal']['total'])) {
+                    $details['downloads'] = $jsonData['props']['pageProps']['getAssetDownloadTotal']['total'];
+                }
+            }
+
+            return array_filter($details, fn ($v) => $v !== null);
+        } catch (Exception $exception) {
+            report($exception);
+
+            return ['modId' => $modId];
+        }
     }
 
     protected function getHeaderActions(): array
