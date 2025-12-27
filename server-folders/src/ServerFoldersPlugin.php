@@ -3,10 +3,7 @@
 namespace FlexKleks\ServerFolders;
 
 use Filament\Contracts\Plugin;
-use Filament\Navigation\NavigationItem;
 use Filament\Panel;
-use FlexKleks\ServerFolders\Filament\App\Resources\ServerFolders\Pages\ViewServerFolder;
-use FlexKleks\ServerFolders\Models\ServerFolder;
 
 class ServerFoldersPlugin implements Plugin
 {
@@ -29,5 +26,8 @@ class ServerFoldersPlugin implements Plugin
         );
     }
 
-    public function boot(Panel $panel): void {}
+    public function boot(Panel $panel): void
+    {
+        //
+    }
 }

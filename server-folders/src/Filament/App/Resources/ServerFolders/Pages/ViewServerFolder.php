@@ -3,7 +3,6 @@
 namespace FlexKleks\ServerFolders\Filament\App\Resources\ServerFolders\Pages;
 
 use App\Models\Role;
-use App\Models\Server;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\ColorPicker;
