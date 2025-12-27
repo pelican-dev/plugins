@@ -22,15 +22,20 @@ class PasteFoxSharePlugin implements HasPluginSettings, Plugin
 
     public function register(Panel $panel): void
     {
-        $id = str($panel->getId())->title();
+        if ($panel->getId() === 'server') {
+            $id = str($panel->getId())->title();
 
-        $panel->discoverPages(
-            plugin_path($this->getId(), "src/Filament/$id/Pages"),
-            "FlexKleks\\PasteFoxShare\\Filament\\$id\\Pages"
-        );
+            $panel->discoverPages(
+                plugin_path($this->getId(), "src/Filament/$id/Pages"),
+                "FlexKleks\\PasteFoxShare\\Filament\\$id\\Pages"
+            );
+        }
     }
 
-    public function boot(Panel $panel): void {}
+    public function boot(Panel $panel): void
+    {
+        //
+    }
 
     public function getSettingsForm(): array
     {

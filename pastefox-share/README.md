@@ -30,8 +30,9 @@ php artisan optimize:clear
 
 ## Configuration
 
-1. Go to **Admin → Advanced → PasteFox**
-2. Configure the following settings:
+1. Go to **Admin → Plugins**
+2. Find **PasteFox Share** and click the **Settings** (gear icon) button
+3. Configure the following settings:
 
 | Setting | Description |
 |---------|-------------|
