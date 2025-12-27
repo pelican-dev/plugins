@@ -51,37 +51,53 @@ class UploadLogsAction extends Action
                 $logs = is_array($logs) ? implode(PHP_EOL, $logs) : $logs;
 
                 $apiKey = config('pastefox-share.api_key');
+                $hasApiKey = !empty($apiKey);
 
-                if (empty($apiKey)) {
-                    Notification::make()
-                        ->title(trans('pastefox-share::messages.api_key_missing'))
-                        ->danger()
-                        ->send();
+                // Build request payload
+                $payload = [
+                    'content' => $logs,
+                    'title' => 'Console Logs: '.$server->name.' - '.now()->format('Y-m-d H:i:s'),
+                    'language' => 'log',
+                    'effect' => config('pastefox-share.effect', 'NONE'),
+                    'theme' => config('pastefox-share.theme', 'dark'),
+                ];
 
-                    return;
+                // Only add these options if API key is present
+                if ($hasApiKey) {
+                    $payload['visibility'] = config('pastefox-share.visibility', 'PUBLIC');
+                    
+                    $password = config('pastefox-share.password');
+                    if (!empty($password)) {
+                        $payload['password'] = $password;
+                    }
                 }
 
-                $response = Http::withHeaders([
-                    'X-API-Key' => $apiKey,
-                    'Content-Type' => 'application/json',
-                ])
+                // Build HTTP request
+                $request = Http::withHeaders(['Content-Type' => 'application/json'])
                     ->timeout(30)
-                    ->connectTimeout(5)
+                    ->connectTimeout(5);
+
+                // Add API key header if available
+                if ($hasApiKey) {
+                    $request = $request->withHeaders(['X-API-Key' => $apiKey]);
+                }
+
+                $response = $request
                     ->throw()
-                    ->post('https://pastefox.com/api/pastes', [
-                        'content' => $logs,
-                        'title' => 'Console Logs: '.$server->name.' - '.now()->format('Y-m-d H:i:s'),
-                        'language' => 'log',
-                        'visibility' => config('pastefox-share.visibility', 'PUBLIC'),
-                    ])
+                    ->post('https://pastefox.com/api/pastes', $payload)
                     ->json();
 
                 if ($response['success']) {
                     $url = 'https://pastefox.com/'.$response['data']['slug'];
 
+                    $body = $url;
+                    if (!$hasApiKey) {
+                        $body .= "\n" . trans('pastefox-share::messages.expires_7_days');
+                    }
+
                     Notification::make()
                         ->title(trans('pastefox-share::messages.uploaded'))
-                        ->body($url)
+                        ->body($body)
                         ->persistent()
                         ->success()
                         ->send();
