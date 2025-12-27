@@ -9,7 +9,7 @@
     "update_url": null,
     "namespace": "FlexKleks\\PasteFoxShare",
     "class": "PasteFoxSharePlugin",
-    "panels": ["server"],
+    "panels": ["admin", "server"],
     "panel_version": null,
     "composer_packages": null
 }

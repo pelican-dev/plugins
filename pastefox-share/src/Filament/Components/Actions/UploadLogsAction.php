@@ -50,7 +50,7 @@ class UploadLogsAction extends Action
 
                 $logs = is_array($logs) ? implode(PHP_EOL, $logs) : $logs;
 
-                $apiKey = env('PASTEFOX_API_KEY');
+                $apiKey = config('pastefox-share.api_key');
 
                 if (empty($apiKey)) {
                     Notification::make()
@@ -72,7 +72,7 @@ class UploadLogsAction extends Action
                         'content' => $logs,
                         'title' => 'Console Logs: '.$server->name.' - '.now()->format('Y-m-d H:i:s'),
                         'language' => 'log',
-                        'visibility' => env('PASTEFOX_VISIBILITY', 'PUBLIC'),
+                        'visibility' => config('pastefox-share.visibility', 'PUBLIC'),
                     ])
                     ->json();
 
