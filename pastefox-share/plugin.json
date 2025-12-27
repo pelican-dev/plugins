@@ -1,0 +1,15 @@
+{
+    "id": "pastefox-share",
+    "name": "PasteFox Share",
+    "author": "FlexKleks",
+    "version": "1.0.0",
+    "description": "Share console logs via pastefox.com",
+    "category": "plugin",
+    "url": "https://github.com/pelican-dev/plugins/tree/main/pastefox-share",
+    "update_url": null,
+    "namespace": "FlexKleks\\PasteFoxShare",
+    "class": "PasteFoxSharePlugin",
+    "panels": ["server"],
+    "panel_version": null,
+    "composer_packages": null
+}
