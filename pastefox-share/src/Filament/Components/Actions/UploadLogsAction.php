@@ -51,9 +51,9 @@ class UploadLogsAction extends Action
                 $logs = is_array($logs) ? implode(PHP_EOL, $logs) : $logs;
 
                 $apiKey = config('pastefox-share.api_key');
-				$hasApiKey = filled($apiKey);
-				
-				$headers = ['Content-Type' => 'application/json'];
+                $hasApiKey = filled($apiKey);
+
+                $headers = ['Content-Type' => 'application/json'];
 
                 $payload = [
                     'content' => $logs,
