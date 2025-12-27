@@ -32,8 +32,10 @@ class SubdomainsPlugin implements HasPluginSettings, Plugin
     {
         return [
             TextInput::make('token')
-                ->label('Cloudflare API Token')
+                ->label(trans('subdomains::strings.api_token'))
                 ->required()
+                ->hintIcon('tabler-question-mark')
+                ->hintIconTooltip(trans('subdomains::strings.api_token_help'))
                 ->default(fn () => config('subdomains.token')),
         ];
     }

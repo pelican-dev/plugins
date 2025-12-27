@@ -6,7 +6,6 @@ use App\Contracts\Plugins\HasPluginSettings;
 use App\Traits\EnvironmentWriterTrait;
 use Filament\Contracts\Plugin;
 use Filament\Forms\Components\Slider;
-use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Panel;
 use Filament\Schemas\Components\Group;
@@ -27,60 +26,50 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
     public function getSettingsForm(): array
     {
         $schema = [
-            Toggle::make('SNOWFLAKES_ENABLED')
-                ->label('Enable Snowflakes')
-                ->columnSpanFull()
-                ->live()
-                ->default(fn () => config('snowflakes.enabled')),
             Slider::make('SNOWFLAKES_SIZE')
+                ->label(trans('snowflakes::strings.size'))
                 ->range(minValue: 0.5, maxValue: 4)
                 ->decimalPlaces(1)
                 ->step(0.1)
-                ->label('Size')
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('Size of the snowflakes.')
-                ->disabled(fn ($get) => !$get('SNOWFLAKES_ENABLED'))
+                ->hintIconTooltip(trans('snowflakes::strings.size_help'))
                 ->default(fn () => config('snowflakes.size')),
             Slider::make('SNOWFLAKES_SPEED')
-                ->label('Speed')
+                ->label(trans('snowflakes::strings.speed'))
                 ->range(minValue: 0.5, maxValue: 3)
                 ->decimalPlaces(1)
                 ->step(0.1)
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('Speed of the snowflakes falling.')
-                ->disabled(fn ($get) => !$get('SNOWFLAKES_ENABLED'))
+                ->hintIconTooltip(trans('snowflakes::strings.speed_help'))
                 ->default(fn () => config('snowflakes.speed')),
             Slider::make('SNOWFLAKES_OPACITY')
-                ->label('Opacity')
+                ->label(trans('snowflakes::strings.opacity'))
                 ->range(minValue: 0.1, maxValue: 1)
                 ->decimalPlaces(1)
                 ->step(0.1)
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('How well can you see through the snowflakes.')
-                ->disabled(fn ($get) => !$get('SNOWFLAKES_ENABLED'))
+                ->hintIconTooltip(trans('snowflakes::strings.opacity_help'))
                 ->default(fn () => config('snowflakes.opacity')),
             Slider::make('SNOWFLAKES_DENSITY')
-                ->label('Density')
+                ->label(trans('snowflakes::strings.density'))
                 ->range(minValue: 0.5, maxValue: 10)
                 ->decimalPlaces(1)
                 ->step(0.1)
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('Page density of the snowflakes. More density, more snowflakes.')
-                ->disabled(fn ($get) => !$get('SNOWFLAKES_ENABLED'))
+                ->hintIconTooltip(trans('snowflakes::strings.density_help'))
                 ->default(fn () => config('snowflakes.density')),
             Slider::make('SNOWFLAKES_QUALITY')
-                ->label('Quality')
+                ->label(trans('snowflakes::strings.quality'))
                 ->range(minValue: 0.1, maxValue: 1)
                 ->decimalPlaces(1)
                 ->step(0.1)
                 ->tooltips()
                 ->hintIcon('tabler-question-mark')
-                ->hintIconTooltip('Higher quality may impact performance on some devices.')
-                ->disabled(fn ($get) => !$get('SNOWFLAKES_ENABLED'))
+                ->hintIconTooltip(trans('snowflakes::strings.quality_help'))
                 ->default(fn () => config('snowflakes.quality')),
         ];
 
@@ -93,11 +82,10 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
 
     public function saveSettings(array $data): void
     {
-        $data['SNOWFLAKES_ENABLED'] = $data['SNOWFLAKES_ENABLED'] ? 'true' : 'false';
         $this->writeToEnvironment($data);
 
         Notification::make()
-            ->title('Settings saved')
+            ->title(trans('admin/setting.save_success'))
             ->success()
             ->send();
     }

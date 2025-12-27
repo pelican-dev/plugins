@@ -17,8 +17,8 @@ return new class extends Migration
             $table->unsignedInteger('domain_id');
             $table->foreign('domain_id')->references('id')->on('cloudflare_domains')->cascadeOnDelete();
 
-            $table->unsignedInteger('allocation_id');
-            $table->foreign('allocation_id')->references('id')->on('allocations')->cascadeOnDelete();
+            $table->unsignedInteger('server_id');
+            $table->foreign('server_id')->references('id')->on('servers')->cascadeOnDelete();
 
             $table->timestamps();
 
