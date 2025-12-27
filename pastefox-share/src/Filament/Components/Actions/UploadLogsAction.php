@@ -65,7 +65,7 @@ class UploadLogsAction extends Action
                 // Only add these options if API key is present
                 if ($hasApiKey) {
                     $payload['visibility'] = config('pastefox-share.visibility', 'PUBLIC');
-                    
+
                     $password = config('pastefox-share.password');
                     if (!empty($password)) {
                         $payload['password'] = $password;
@@ -92,7 +92,7 @@ class UploadLogsAction extends Action
 
                     $body = $url;
                     if (!$hasApiKey) {
-                        $body .= "\n" . trans('pastefox-share::messages.expires_7_days');
+                    $body .= "\n".trans('pastefox-share::messages.expires_7_days');
                     }
 
                     Notification::make()
