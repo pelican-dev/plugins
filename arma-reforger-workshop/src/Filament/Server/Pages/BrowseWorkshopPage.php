@@ -26,6 +26,8 @@ class BrowseWorkshopPage extends Page implements HasTable
     use BlockAccessInConflict;
     use InteractsWithTable;
 
+    protected ?array $installedModIds = null;
+
     protected static string|\BackedEnum|null $navigationIcon = 'tabler-world-search';
 
     protected static ?string $slug = 'workshop/browse';
@@ -62,6 +64,24 @@ class BrowseWorkshopPage extends Page implements HasTable
     public function getTitle(): string
     {
         return 'Browse Arma Reforger Workshop';
+    }
+
+    protected function getInstalledModIds(): array
+    {
+        if ($this->installedModIds === null) {
+            /** @var Server $server */
+            $server = Filament::getTenant();
+            /** @var DaemonFileRepository $fileRepository */
+            $fileRepository = app(DaemonFileRepository::class);
+
+            $installedMods = ArmaReforgerWorkshop::getInstalledMods($server, $fileRepository);
+            $this->installedModIds = array_map(
+                fn (array $mod) => strtoupper($mod['modId']),
+                $installedMods
+            );
+        }
+
+        return $this->installedModIds;
     }
 
     /**
@@ -129,14 +149,7 @@ class BrowseWorkshopPage extends Page implements HasTable
                     ->label('Add to Server')
                     ->icon('tabler-plus')
                     ->color('success')
-                    ->visible(function (array $record) {
-                        /** @var Server $server */
-                        $server = Filament::getTenant();
-                        /** @var DaemonFileRepository $fileRepository */
-                        $fileRepository = app(DaemonFileRepository::class);
-
-                        return !ArmaReforgerWorkshop::isModInstalled($server, $fileRepository, $record['modId']);
-                    })
+                    ->visible(fn (array $record) => !in_array(strtoupper($record['modId']), $this->getInstalledModIds(), true))
                     ->requiresConfirmation()
                     ->modalHeading(fn (array $record) => "Add \"{$record['name']}\"")
                     ->modalDescription(fn (array $record) => "This will add \"{$record['name']}\" by {$record['author']} to your server's mod list.")
@@ -181,14 +194,7 @@ class BrowseWorkshopPage extends Page implements HasTable
                     ->icon('tabler-check')
                     ->color('gray')
                     ->disabled()
-                    ->visible(function (array $record) {
-                        /** @var Server $server */
-                        $server = Filament::getTenant();
-                        /** @var DaemonFileRepository $fileRepository */
-                        $fileRepository = app(DaemonFileRepository::class);
-
-                        return ArmaReforgerWorkshop::isModInstalled($server, $fileRepository, $record['modId']);
-                    }),
+                    ->visible(fn (array $record) => in_array(strtoupper($record['modId']), $this->getInstalledModIds(), true)),
             ]);
     }
 
