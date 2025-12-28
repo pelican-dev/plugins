@@ -32,5 +32,7 @@ return [
         'dns_updated' => 'DNS record updated on Cloudflare',
         'dns_deleted' => 'DNS record deleted from Cloudflare',
         'dns_action_failed' => 'Cloudflare DNS action failed',
+        'zone_request_failed' => 'Cloudflare zone request failed',
+        'zone_request_succeeded' => 'Cloudflare zone request succeeded',
     ],
 ];

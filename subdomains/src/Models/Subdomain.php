@@ -118,7 +118,6 @@ class Subdomain extends Model implements HasLabel
         $port = $this->server && $this->server->allocation ? ($this->server->allocation->port ?? null) : null;
 
         if (empty($target) || empty($port)) {
-            // Output to log for debugging
             Log::error('SRV record target or port is missing for Subdomain ID ' . $this->id . '. Target: ' . ($target ?? 'null') . ', Port: ' . ($port ?? 'null'));
             return null;
         }
