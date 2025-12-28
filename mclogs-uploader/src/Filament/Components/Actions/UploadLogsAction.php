@@ -22,53 +22,21 @@ class UploadLogsAction extends Action
         parent::setUp();
 
         $this->hidden(function () {
-            $mc_tag = "mclogs-updater";
-
             /** @var Server $server */
             $server = Filament::getTenant();
 
             if ($server->retrieveStatus()->isOffline()) {
                 return true;
             }
+
             $egg = $server->egg;
+            $mcTag = 'mclogs-updater';
 
-            // check if egg has tag 'mclogs-updater'
-            if (method_exists($egg, $mc_tag)) {
-                try {
-                    $hasTag = $egg->tags()->where('name', $mc_tag)->exists();
-                    if ($hasTag) {
-                        return false;
-                    }
-                } catch (Exception $e) {
-                }
-            }
-            if (isset($egg->tags)) {
-                $tags = is_string($egg->tags) ? json_decode($egg->tags, true) : $egg->tags;
-                if (is_array($tags) && in_array($mc_tag, $tags)) {
-                    return false;
-                }
-            }
-            if (isset($egg->meta) && is_array($egg->meta) && isset($egg->meta['tags'])) {
-                if (in_array($mc_tag, $egg->meta['tags'])) {
-                    return false;
-                }
+            if (!in_array($mcTag, $egg->tags ?? [])) {
+                return true;
             }
 
-            try {
-                $eggTags = \DB::table('egg_tag')
-                    ->join('tags', 'egg_tag.tag_id', '=', 'tags.id')
-                    ->where('egg_tag.egg_id', $egg->id)
-                    ->where('tags.name', $mc_tag)
-                    ->exists();
-
-                if ($eggTags) {
-                    return false;
-                }
-            } catch (Exception $e) {
-
-            }
-
-            return true;
+            return false;
         });
 
         $this->label(fn () => trans('mclogs-uploader::upload.upload_logs'));
