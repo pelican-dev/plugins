@@ -4,7 +4,7 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 
 ## How to install plugins
 
-[Download the repository archive](https://github.com/pelican-dev/plugins/archive/refs/heads/main.zip) and extract the folders of the plugins you want to install to your panels `plugins` folder (`/var/www/pelican/plugins` by default). Finally, open your panel and head to the plugins page and click on "Install".
+[Download the repository archive](https://github.com/pelican-dev/plugins/archive/refs/heads/main.zip) and extract the folders of the plugins you want to install to your panels `plugins` folder (`(/var/www/pelican/plugins` by default). Finally, open your panel and head to the plugins page and click on "Install".
 
 ## Plugins
 
@@ -12,7 +12,7 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 - [Billing](/billing) - Allows users to purchase servers via Stripe
 - [Generic OIDC Providers](/generic-oidc-providers) - Create generic OIDC providers for authentication
 - [Legal Pages](/legal-pages) - Adds legal pages (Imprint, Privacy Policy, ToS) to the panel
-- [MCLogs Uploader](/mclogs-uploader) - Upload console logs to mclo.gs
+- [MCLogs Uploader](/mclogs-uploader) - Upload console logs to mclo.gs (add `mclogs-updater` tag to eggs to enable)
 - [Minecraft Modrinth](/minecraft-modrinth) - Download Minecraft mods & plugins from Modrinth
 - [Player Counter](/player-counter) - Show connected players count for game servers
 - [Register](/register) - Enable user self-registration on all panels
