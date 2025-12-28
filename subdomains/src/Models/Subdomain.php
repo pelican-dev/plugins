@@ -8,6 +8,9 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Filament\Notifications\Notification;
+use Boy132\Subdomains\Services\CloudflareService;
 
 /**
  * @property int $id
@@ -66,12 +69,8 @@ class Subdomain extends Model implements HasLabel
             }
         });
 
-        static::created(function (self $model) {
-            $model->createOnCloudflare();
-        });
-
-        static::updated(function (self $model) {
-            $model->updateOnCloudflare();
+        static::saved(function (self $model) {
+            $model->upsertOnCloudflare();
         });
 
         static::deleted(function (self $model) {
@@ -99,6 +98,8 @@ class Subdomain extends Model implements HasLabel
         return $this->record_type === 'SRV';
     }
 
+
+
     public function setSrvRecordAttribute($value): void
     {
         if ($value) {
@@ -112,148 +113,111 @@ class Subdomain extends Model implements HasLabel
         }
     }
 
-    protected function buildSrvPayload(): ?array
-    {
-        $target = $this->domain->srv_target ?? null;
-        $port = $this->server && $this->server->allocation ? ($this->server->allocation->port ?? null) : null;
 
-        if (empty($target) || empty($port)) {
-            Log::error('SRV record target or port is missing for Subdomain ID ' . $this->id . '. Target: ' . ($target ?? 'null') . ', Port: ' . ($port ?? 'null'));
-            return null;
+
+    protected function upsertOnCloudflare(): void
+    {
+        $service = app(CloudflareService::class);
+
+        $zoneId = $this->domain->cloudflare_id;
+        if (empty($zoneId)) {
+            Log::warning('Cloudflare zone id missing for domain', ['domain_id' => $this->domain_id]);
+
+            Notification::make()
+                ->danger()
+                ->title('Cloudflare: Missing Zone ID')
+                ->body(sprintf('Cloudflare zone ID is not configured for %s. Cannot upsert DNS record for %s.%s.', $this->domain->name ?? 'unknown', $this->name, $this->domain->name ?? 'unknown'))
+                ->send();
+
+            return;
         }
 
-        $priority = (int) ($this->srv_priority ?? 0);
-        $weight = (int) ($this->srv_weight ?? 0);
-        $port = (int) $port;
-
-        // Need to build the name to include the services and protocol parts for SRV records, this may vary based on game(egg tag)/server type
-        // Temporrary placeholder for service and protocol = '_minecraft._tcp.'
-
-        return [
-            'name' => sprintf('_minecraft._tcp.%s', $this->name),
-            'ttl' => 1,
-            'type' => 'SRV',
-            'comment' => 'Created by Pelican Subdomains plugin',
-            'content' => sprintf('%d %d %d %s', $priority, $weight, $port, $target),
-            'proxied' => false,
-            'data' => [
-                'priority' => $priority,
-                'weight' => $weight,
-                'port' => $port,
-                'target' => $target,
-            ],
-        ];
-    }
-
-    protected function createOnCloudflare(): void
-    {
+        // SRV: target comes from domain, port from server allocation
         if ($this->record_type === 'SRV') {
-            $payload = $this->buildSrvPayload();
+            $port = $this->server && $this->server->allocation ? ($this->server->allocation->port ?? null) : null;
 
-            if ($payload === null) {
+            if (empty($port)) {
+                Log::warning('Server missing allocation with port', ['server_id' => $this->server_id]);
+
+                Notification::make()
+                    ->danger()
+                    ->title('Cloudflare: Missing SRV Port')
+                    ->body(sprintf('SRV target or port is missing for %s.%s. Cannot upsert SRV record.', $this->name, $this->domain->name ?? 'unknown'))
+                    ->send();
+
                 return;
             }
 
-            if (!$this->cloudflare_id) {
-                $response = Http::cloudflare()->post("zones/{$this->domain->cloudflare_id}/dns_records", $payload)->json();
+            $result = $service->upsertDnsRecord($zoneId, $this->name, 'SRV', $this->domain->srv_target, $port);
 
-                if (!empty($response['success'])) {
-                    $dnsRecord = $response['result'];
-
-                    $this->updateQuietly([
-                        'cloudflare_id' => $dnsRecord['id'],
-                    ]);
+            if ($result['success'] && !empty($result['id'])) {
+                if ($this->cloudflare_id !== $result['id']) {
+                    $this->updateQuietly(['cloudflare_id' => $result['id']]);
                 }
-            }
-
-            return;
-        }
-
-        if (!$this->server->allocation || $this->server->allocation->ip === '0.0.0.0' || $this->server->allocation->ip === '::') {
-            return;
-        }
-
-        if (!$this->cloudflare_id) {
-            $body = [
-                'name' => $this->name,
-                'ttl' => 1,
-                'type' => $this->record_type,
-                'comment' => 'Created by Pelican Subdomains plugin',
-                'content' => $this->server->allocation->ip,
-                'proxied' => false,
-            ];
-
-            $response = Http::cloudflare()->post("zones/{$this->domain->cloudflare_id}/dns_records", $body)->json();
-
-            if ($response['success']) {
-                $dnsRecord = $response['result'];
-
-                $this->updateQuietly([
-                    'cloudflare_id' => $dnsRecord['id'],
-                ]);
-            }
-        }
-    }
-
-    protected function updateOnCloudflare(): void
-    {
-        if (!$this->server->allocation || $this->server->allocation->ip === '0.0.0.0' || $this->server->allocation->ip === '::') {
-            return;
-        }
-
-        if ($this->record_type === 'SRV') {
-            $payload = $this->buildSrvPayload();
-
-            if ($payload === null) {
-                return;
-            }
-
-            if ($this->cloudflare_id) {
-                Http::cloudflare()->put("zones/{$this->domain->cloudflare_id}/dns_records/{$this->cloudflare_id}", $payload);
             } else {
-                $response = Http::cloudflare()->post("zones/{$this->domain->cloudflare_id}/dns_records", $payload)->json();
+                Log::error('Failed to upsert SRV record on Cloudflare for Subdomain ID ' . $this->id, ['result' => $result]);
 
-                if (!empty($response['success'])) {
-                    $dnsRecord = $response['result'];
-
-                    $this->updateQuietly([
-                        'cloudflare_id' => $dnsRecord['id'],
-                    ]);
-                }
+                Notification::make()
+                    ->danger()
+                    ->title('Cloudflare: SRV upsert failed')
+                    ->body('Failed to upsert SRV record for ' . $this->name . '.' . ($this->domain->name ?? 'unknown') . '. See logs for details. Errors: ' . json_encode($result['errors'] ?? $result['body'] ?? []))
+                    ->send();
             }
 
             return;
+        }
+
+        // A/AAAA
+        if (!$this->server->allocation || $this->server->allocation->ip === '0.0.0.0' || $this->server->allocation->ip === '::') {
+            return;
+        }
+
+        $result = $service->upsertDnsRecord($zoneId, $this->name, $this->record_type, $ip, null, null, $this->domain->name);
+
+        if ($result['success'] && !empty($result['id'])) {
+            if ($this->cloudflare_id !== $result['id']) {
+                $this->updateQuietly(['cloudflare_id' => $result['id']]);
+            }
         } else {
-            $body = [
-                'name' => $this->name,
-                'ttl' => 1,
-                'type' => $this->record_type,
-                'comment' => 'Created by Pelican Subdomains plugin',
-                'content' => $this->server->allocation->ip,
-                'proxied' => false,
-            ];
+            Log::error('Failed to upsert record on Cloudflare for Subdomain ID ' . $this->id, ['result' => $result]);
 
-            if ($this->cloudflare_id) {
-                Http::cloudflare()->put("zones/{$this->domain->cloudflare_id}/dns_records/{$this->cloudflare_id}", $body);
-            } else {
-                $response = Http::cloudflare()->post("zones/{$this->domain->cloudflare_id}/dns_records", $body)->json();
+            $domainName = $this->domain->name ?? 'unknown';
+            $sub = sprintf('%s.%s', $this->name, $domainName);
 
-                if (!empty($response['success'])) {
-                    $dnsRecord = $response['result'];
-
-                    $this->updateQuietly([
-                        'cloudflare_id' => $dnsRecord['id'],
-                    ]);
-                }
-            }
+            Notification::make()
+                ->danger()
+                ->title('Cloudflare: Upsert failed')
+                ->body('Failed to upsert record for ' . $sub . '. See logs for details. Errors: ' . json_encode($result['errors'] ?? $result['body'] ?? []))
+                ->send();
         }
-
     }
+
+
 
     protected function deleteOnCloudflare(): void
     {
-        if ($this->cloudflare_id) {
-            Http::cloudflare()->delete("zones/{$this->domain->cloudflare_id}/dns_records/{$this->cloudflare_id}");
+        if ($this->cloudflare_id && $this->domain && $this->domain->cloudflare_id) {
+            $service = app(CloudflareService::class);
+
+            $result = $service->deleteDnsRecord($this->domain->cloudflare_id, $this->cloudflare_id);
+
+            if (!empty($result['success'])) {
+                Log::info('Deleted Cloudflare record for Subdomain ID ' . $this->id, ['result' => $result]);
+            } else {
+                Log::warning('Failed to delete Cloudflare record for Subdomain ID ' . $this->id, ['result' => $result]);
+
+                Notification::make()
+                    ->danger()
+                    ->title('Cloudflare: Delete failed')
+                    ->body('Failed to delete Cloudflare record for ' . $this->name . '.' . ($this->domain->name ?? 'unknown') . '. See logs for details. Errors: ' . json_encode($result['errors'] ?? $result['body'] ?? []))
+                    ->send();
+
+            Notification::make()
+                ->danger()
+                ->title('Cloudflare: Upsert failed')
+                ->body('Failed to upsert record for ' . $this->name . '.' . ($this->domain->name ?? 'unknown') . '. See logs for details. Errors: ' . json_encode($result['errors'] ?? $result['body'] ?? []))
+                ->send();
+            }
         }
     }
 }
