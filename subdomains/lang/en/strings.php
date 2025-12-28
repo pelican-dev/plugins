@@ -14,6 +14,12 @@ return [
 
     'name' => 'Name',
 
+    'srv_record' => 'SRV Record',
+    'srv_record_help' => 'Enable this option to create a SRV record instead of an A or AAAA record.',
+
+    'srv_target' => 'SRV Target',
+    'srv_target_help' => 'The hostname that SRV records point to (for example: play.example.com).',
+
     'api_token' => 'Cloudflare API Token',
     'api_token_help' => 'The token needs to have read permissions for Zone.Zone and write for Zone.Dns. For better security you can also set the "Zone Resources" to exclude certain domains and add the panel ip to the "Client IP Adress Filtering".',
 ];
