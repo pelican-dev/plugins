@@ -12,6 +12,7 @@ class CloudflareService
     {
         if (empty($domainName)) {
             Log::error('Cloudflare getZoneId called with empty domain name', ['domain' => $domainName]);
+
             return null;
         }
 
@@ -21,6 +22,7 @@ class CloudflareService
             ]);
         } catch (\Throwable $e) {
             Log::error('Cloudflare getZoneId request failed: ' . $e->getMessage(), ['domain' => $domainName]);
+
             return null;
         }
 
@@ -42,6 +44,7 @@ class CloudflareService
     {
         if (empty($zoneId) || empty($name) || empty($recordType)) {
             Log::error('Cloudflare upsertDnsRecord missing required parameters', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
+
             return ['success' => false, 'id' => null, 'errors' => ['missing_parameters' => true], 'status' => 0, 'body' => null];
         }
 
@@ -56,6 +59,7 @@ class CloudflareService
         if ($recordType === 'SRV') {
             if (empty($port) || empty($target)) {
                 Log::error('Cloudflare upsert missing SRV target or port', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
+
                 return ['success' => false, 'id' => null, 'errors' => ['missing_srv_target_or_port' => true], 'status' => 0, 'body' => null];
             }
 
@@ -94,6 +98,7 @@ class CloudflareService
                 }
 
                 Log::error('Cloudflare update failed', ['zone' => $zoneId, 'recordId' => $recordId, 'response' => $parsed]);
+
                 return $parsed;
             }
 
@@ -105,9 +110,11 @@ class CloudflareService
             }
 
             Log::error('Cloudflare create failed', ['zone' => $zoneId, 'payload' => $payload, 'response' => $parsed]);
+
             return $parsed;
         } catch (\Throwable $e) {
             Log::error('Cloudflare upsert exception: ' . $e->getMessage(), ['zone' => $zoneId, 'payload' => $payload]);
+
             return ['success' => false, 'id' => null, 'errors' => ['exception' => $e->getMessage()], 'status' => 0, 'body' => null];
         }
     }
@@ -144,9 +151,11 @@ class CloudflareService
             }
 
             Log::error('Cloudflare delete failed', ['zone' => $zoneId, 'id' => $recordId, 'response' => $parsed]);
+
             return $parsed;
         } catch (\Throwable $e) {
             Log::error('Cloudflare delete exception: ' . $e->getMessage(), ['zone' => $zoneId, 'id' => $recordId]);
+
             return ['success' => false, 'errors' => ['exception' => $e->getMessage()], 'status' => 0, 'body' => null];
         }
     }
