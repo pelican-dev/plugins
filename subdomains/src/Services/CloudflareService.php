@@ -43,7 +43,7 @@ class CloudflareService
         string $zoneId,
         string $name,
         string $recordType,
-        string $target = null,
+        string $target,
         ?int $port = null,
     ): array
     {
@@ -139,9 +139,6 @@ class CloudflareService
         ];
     }
 
-    /**
-     * Parse a Response object into a normalized structure with HTTP status and body.
-     */
     protected function parseCloudflareHttpResponse(Response $response): array
     {
         $status = $response->status();
@@ -159,9 +156,6 @@ class CloudflareService
     }
 
 
-    /**
-     * Delete a DNS record by id. Returns a detailed response array.
-     */
     public function deleteDnsRecord(string $zoneId, string $recordId): array
     {
         if (empty($zoneId) || empty($recordId)) {
