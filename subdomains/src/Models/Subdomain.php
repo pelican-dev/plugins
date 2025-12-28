@@ -46,11 +46,13 @@ class Subdomain extends Model implements HasLabel
                 $model->setRecordType($model->attributes['srv_record']);
                 unset($model->attributes['srv_record']);
             }
+        });
 
+        static::saved(function (self $model) {
             $model->upsertOnCloudflare();
         });
 
-        static::deleting(function (self $model) {
+        static::deleted(function (self $model) {
             $model->deleteOnCloudflare();
         });
     }
@@ -88,8 +90,6 @@ class Subdomain extends Model implements HasLabel
         }
     }
 
-
-
     protected function upsertOnCloudflare(): void
     {
         $service = app(CloudflareService::class);
@@ -112,7 +112,7 @@ class Subdomain extends Model implements HasLabel
             $port = $this->server && $this->server->allocation ? ($this->server->allocation->port ?? null) : null;
 
             if (empty($port)) {
-                Log::warning('Server missing allocation with port', ['server_id' => $this->server_id]);
+                Log::warning('Server missing allocation with port', $this->toArray());
 
                 Notification::make()
                     ->danger()
@@ -149,7 +149,7 @@ class Subdomain extends Model implements HasLabel
         }
 
         // A/AAAA
-        if (!$this->server->allocation || $this->server->allocation->ip === '0.0.0.0' || $this->server->allocation->ip === '::') {
+        if (!$this->server || !$this->server->allocation || $this->server->allocation->ip === '0.0.0.0' || $this->server->allocation->ip === '::') {
             Log::warning('Server allocation missing or invalid IP', ['server_id' => $this->server_id]);
 
             Notification::make()
@@ -187,8 +187,6 @@ class Subdomain extends Model implements HasLabel
         }
     }
 
-
-
     protected function deleteOnCloudflare(): void
     {
         if ($this->cloudflare_id && $this->domain && $this->domain->cloudflare_id) {
@@ -197,22 +195,18 @@ class Subdomain extends Model implements HasLabel
             $result = $service->deleteDnsRecord($this->domain->cloudflare_id, $this->cloudflare_id);
 
             if (!empty($result['success'])) {
-                Log::info('Deleted Cloudflare record for Subdomain ID ' . $this->id, ['result' => $result]);
-            } else {
-                Log::warning('Failed to delete Cloudflare record for Subdomain ID ' . $this->id, ['result' => $result]);
-
                 Notification::make()
                     ->danger()
-                    ->title('Cloudflare: Delete failed')
-                    ->body('Failed to delete Cloudflare record for ' . $this->name . '.' . ($this->domain->name ?? 'unknown') . '. See logs for details. Errors: ' . json_encode($result['errors'] ?? $result['body'] ?? []))
+                    ->title('Cloudflare: Delete successed')
+                    ->body('Successfully deleted Cloudflare record for ' . $this->name . '.' . ($this->domain->name ?? 'unknown') . '.')
                     ->send();
+            }
 
             Notification::make()
                 ->danger()
-                ->title('Cloudflare: Upsert failed')
-                ->body('Failed to upsert record for ' . $this->name . '.' . ($this->domain->name ?? 'unknown') . '. See logs for details. Errors: ' . json_encode($result['errors'] ?? $result['body'] ?? []))
+                ->title('Cloudflare: Delete failed')
+                ->body('Failed to delete Cloudflare record for ' . $this->name . '.' . ($this->domain->name ?? 'unknown') . '. See logs for details. Errors: ' . json_encode($result['errors'] ?? $result['body'] ?? []))
                 ->send();
-            }
         }
     }
 }
