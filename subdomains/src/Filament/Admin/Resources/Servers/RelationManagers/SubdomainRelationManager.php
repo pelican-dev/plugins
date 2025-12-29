@@ -1,8 +1,9 @@
 <?php
 
-namespace Boy132\Subdomains\Filament\Admin\Resources\Users\RelationManagers;
+namespace Boy132\Subdomains\Filament\Admin\Resources\Servers\RelationManagers;
 
 use App\Models\Server;
+use Boy132\Subdomains\Filament\Admin\Resources\CloudflareDomains\CloudflareDomainResource;
 use Boy132\Subdomains\Models\CloudflareDomain;
 use Boy132\Subdomains\Models\Subdomain;
 use Filament\Actions\Action;
@@ -17,6 +18,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method Server getOwnerRecord()
@@ -25,10 +27,19 @@ class SubdomainRelationManager extends RelationManager
 {
     protected static string $relationship = 'subdomains';
 
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    {
+        if (static::shouldSkipAuthorization()) {
+            return true;
+        }
+
+        return CloudflareDomainResource::canViewAny();
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->heading(fn () => trans_choice('subdomains::strings.subdomain', 2) . ' (' . trans('subdomains::strings.limit') .': ' . ($this->getOwnerRecord()->subdomain_limit ?? 0) . ')')
+            ->heading(fn () => trans_choice('subdomains::strings.subdomain', 2) . ' (' . trans('subdomains::strings.limit') . ': ' . ($this->getOwnerRecord()->subdomain_limit ?? 0) . ')')
             ->columns([
                 TextColumn::make('label')
                     ->label(trans('subdomains::strings.name'))
@@ -39,31 +50,9 @@ class SubdomainRelationManager extends RelationManager
                 DeleteAction::make(),
             ])
             ->headerActions([
-                Action::make('change_limit')
-                    ->label(trans('subdomains::strings.change_limit'))
-                    ->schema([
-                        TextInput::make('limit')
-                            ->label(trans('subdomains::strings.limit'))
-                            ->numeric()
-                            ->required()
-                            ->default($this->getOwnerRecord()->subdomain_limit ?? 0)
-                            ->minValue(0),
-                    ])
-                    ->action(function ($data) {
-                        $oldLimit = $this->getOwnerRecord()->subdomain_limit ?? 0;
-                        $newLimit = $data['limit'];
-
-                        $this->getOwnerRecord()->update(['subdomain_limit' => $newLimit]);
-
-                        Notification::make()
-                            ->title(trans('subdomains::strings.limit_changed'))
-                            ->body($oldLimit . ' -> ' . $newLimit)
-                            ->success()
-                            ->send();
-                    }),
                 CreateAction::make()
                     ->visible(fn () => CloudflareDomain::count() > 0)
-                    ->disabled(fn () => !$this->getOwnerRecord()->allocation || $this->getOwnerRecord()->allocation->ip === '0.0.0.0' || $this->getOwnerRecord()->allocation->ip === '::')
+                    ->disabled(fn () => !$this->getOwnerRecord()->allocation || in_array($this->getOwnerRecord()->allocation->ip, ['0.0.0.0', '::']))
                     ->createAnother(false),
             ]);
     }

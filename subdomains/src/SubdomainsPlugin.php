@@ -4,6 +4,7 @@ namespace Boy132\Subdomains;
 
 use App\Contracts\Plugins\HasPluginSettings;
 use App\Traits\EnvironmentWriterTrait;
+use Boy132\Subdomains\Filament\Admin\Resources\Servers\RelationManagers\SubdomainRelationManager;
 use Filament\Contracts\Plugin;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -21,6 +22,8 @@ class SubdomainsPlugin implements HasPluginSettings, Plugin
     public function register(Panel $panel): void
     {
         $id = str($panel->getId())->title();
+
+        ServerResource::registerCustomRelations(SubdomainRelationManager::class);
 
         $panel->discoverResources(plugin_path($this->getId(), "src/Filament/$id/Resources"), "Boy132\\Subdomains\\Filament\\$id\\Resources");
         $panel->discoverPages(plugin_path($this->getId(), "src/Filament/$id/Pages"), "Boy132\\Subdomains\\Filament\\$id\\Pages");
