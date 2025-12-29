@@ -6,10 +6,10 @@ return [
 
     'no_subdomains' => 'No Subdomains',
     'subdomain' => 'Subdomain|Subdomains',
-    'limit' => 'Limit',
-    'change_limit' => 'Change Limit',
-    'limit_changed' => 'Limit changed',
-    'limit_reached' => 'Subdomain Limit Reached',
+    'subdomain_limit' => 'Subdomain Limit',
+    'subdomain_change_limit' => 'Change Subdomain Limit',
+    'subdomain_limit_changed' => 'Subdomain Limit changed',
+    'subdomain_limit_reached' => 'Subdomain Limit Reached',
     'create_subdomain' => 'Create Subdomain',
 
     'name' => 'Name',
