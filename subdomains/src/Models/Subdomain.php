@@ -134,7 +134,7 @@ class Subdomain extends Model implements HasLabel
                 return;
             }
 
-            $result = $service->upsertDnsRecord($zoneId, $this->name, 'SRV', $this->domain->srv_target, $this->cloudflare_id ?? null, $port);
+            $result = $service->upsertDnsRecord($zoneId, $this->name, 'SRV', $this->domain->srv_target, $this->cloudflare_id, $port);
 
             if ($result['success'] && !empty($result['id'])) {
                 if ($this->cloudflare_id !== $result['id']) {
@@ -172,7 +172,7 @@ class Subdomain extends Model implements HasLabel
             return;
         }
 
-        $result = $service->upsertDnsRecord($zoneId, $this->name, $this->record_type, $this->server->allocation->ip, $this->cloudflare_id ?? null, null);
+        $result = $service->upsertDnsRecord($zoneId, $this->name, $this->record_type, $this->server->allocation->ip, $this->cloudflare_id, null);
 
         if ($result['success'] && !empty($result['id'])) {
             if ($this->cloudflare_id !== $result['id']) {
