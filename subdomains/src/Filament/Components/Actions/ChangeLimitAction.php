@@ -18,12 +18,12 @@ class ChangeLimitAction extends Action
     {
         parent::setUp();
 
-        $this->label(fn () => trans('subdomains::strings.change_limit'));
+        $this->label(fn () => trans('subdomains::strings.subdomain_change_limit'));
 
         $this->schema(function (?Server $server) {
             return [
                 TextInput::make('limit')
-                    ->label(fn () => trans('subdomains::strings.limit'))
+                    ->label(fn () => trans('subdomains::strings.subdomain_limit'))
                     ->numeric()
                     ->required()
                     ->default(fn () => $server?->subdomain_limit ?? 0)
@@ -38,7 +38,7 @@ class ChangeLimitAction extends Action
             $server->update(['subdomain_limit' => $new]);
 
             Notification::make()
-                ->title(trans('subdomains::strings.limit_changed'))
+                ->title(trans('subdomains::strings.subdomain_limit_changed'))
                 ->body($old . ' -> ' . $new)
                 ->success()
                 ->send();

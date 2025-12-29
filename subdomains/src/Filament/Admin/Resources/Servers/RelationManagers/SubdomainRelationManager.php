@@ -39,7 +39,7 @@ class SubdomainRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->heading(fn () => trans_choice('subdomains::strings.subdomain', 2) . ' (' . trans('subdomains::strings.limit') . ': ' . ($this->getOwnerRecord()->subdomain_limit ?? 0) . ')')
+            ->heading(fn () => trans_choice('subdomains::strings.subdomain', 2) . ' (' . trans('subdomains::strings.subdomain_limit') . ': ' . ($this->getOwnerRecord()->subdomain_limit ?? 0) . ')')
             ->columns([
                 TextColumn::make('label')
                     ->label(trans('subdomains::strings.name'))
