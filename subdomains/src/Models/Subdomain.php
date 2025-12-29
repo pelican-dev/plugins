@@ -151,8 +151,8 @@ class Subdomain extends Model implements HasLabel
 
                 Notification::make()
                     ->danger()
-                    ->title(trans('subdomains::strings.notifications.cloudflare_srv_upsert_failed_title'))
-                    ->body(trans('subdomains::strings.notifications.cloudflare_srv_upsert_failed', ['subdomain' => $this->name . '.' . ($this->domain->name ?? 'unknown'), 'errors' => json_encode($result['errors'] ?? $result['body'] ?? [])]))
+                    ->title(trans('subdomains::strings.notifications.cloudflare_upsert_failed_title'))
+                    ->body(trans('subdomains::strings.notifications.cloudflare_upsert_failed', ['subdomain' => $this->name . '.' . ($this->domain->name ?? 'unknown'), 'errors' => json_encode($result['errors'] ?? $result['body'] ?? [])]))
                     ->send();
             }
 
