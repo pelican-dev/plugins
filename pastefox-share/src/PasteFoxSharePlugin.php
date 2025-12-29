@@ -27,60 +27,60 @@ class PasteFoxSharePlugin implements HasPluginSettings, Plugin
     public function getSettingsForm(): array
     {
         return [
-            Section::make('API Configuration')
-                ->description('Without API key, pastes expire after 7 days and are always public.')
+            Section::make(trans('pastefox-share::messages.section_api'))
+                ->description(trans('pastefox-share::messages.section_api_description'))
                 ->schema([
                     TextInput::make('api_key')
-                        ->label('API Key')
+                        ->label(trans('pastefox-share::messages.api_key'))
                         ->password()
                         ->revealable()
-                        ->helperText('Optional - Get your API key from https://pastefox.com/dashboard')
+                        ->helperText(trans('pastefox-share::messages.api_key_helper'))
                         ->default(fn () => config('pastefox-share.api_key')),
                 ]),
 
-            Section::make('Paste Settings')
+            Section::make(trans('pastefox-share::messages.section_paste'))
                 ->schema([
                     Select::make('visibility')
-                        ->label('Visibility')
+                        ->label(trans('pastefox-share::messages.visibility'))
                         ->options([
-                            'PUBLIC' => 'Public',
-                            'PRIVATE' => 'Private (requires API key)',
+                            'PUBLIC' => trans('pastefox-share::messages.visibility_public'),
+                            'PRIVATE' => trans('pastefox-share::messages.visibility_private'),
                         ])
                         ->default(fn () => config('pastefox-share.visibility', 'PUBLIC'))
-                        ->helperText('Private pastes require an API key'),
+                        ->helperText(trans('pastefox-share::messages.visibility_helper')),
 
                     Select::make('effect')
-                        ->label('Visual Effect')
+                        ->label(trans('pastefox-share::messages.effect'))
                         ->options([
-                            'NONE' => 'None',
-                            'MATRIX' => 'Matrix Rain',
-                            'GLITCH' => 'Glitch',
-                            'CONFETTI' => 'Confetti',
-                            'SCRATCH' => 'Scratch Card',
-                            'PUZZLE' => 'Puzzle Reveal',
-                            'SLOTS' => 'Slot Machine',
-                            'SHAKE' => 'Shake',
-                            'FIREWORKS' => 'Fireworks',
-                            'TYPEWRITER' => 'Typewriter',
-                            'BLUR' => 'Blur Reveal',
+                            'NONE' => trans('pastefox-share::messages.effect_none'),
+                            'MATRIX' => trans('pastefox-share::messages.effect_matrix'),
+                            'GLITCH' => trans('pastefox-share::messages.effect_glitch'),
+                            'CONFETTI' => trans('pastefox-share::messages.effect_confetti'),
+                            'SCRATCH' => trans('pastefox-share::messages.effect_scratch'),
+                            'PUZZLE' => trans('pastefox-share::messages.effect_puzzle'),
+                            'SLOTS' => trans('pastefox-share::messages.effect_slots'),
+                            'SHAKE' => trans('pastefox-share::messages.effect_shake'),
+                            'FIREWORKS' => trans('pastefox-share::messages.effect_fireworks'),
+                            'TYPEWRITER' => trans('pastefox-share::messages.effect_typewriter'),
+                            'BLUR' => trans('pastefox-share::messages.effect_blur'),
                         ])
                         ->default(fn () => config('pastefox-share.effect', 'NONE')),
 
                     Select::make('theme')
-                        ->label('Theme')
+                        ->label(trans('pastefox-share::messages.theme'))
                         ->options([
-                            'dark' => 'Dark',
-                            'light' => 'Light',
+                            'dark' => trans('pastefox-share::messages.theme_dark'),
+                            'light' => trans('pastefox-share::messages.theme_light'),
                         ])
                         ->default(fn () => config('pastefox-share.theme', 'dark')),
 
                     TextInput::make('password')
-                        ->label('Password Protection')
+                        ->label(trans('pastefox-share::messages.password'))
                         ->password()
                         ->revealable()
                         ->minLength(4)
                         ->maxLength(100)
-                        ->helperText('Optional - 4-100 characters')
+                        ->helperText(trans('pastefox-share::messages.password_helper'))
                         ->default(fn () => config('pastefox-share.password')),
                 ]),
         ];
@@ -97,7 +97,7 @@ class PasteFoxSharePlugin implements HasPluginSettings, Plugin
         ]);
 
         Notification::make()
-            ->title('Settings saved')
+            ->title(trans('pastefox-share::messages.settings_saved'))
             ->success()
             ->send();
     }
