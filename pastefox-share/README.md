@@ -18,13 +18,13 @@ Share console logs via [pastefox.com](https://pastefox.com) with one click.
 2. Find **PasteFox Share** and click the **Settings** (gear icon) button
 3. Configure the following settings:
 
-| Setting | Description |
-|---------|-------------|
-| API Key | Optional - Get from https://pastefox.com/dashboard |
-| Visibility | PUBLIC or PRIVATE (requires API key) |
-| Effect | Visual effect for the paste |
-| Theme | Light or Dark theme |
-| Password | Optional password protection |
+| Setting    | Description                                        |
+|------------|----------------------------------------------------|
+| API Key    | Optional - Get from https://pastefox.com/dashboard |
+| Visibility | PUBLIC or PRIVATE (requires API key)               |
+| Effect     | Visual effect for the paste                        |
+| Theme      | Light or Dark theme                                |
+| Password   | Optional password protection                       |
 
 ### Without API Key
 - Pastes expire after 7 days

@@ -14,6 +14,7 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 - [Legal Pages](/legal-pages) - Adds legal pages (Imprint, Privacy Policy, ToS) to the panel
 - [MCLogs Uploader](/mclogs-uploader) - Upload console logs to mclo.gs
 - [Minecraft Modrinth](/minecraft-modrinth) - Download Minecraft mods & plugins from Modrinth
+- [PasteFox Share](/pastefox-share) - Share console logs via pastefox.com
 - [Player Counter](/player-counter) - Show connected players count for game servers
 - [Register](/register) - Enable user self-registration on all panels
 - [Robo Avatars](/robo-avatars) - Adds RoboHash as avatar provider
