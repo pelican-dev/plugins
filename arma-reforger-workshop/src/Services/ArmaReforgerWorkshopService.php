@@ -71,7 +71,7 @@ class ArmaReforgerWorkshopService
     /**
      * Add a mod to the server's config.json
      */
-    public function addMod(Server $server, DaemonFileRepository $fileRepository, string $modId, string $name, string $version = ''): bool
+    public function addMod(Server $server, DaemonFileRepository $fileRepository, string $modId, string $name, ?string $version = null): bool
     {
         // Normalize modId to uppercase for consistent comparison
         $modId = strtoupper($modId);
