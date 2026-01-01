@@ -124,7 +124,7 @@ class CloudflareService
         $status = $response->status();
         $body = $response->json() ?? [];
 
-        $success = $response->successful() && ($body['success'] === true || count($body['result']) > 0);
+        $success = $response->successful() && ($body['success'] === true || (is_array($body['result']) && count($body['result']) > 0));
 
         return [
             'success' => $success,

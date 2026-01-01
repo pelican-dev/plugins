@@ -34,7 +34,6 @@ use Filament\Support\Enums\IconSize;
 use Filament\Support\RawJs;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Phiki\Grammar\Grammar;
 
