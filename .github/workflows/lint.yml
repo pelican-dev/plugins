@@ -1,0 +1,69 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  pint:
+    name: Pint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: none
+
+      - name: Init composer
+        run: composer init --no-interaction
+
+      - name: Install Laravel Pint
+        run: composer require "laravel/pint:^1.15.3"
+
+      - name: Run Pint
+        run: vendor/bin/pint --test
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Clone Pelican Panel
+        run: git clone --depth=1 https://github.com/pelican-dev/panel pelican
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          cd pelican
+          composer install --no-scripts --no-progress --prefer-dist
+          composer require "stripe/stripe-php:^18.0" "kovah/laravel-socialite-oidc:^0.5" "krymosoftware/gameq:^4.0"
+
+      - name: Setup .env file
+        run: cp pelican/.env.example pelican/.env
+
+      - name: Move plugin folders
+        run: |
+          mkdir -p pelican/plugins
+          rsync -av --progress ./ pelican/plugins/ --exclude=pelican
+
+      - name: Run PHPStan Analysis
+        run: |
+          cd pelican
+          vendor/bin/phpstan analyse plugins --memory-limit=-1 --error-format=github
+
