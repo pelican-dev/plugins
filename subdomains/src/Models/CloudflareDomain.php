@@ -18,7 +18,6 @@ class CloudflareDomain extends Model
     protected $fillable = [
         'name',
         'cloudflare_id',
-        'srv_target',
     ];
 
     protected static function boot(): void

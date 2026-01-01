@@ -2,10 +2,11 @@
 
 namespace Boy132\Subdomains\Providers;
 
+use App\Filament\Admin\Resources\Nodes\NodeResource;
 use App\Filament\Admin\Resources\Servers\ServerResource;
 use App\Models\Role;
 use App\Models\Server;
-use Boy132\Subdomains\Filament\Admin\Resources\Users\RelationManagers\SubdomainRelationManager;
+use Boy132\Subdomains\Filament\Admin\Resources\Nodes\Pages\EditNode;
 use Boy132\Subdomains\Models\Subdomain;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +15,7 @@ class SubdomainsPluginProvider extends ServiceProvider
 {
     public function register(): void
     {
+        NodeResource::registerCustomPages(['edit' => EditNode::route('/{record}/edit')]);
         ServerResource::registerCustomRelations(SubdomainRelationManager::class);
 
         Role::registerCustomDefaultPermissions('cloudflare_domain');

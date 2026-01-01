@@ -79,10 +79,11 @@ class SubdomainResource extends Resource
                 TextColumn::make('label')
                     ->label(trans('subdomains::strings.name'))
                     ->state(fn (Subdomain $subdomain) => $subdomain->getLabel()),
-                ToggleColumn::make('srv_record')
-                    ->label(trans('subdomains::strings.srv_record'))
-                    ->tooltip(fn (Subdomain $record) => $record->domain && $record->domain->srv_target ? trans('subdomains::strings.srv_record_help') : trans('subdomains::strings.srv_target_missing'))
-                    ->disabled(fn (Subdomain $record) => !$record->domain || empty($record->domain->srv_target)),
+                TextColumn::make('record_type')
+                    ->label(trans('subdomains::strings.record_type'))
+                    ->icon(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node?->srv_target) ? 'tabler-alert-triangle' : null)
+                    ->color(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node?->srv_target) ? 'danger' : null)
+                    ->helperText(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node?->srv_target) ? trans('subdomains::strings.srv_target_missing') : null),
             ])
             ->recordActions([
                 EditAction::make()
@@ -122,10 +123,9 @@ class SubdomainResource extends Resource
                     ->searchable(),
                 Toggle::make('srv_record')
                     ->label(trans('subdomains::strings.srv_record'))
-                    ->helperText(trans('subdomains::strings.srv_record_help'))
+                    ->helperText(fn () => Filament::getTenant()->node->srv_target ? trans('subdomains::strings.srv_record_help') : trans('subdomains::strings.srv_target_missing'))
                     ->reactive()
-                    ->disabled(fn (callable $get) => (empty($get('domain_id')) || empty(CloudflareDomain::find($get('domain_id'))?->srv_target)))
-                    ->default(false),
+                    ->disabled(fn () => empty(Filament::getTenant()->node->srv_target)),
             ]);
     }
 

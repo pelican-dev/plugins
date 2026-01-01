@@ -53,8 +53,6 @@ class CloudflareDomainResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->label(trans('subdomains::strings.name')),
-                TextColumn::make('srv_target')
-                    ->label(trans('subdomains::strings.srv_target')),
                 TextColumn::make('subdomains_count')
                     ->label(trans_choice('subdomains::strings.subdomain', 2))
                     ->counts('subdomains'),
@@ -79,11 +77,6 @@ class CloudflareDomainResource extends Resource
                     ->label(trans('subdomains::strings.name'))
                     ->required()
                     ->unique(),
-                TextInput::make('srv_target')
-                    ->label(trans('subdomains::strings.srv_target'))
-                    ->helperText(trans('subdomains::strings.srv_target_help'))
-                    ->placeholder('play.example.com')
-                    ->rules(['nullable', 'string', 'regex:/^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(?:\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/']),
             ]);
     }
 
