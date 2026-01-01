@@ -74,10 +74,10 @@ class UploadLogsAction extends Action
                 }
 
                 $response = Http::withHeaders($headers)
-                    ->post('https://pastefox.com/api/pastes', $payload)
                     ->timeout(30)
                     ->connectTimeout(5)
                     ->throw()
+                    ->post('https://pastefox.com/api/pastes', $payload)
                     ->json();
 
                 if ($response['success']) {

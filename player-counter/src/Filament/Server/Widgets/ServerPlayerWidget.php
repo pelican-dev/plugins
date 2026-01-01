@@ -17,7 +17,7 @@ class ServerPlayerWidget extends StatsOverviewWidget
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return !$server->isInConflictState() && $server->allocation && $server->egg->gameQuery()->exists() && !$server->retrieveStatus()->isOffline();
+        return !$server->isInConflictState() && $server->allocation && $server->egg->gameQuery()->exists() && !$server->retrieveStatus()->isOffline(); // @phpstan-ignore method.notFound
     }
 
     protected function getStats(): array
@@ -26,7 +26,7 @@ class ServerPlayerWidget extends StatsOverviewWidget
         $server = Filament::getTenant();
 
         /** @var ?GameQuery $gameQuery */
-        $gameQuery = $server->egg->gameQuery;
+        $gameQuery = $server->egg->gameQuery; // @phpstan-ignore property.notFound
 
         if (!$gameQuery) {
             return [];

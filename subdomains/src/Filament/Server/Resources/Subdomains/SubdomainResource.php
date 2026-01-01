@@ -60,7 +60,7 @@ class SubdomainResource extends Resource
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return $server->subdomains->count();
+        return $server->subdomains->count(); // @phpstan-ignore property.notFound
     }
 
     protected static function getBadgeLimit(): int

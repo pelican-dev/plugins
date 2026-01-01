@@ -148,7 +148,7 @@ class UserResourceLimits extends Model
             $object->setPorts(array_filter(explode(',', config('user-creatable-servers.deployment_ports'))));
 
             /** @var ServerCreationService $service */
-            $service = app(ServerCreationService::class); // @phpstan-ignore-line
+            $service = app(ServerCreationService::class);
 
             return $service->handle($data, $object);
         }
