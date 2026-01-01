@@ -13,8 +13,8 @@ return [
     'limit_reached' => 'Subdomain Limit Reached',
 
     'create_subdomain' => 'Create Subdomain',
-    'subdomain_change_limit' => "Change Subdomain Limit",
-    'subdomain_limit' => "Subdomain Limit",
+    'subdomain_change_limit' => 'Change Subdomain Limit',
+    'subdomain_limit' => 'Subdomain Limit',
 
     'record_type' => 'Record Type',
     'srv_record' => 'SRV Record',

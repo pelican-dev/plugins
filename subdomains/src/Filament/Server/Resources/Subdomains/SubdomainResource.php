@@ -19,7 +19,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class SubdomainResource extends Resource
@@ -112,6 +111,7 @@ class SubdomainResource extends Resource
                 TextInput::make('name')
                     ->label(trans('subdomains::strings.name'))
                     ->required()
+                    ->suffix(fn (callable $get) => CloudflareDomain::find($get('domain_id'))?->name)
                     ->unique(),
                 Select::make('domain_id')
                     ->label(trans_choice('subdomains::strings.domain', 1))

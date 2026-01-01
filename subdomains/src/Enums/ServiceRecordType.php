@@ -23,12 +23,14 @@ enum ServiceRecordType: string implements HasLabel
                 return true;
             }
         }
+
         return false;
     }
 
     public static function fromServer(Server $server): ?self
     {
         $tags = $server->egg->tags ?? [];
+
         return self::fromTags($tags);
     }
 
@@ -47,12 +49,14 @@ enum ServiceRecordType: string implements HasLabel
     public function service(): string
     {
         $parts = explode('.', $this->value);
+
         return $parts[0];
     }
 
     public function protocol(): string
     {
         $parts = explode('.', $this->value);
+
         return $parts[1];
     }
 }
