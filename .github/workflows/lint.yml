@@ -66,5 +66,5 @@ jobs:
       - name: Run PHPStan Analysis
         run: |
           cd pelican
-          vendor/bin/phpstan analyse plugins --memory-limit=-1 --error-format=github
+          vendor/bin/phpstan analyse --memory-limit=-1 --error-format=github
 
