@@ -57,10 +57,11 @@ jobs:
       - name: Setup .env file
         run: cp pelican/.env.example pelican/.env
 
-      - name: Move plugin folders
+      - name: Move plugin folders and phpstan.neon
         run: |
           mkdir -p pelican/plugins
           rsync -av --progress ./ pelican/plugins/ --exclude=pelican
+          cp phpstan.neon laravel-project/phpstan.neon
 
       - name: Run PHPStan Analysis
         run: |
