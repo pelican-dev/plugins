@@ -3,6 +3,7 @@
 namespace Boy132\Subdomains\Models;
 
 use App\Models\Server;
+use Boy132\Subdomains\Enums\ServiceRecordType;
 use Boy132\Subdomains\Services\CloudflareService;
 use Filament\Notifications\Notification;
 use Filament\Support\Contracts\HasLabel;
