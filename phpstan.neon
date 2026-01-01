@@ -9,6 +9,5 @@ parameters:
     level: 6
 
     ignoreErrors:
-        - identifier: argument.templateType
         - identifier: missingType.generics
         - identifier: larastan.noEnvCallsOutsideOfConfig
