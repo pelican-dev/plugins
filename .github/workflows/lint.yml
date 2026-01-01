@@ -61,7 +61,7 @@ jobs:
         run: |
           mkdir -p pelican/plugins
           rsync -av --progress ./ pelican/plugins/ --exclude=pelican
-          cp phpstan.neon laravel-project/phpstan.neon
+          cp phpstan.neon pelican/phpstan.neon
 
       - name: Run PHPStan Analysis
         run: |
