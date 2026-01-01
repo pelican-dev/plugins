@@ -60,7 +60,7 @@ class SubdomainResource extends Resource
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return $server->subdomains->count();
+        return $server->subdomains->count(); // @phpstan-ignore property.notFound
     }
 
     protected static function getBadgeLimit(): int
@@ -86,7 +86,7 @@ class SubdomainResource extends Resource
             ->toolbarActions([
                 CreateAction::make()
                     ->icon('tabler-world-plus')
-                    ->tooltip(fn () => static::getBadgeCount() >= static::getBadgeLimit() ? trans('subdomains::strings.limit') : trans('subdomains::strings.create_subdomain'))
+                    ->tooltip(fn () => static::getBadgeCount() >= static::getBadgeLimit() ? trans('subdomains::strings.limit_reached') : trans('subdomains::strings.create_subdomain'))
                     ->disabled(fn () => static::getBadgeCount() >= static::getBadgeLimit())
                     ->color(fn () => static::getBadgeCount() >= static::getBadgeLimit() ? 'danger' : 'primary')
                     ->createAnother(false)
@@ -106,12 +106,13 @@ class SubdomainResource extends Resource
                     ->unique(),
                 Select::make('domain_id')
                     ->label(trans_choice('subdomains::strings.domain', 1))
+                    ->disabledOn('edit')
                     ->required()
                     ->relationship('domain', 'name')
                     ->preload()
                     ->searchable(),
                 Hidden::make('record_type')
-                    ->state(function () {
+                    ->default(function () {
                         /** @var Server $server */
                         $server = Filament::getTenant();
 

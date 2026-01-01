@@ -163,7 +163,7 @@ class ServerResourcePage extends ServerFormPage
 
         try {
             /** @var DaemonServerRepository $repository */
-            $repository = app(DaemonServerRepository::class); // @phpstan-ignore-line
+            $repository = app(DaemonServerRepository::class);
 
             $repository->setServer($server)->sync();
 

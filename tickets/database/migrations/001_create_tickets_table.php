@@ -18,9 +18,9 @@ return new class extends Migration
             $table->text('answer')->nullable();
             $table->unsignedInteger('server_id');
             $table->foreign('server_id')->references('id')->on('servers')->cascadeOnDelete();
-            $table->unsignedInteger('author_id');
+            $table->unsignedInteger('author_id')->nullable();
             $table->foreign('author_id')->references('id')->on('users')->nullOnDelete();
-            $table->unsignedInteger('assigned_user_id');
+            $table->unsignedInteger('assigned_user_id')->nullable();
             $table->foreign('assigned_user_id')->references('id')->on('users')->nullOnDelete();
             $table->timestamps();
         });

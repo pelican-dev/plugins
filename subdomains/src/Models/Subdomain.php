@@ -68,6 +68,7 @@ class Subdomain extends Model implements HasLabel
         }
 
         if (!$this->cloudflare_id) {
+            // @phpstan-ignore staticMethod.notFound
             $response = Http::cloudflare()->post("zones/{$this->domain->cloudflare_id}/dns_records", [
                 'name' => $this->name,
                 'ttl' => 120,
@@ -94,6 +95,7 @@ class Subdomain extends Model implements HasLabel
         }
 
         if ($this->cloudflare_id) {
+            // @phpstan-ignore staticMethod.notFound
             Http::cloudflare()->patch("zones/{$this->domain->cloudflare_id}/dns_records/{$this->cloudflare_id}", [
                 'name' => $this->name,
                 'ttl' => 120,
@@ -108,6 +110,7 @@ class Subdomain extends Model implements HasLabel
     protected function deleteOnCloudflare(): void
     {
         if ($this->cloudflare_id) {
+            // @phpstan-ignore staticMethod.notFound
             Http::cloudflare()->delete("zones/{$this->domain->cloudflare_id}/dns_records/{$this->cloudflare_id}");
         }
     }

@@ -144,11 +144,11 @@ class UserResourceLimits extends Model
 
             $object = new DeploymentObject();
             $object->setDedicated(false);
-            $object->setTags(['user_creatable_servers']);
-            $object->setPorts([]);
+            $object->setTags(array_filter(explode(',', config('user-creatable-servers.deployment_tags'))));
+            $object->setPorts(array_filter(explode(',', config('user-creatable-servers.deployment_ports'))));
 
             /** @var ServerCreationService $service */
-            $service = app(ServerCreationService::class); // @phpstan-ignore-line
+            $service = app(ServerCreationService::class);
 
             return $service->handle($data, $object);
         }

@@ -22,7 +22,7 @@ class ProductWidget extends Widget implements HasActions, HasSchemas
     use InteractsWithActions;
     use InteractsWithSchemas;
 
-    protected string $view = 'billing::widget';
+    protected string $view = 'billing::widget'; // @phpstan-ignore property.defaultValue
 
     public ?Product $product = null;
 

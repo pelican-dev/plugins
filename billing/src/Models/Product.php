@@ -74,7 +74,7 @@ class Product extends Model implements HasLabel
         static::deleted(function (self $model) {
             if (!is_null($model->stripe_id)) {
                 /** @var StripeClient $stripeClient */
-                $stripeClient = app(StripeClient::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+                $stripeClient = app(StripeClient::class);
 
                 $stripeClient->products->delete($model->stripe_id);
             }
@@ -99,7 +99,7 @@ class Product extends Model implements HasLabel
     public function sync(): void
     {
         /** @var StripeClient $stripeClient */
-        $stripeClient = app(StripeClient::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+        $stripeClient = app(StripeClient::class);
 
         if (is_null($this->stripe_id)) {
             $stripeProduct = $stripeClient->products->create([

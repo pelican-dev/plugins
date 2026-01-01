@@ -40,7 +40,7 @@ class PlayersPage extends Page implements HasTable
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return parent::canAccess() && $server->allocation && $server->egg->gameQuery()->exists();
+        return parent::canAccess() && $server->allocation && $server->egg->gameQuery()->exists(); // @phpstan-ignore method.notFound
     }
 
     public static function getNavigationLabel(): string
@@ -72,7 +72,7 @@ class PlayersPage extends Page implements HasTable
         $server = Filament::getTenant();
 
         /** @var ?GameQuery $gameQuery */
-        $gameQuery = $server->egg->gameQuery;
+        $gameQuery = $server->egg->gameQuery; // @phpstan-ignore property.notFound
 
         $isMinecraft = $gameQuery?->query_type->isMinecraft();
 
@@ -105,7 +105,7 @@ class PlayersPage extends Page implements HasTable
                 $players = [];
 
                 /** @var ?GameQuery $gameQuery */
-                $gameQuery = $server->egg->gameQuery;
+                $gameQuery = $server->egg->gameQuery; // @phpstan-ignore property.notFound
 
                 if ($gameQuery) {
                     $data = $gameQuery->runQuery($server->allocation);

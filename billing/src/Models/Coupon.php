@@ -54,7 +54,7 @@ class Coupon extends Model
         static::deleted(function (self $model) {
             if (!is_null($model->stripe_coupon_id)) {
                 /** @var StripeClient $stripeClient */
-                $stripeClient = app(StripeClient::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+                $stripeClient = app(StripeClient::class);
 
                 $stripeClient->coupons->delete($model->stripe_coupon_id);
                 $stripeClient->coupons->delete($model->stripe_promotion_id);
@@ -65,7 +65,7 @@ class Coupon extends Model
     public function sync(): void
     {
         /** @var StripeClient $stripeClient */
-        $stripeClient = app(StripeClient::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+        $stripeClient = app(StripeClient::class);
 
         if (is_null($this->stripe_coupon_id)) {
             $data = [
