@@ -2,19 +2,12 @@
 
 namespace Boy132\Subdomains\Filament\Admin\Resources\Nodes\Pages;
 
-use App\Filament\Admin\Resources\Nodes\NodeResource;
 use App\Filament\Admin\Resources\Nodes\Pages\EditNode as BaseEditNode;
 use App\Models\Node;
-use App\Repositories\Daemon\DaemonSystemRepository;
 use App\Services\Helpers\SoftwareVersionService;
 use App\Services\Nodes\NodeAutoDeployService;
-use App\Services\Nodes\NodeUpdateService;
-use App\Traits\Filament\CanCustomizeHeaderActions;
-use App\Traits\Filament\CanCustomizeHeaderWidgets;
-use Boy132\Subdomains\Models\Subdomain;
 use Exception;
 use Filament\Actions\Action;
-use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Slider;
 use Filament\Forms\Components\Slider\Enums\PipsMode;
@@ -25,7 +18,6 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Infolists\Components\CodeEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
@@ -42,11 +34,9 @@ use Filament\Support\Enums\IconSize;
 use Filament\Support\RawJs;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\HtmlString;
 use Phiki\Grammar\Grammar;
-use Boy132\Subdomains\Jobs\UpdateServerSubdomains;
-use App\Models\Server;
 
 class EditNode extends BaseEditNode
 {
@@ -394,6 +384,14 @@ class EditNode extends BaseEditNode
                                         ->body(trans('subdomains::strings.notifications.srv_target_updated'))
                                         ->warning()
                                         ->send();
+
+                                    // Update all subdomains on servers linked to this node
+                                    $serverIds = Server::where('node_id', $this->record->id)->pluck('id');
+                                    Log::info('Updating subdomains for Node ID ', ['node_id' => $this->record->id, 'serverIds' => $serverIds]);
+
+                                    foreach ($serverIds as $serverId) {
+                                        UpdateServerSubdomains::dispatch($serverId, $state);
+                                    }
 
                                     return $state;
                                 }),
