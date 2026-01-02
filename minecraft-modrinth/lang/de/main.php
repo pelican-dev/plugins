@@ -44,4 +44,3 @@ return [
         'download_failed' => 'Download konnte nicht gestartet werden',
     ],
 ];
-
