@@ -26,7 +26,7 @@ class CloudflareService
             return ['success' => false, 'errors' => ['exception' => $e->getMessage()], 'status' => $e->getCode(), 'body' => $e->getTraceAsString()];
         }
 
-        $body = $response->json() ?? [];
+        $body = $response->json();
 
         if ($response->successful() && !empty($body['result']) && count($body['result']) > 0) {
             return $body['result'][0]['id'] ?? null;
@@ -146,7 +146,7 @@ class CloudflareService
     protected function parseCloudflareHttpResponse(Response $response): array
     {
         $status = $response->status();
-        $body = $response->json() ?? [];
+        $body = $response->json();
 
         $success = $response->successful() && ($body['success'] === true || (is_array($body['result']) && count($body['result']) > 0));
 

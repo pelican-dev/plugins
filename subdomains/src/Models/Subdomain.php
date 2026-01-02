@@ -115,12 +115,12 @@ class Subdomain extends Model implements HasLabel
         return $this->record_type === 'SRV';
     }
 
-    public function setSrvRecordAttribute($isSrvRecord): void
+    public function setSrvRecordAttribute(bool $isSrvRecord): void
     {
         if ($isSrvRecord) {
             $this->attributes['record_type'] = 'SRV';
         } else {
-            $ip = $this->server?->allocation?->ip ?? null;
+            $ip = $this->server?->allocation?->ip;
             if (!empty($ip) && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                 $this->attributes['record_type'] = 'AAAA';
             } else {
@@ -133,7 +133,7 @@ class Subdomain extends Model implements HasLabel
     {
         $registrar = app(CloudflareService::class);
 
-        $zoneId = $this->domain?->cloudflare_id ?? null;
+        $zoneId = $this->domain?->cloudflare_id;
         if (empty($zoneId)) {
             Log::warning('Cloudflare zone id missing for domain', ['domain_id' => $this->domain_id]);
 
@@ -148,7 +148,7 @@ class Subdomain extends Model implements HasLabel
 
         // SRV: target comes from node, port from server allocation
         if ($this->record_type === 'SRV') {
-            $port = $this->server->allocation?->port ?? null;
+            $port = $this->server->allocation?->port;
             if (empty($port)) {
                 Log::warning('Server missing allocation with port', $this->toArray());
                 Notification::make()
@@ -173,7 +173,7 @@ class Subdomain extends Model implements HasLabel
             }
 
             if (empty($this->server?->node?->srv_target)) {
-                Log::warning('Node missing SRV target for SRV record', ['node_id' => $this->server->node?->id ?? null]);
+                Log::warning('Node missing SRV target for SRV record', ['node_id' => $this->server->node?->id]);
                 Notification::make()
                     ->danger()
                     ->title(trans('subdomains::strings.notifications.cloudflare_missing_srv_target_title'))
@@ -205,7 +205,7 @@ class Subdomain extends Model implements HasLabel
         }
 
         // A/AAAA
-        $ip = $this->server?->allocation?->ip ?? null;
+        $ip = $this->server?->allocation?->ip;
         if (empty($ip) || $ip === '0.0.0.0' || $ip === '::') {
             Log::warning('Server allocation missing or invalid IP', ['server_id' => $this->server_id]);
             Notification::make()
