@@ -31,7 +31,7 @@ class MinecraftModrinthPlugin implements HasPluginSettings, Plugin
     {
         return [
             TextInput::make('latest_minecraft_version')
-                ->label('Latest Minecraft Version')
+                ->label(__('minecraft-modrinth::main.settings.latest_minecraft_version'))
                 ->required()
                 ->default(fn () => config('minecraft-modrinth.latest_minecraft_version', '1.21.11')),
         ];
@@ -44,7 +44,7 @@ class MinecraftModrinthPlugin implements HasPluginSettings, Plugin
         ]);
 
         Notification::make()
-            ->title('Settings saved')
+            ->title(__('minecraft-modrinth::main.settings.settings_saved'))
             ->success()
             ->send();
     }
