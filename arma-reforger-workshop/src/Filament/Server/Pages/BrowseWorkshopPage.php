@@ -96,12 +96,15 @@ class BrowseWorkshopPage extends Page implements HasTable
             ->records(function (?string $search, int $page) {
                 $result = ArmaReforgerWorkshop::browseWorkshop($search ?? '', $page);
 
-                return new LengthAwarePaginator(
+                /** @var LengthAwarePaginator<int, array{modId: string, name: string, summary: string, author: string, version: string, subscribers: int, rating: int|null, thumbnail: string|null, type: string, tags: array<string>}> $paginator */
+                $paginator = new LengthAwarePaginator(
                     $result['mods'],
                     $result['total'],
                     $result['perPage'],
                     $result['page']
                 );
+
+                return $paginator;
             })
             ->deferLoading()
             ->paginated([24])
