@@ -3,7 +3,6 @@
 namespace Boy132\Subdomains\Providers;
 
 use App\Enums\HeaderActionPosition;
-use App\Filament\Admin\Resources\Nodes\NodeResource;
 use App\Filament\Admin\Resources\Servers\ServerResource;
 use App\Models\Role;
 use App\Models\Server;
