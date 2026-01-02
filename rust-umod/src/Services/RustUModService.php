@@ -21,6 +21,8 @@ class RustUModService
             return false;
         }
 
+        $server->loadMissing('egg');
+
         $features = $server->egg->features ?? [];
         $tags = $server->egg->tags ?? [];
 

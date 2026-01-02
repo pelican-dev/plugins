@@ -1,0 +1,13 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+
+    paths:
+        - plugins
+
+    level: 6
+
+    ignoreErrors:
+        - identifier: missingType.generics
+        - identifier: larastan.noEnvCallsOutsideOfConfig

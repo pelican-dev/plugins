@@ -75,7 +75,7 @@ class Order extends Model implements HasLabel
         if ($this->status === OrderStatus::Active && !is_null($this->expires_at) && now('UTC') >= $this->expires_at) {
             try {
                 if ($this->server) {
-                    app(SuspensionService::class)->handle($this->server, SuspendAction::Suspend); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+                    app(SuspensionService::class)->handle($this->server, SuspendAction::Suspend);
                 }
             } catch (Exception $exception) {
                 report($exception);
@@ -98,7 +98,7 @@ class Order extends Model implements HasLabel
     {
         if (!is_null($this->stripe_checkout_id)) {
             /** @var StripeClient $stripeClient */
-            $stripeClient = app(StripeClient::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+            $stripeClient = app(StripeClient::class);
 
             $session = $stripeClient->checkout->sessions->retrieve($this->stripe_checkout_id);
 
@@ -111,7 +111,7 @@ class Order extends Model implements HasLabel
     public function getCheckoutSession(): Session
     {
         /** @var StripeClient $stripeClient */
-        $stripeClient = app(StripeClient::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+        $stripeClient = app(StripeClient::class);
 
         if (is_null($this->stripe_checkout_id)) {
             $session = $stripeClient->checkout->sessions->create([
@@ -165,7 +165,7 @@ class Order extends Model implements HasLabel
 
         try {
             if ($this->server) {
-                app(SuspensionService::class)->handle($this->server, SuspendAction::Unsuspend); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+                app(SuspensionService::class)->handle($this->server, SuspendAction::Unsuspend);
             } else {
                 $this->createServer();
             }
@@ -178,7 +178,7 @@ class Order extends Model implements HasLabel
     {
         try {
             if ($this->server) {
-                app(SuspensionService::class)->handle($this->server, SuspendAction::Suspend); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+                app(SuspensionService::class)->handle($this->server, SuspendAction::Suspend);
             }
         } catch (Exception $exception) {
             report($exception);
@@ -228,7 +228,7 @@ class Order extends Model implements HasLabel
         $object->setTags($product->tags);
         $object->setPorts($product->ports);
 
-        $server = app(ServerCreationService::class)->handle($data, $object); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+        $server = app(ServerCreationService::class)->handle($data, $object);
 
         $this->update([
             'server_id' => $server->id,

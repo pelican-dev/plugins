@@ -65,7 +65,7 @@ class ProductPrice extends Model implements HasLabel
         $this->product->sync();
 
         /** @var StripeClient $stripeClient */
-        $stripeClient = app(StripeClient::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+        $stripeClient = app(StripeClient::class);
 
         if (is_null($this->stripe_id)) {
             $stripePrice = $stripeClient->prices->create([
