@@ -50,4 +50,22 @@ class CloudflareDomain extends Model
     {
         return $this->hasMany(Subdomain::class, 'domain_id');
     }
+
+    public function fetchCloudflareId(): void
+    {
+        // @phpstan-ignore staticMethod.notFound
+        $response = Http::cloudflare()->get('zones', [
+            'name' => $this->name,
+        ])->json();
+
+        if ($response['success']) {
+            $zones = $response['result'];
+
+            if (count($zones) > 0) {
+                $this->update([
+                    'cloudflare_id' => $zones[0]['id'],
+                ]);
+            }
+        }
+    }
 }

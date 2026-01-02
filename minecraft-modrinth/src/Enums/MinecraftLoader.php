@@ -22,6 +22,8 @@ enum MinecraftLoader: string implements HasLabel
 
     public static function fromServer(Server $server): ?MinecraftLoader
     {
+        $server->loadMissing('egg');
+
         $tags = $server->egg->tags ?? [];
 
         return self::fromTags($tags);
