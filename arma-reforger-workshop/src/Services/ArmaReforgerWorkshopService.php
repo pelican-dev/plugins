@@ -340,7 +340,7 @@ class ArmaReforgerWorkshopService
     /**
      * Extract the best thumbnail URL from previews
      *
-     * @param array<int, array<string, mixed>> $previews
+     * @param  array<int, array<string, mixed>>  $previews
      */
     protected function extractThumbnail(array $previews): ?string
     {
