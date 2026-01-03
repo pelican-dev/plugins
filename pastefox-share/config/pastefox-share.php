@@ -6,4 +6,5 @@ return [
     'effect' => env('PASTEFOX_EFFECT', 'NONE'),
     'theme' => env('PASTEFOX_THEME', 'dark'),
     'password' => env('PASTEFOX_PASSWORD'),
+    'custom_domain' => env('PASTEFOX_CUSTOM_DOMAIN'),
 ];
