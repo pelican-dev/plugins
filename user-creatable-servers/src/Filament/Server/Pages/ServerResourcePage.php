@@ -72,7 +72,6 @@ class ServerResourcePage extends ServerFormPage
                     ->numeric()
                     ->minValue(1)
                     ->maxValue($userResourceLimits->cpu > 0 ? $maxCpu : null)
-                    ->default($server->cpu)
                     ->suffix('%'),
                 TextInput::make('memory')
                     ->label(trans('user-creatable-servers::strings.memory'))
@@ -83,7 +82,6 @@ class ServerResourcePage extends ServerFormPage
                     ->numeric()
                     ->minValue(1)
                     ->maxValue($userResourceLimits->memory > 0 ? $maxMemory : null)
-                    ->default($server->memory)
                     ->suffix($suffix),
                 TextInput::make('disk')
                     ->label(trans('user-creatable-servers::strings.disk'))
@@ -94,7 +92,6 @@ class ServerResourcePage extends ServerFormPage
                     ->numeric()
                     ->minValue(1)
                     ->maxValue($userResourceLimits->disk > 0 ? $maxDisk : null)
-                    ->default($server->disk)
                     ->suffix($suffix),
             ]);
     }
