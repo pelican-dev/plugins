@@ -15,7 +15,7 @@ use spolny\ArmaReforgerWorkshop\Services\ArmaReforgerWorkshopService;
  * @method static bool removeMod(Server $server, DaemonFileRepository $fileRepository, string $modId)
  * @method static string getModWorkshopUrl(string $modId)
  * @method static array<string, mixed> parseNextDataFromHtml(string $html, string $modId)
- * @method static array{mods: array<int, array{modId: string, name: string, summary: string, author: string, version: string, subscribers: int, rating: int|null, thumbnail: string|null, type: string, tags: array<string>}>, total: int, page: int, perPage: int} browseWorkshop(string $search = '', int $page = 1)
+ * @method static array{mods: array<int, mixed>, total: int, page: int, perPage: int} browseWorkshop(string $search = '', int $page = 1)
  * @method static bool isModInstalled(Server $server, DaemonFileRepository $fileRepository, string $modId)
  *
  * @see ArmaReforgerWorkshopService

@@ -96,7 +96,6 @@ class BrowseWorkshopPage extends Page implements HasTable
             ->records(function (?string $search, int $page) {
                 $result = ArmaReforgerWorkshop::browseWorkshop($search ?? '', $page);
 
-                /** @phpstan-ignore-next-line */
                 return new LengthAwarePaginator(
                     $result['mods'],
                     $result['total'],

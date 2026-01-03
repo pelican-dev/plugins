@@ -221,7 +221,7 @@ class ArmaReforgerWorkshopService
     /**
      * Search/browse mods from the Bohemia Workshop
      *
-     * @return array{mods: array<int, array{modId: string, name: string, summary: string, author: string, version: string, subscribers: int, rating: int|null, thumbnail: string|null, type: string, tags: array<string>}>, total: int, page: int, perPage: int}
+     * @return array{mods: array<int, mixed>, total: int, page: int, perPage: int}
      */
     public function browseWorkshop(string $search = '', int $page = 1): array
     {
