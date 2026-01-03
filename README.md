@@ -9,6 +9,7 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 ## Plugins
 
 - [Announcements](/announcements) - Create panel wide announcements to inform your users
+- [Arma Reforger Workshop](/arma-reforger-workshop) - Manage Arma Reforger workshop mods in server config
 - [Billing](/billing) - Allows users to purchase servers via Stripe
 - [Generic OIDC Providers](/generic-oidc-providers) - Create generic OIDC providers for authentication
 - [Legal Pages](/legal-pages) - Adds legal pages (Imprint, Privacy Policy, ToS) to the panel
