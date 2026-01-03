@@ -51,7 +51,7 @@ class UploadLogsAction extends Action
                 $logs = is_array($logs) ? implode(PHP_EOL, $logs) : $logs;
 
                 $apiKey = config('pastefox-share.api_key');
-                $hasApiKey = filled($apiKey);
+                $validApiKey = $this->isApiKeyValid($apiKey);
 
                 $headers = ['Content-Type' => 'application/json'];
 
@@ -63,7 +63,7 @@ class UploadLogsAction extends Action
                     'theme' => config('pastefox-share.theme'),
                 ];
 
-                if ($hasApiKey) {
+                if ($validApiKey) {
                     $headers['X-API-Key'] = $apiKey;
                     $payload['visibility'] = config('pastefox-share.visibility');
 
@@ -81,10 +81,12 @@ class UploadLogsAction extends Action
                     ->json();
 
                 if ($response['success']) {
-                    $url = 'https://pastefox.com/'.$response['data']['slug'];
+                    $customDomain = $validApiKey ? $this->getActiveCustomDomain($apiKey) : null;
+                    $baseUrl = filled($customDomain) ? "https://{$customDomain}" : 'https://pastefox.com';
+                    $url = $baseUrl . '/' . $response['data']['slug'];
 
                     $body = $url;
-                    if (!$hasApiKey) {
+                    if (!$validApiKey) {
                         $body .= "\n".trans('pastefox-share::messages.expires_7_days');
                     }
 
@@ -111,5 +113,57 @@ class UploadLogsAction extends Action
                     ->send();
             }
         });
+    }
+
+    protected function getActiveCustomDomain(?string $apiKey): ?string
+    {
+        $configuredDomain = config('pastefox-share.custom_domain');
+
+        if (blank($configuredDomain) || blank($apiKey)) {
+            return null;
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'X-API-Key' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])
+                ->timeout(5)
+                ->get('https://pastefox.com/api/domains')
+                ->json();
+
+            if ($response['success'] ?? false) {
+                foreach ($response['domains'] ?? [] as $domain) {
+                    if ($domain['domain'] === $configuredDomain && ($domain['isActive'] ?? false)) {
+                        return $configuredDomain;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Silently fail, fall back to default
+        }
+
+        return null;
+    }
+
+    protected function isApiKeyValid(?string $apiKey): bool
+    {
+        if (blank($apiKey)) {
+            return false;
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'X-API-Key' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])
+                ->timeout(5)
+                ->get('https://pastefox.com/api/domains')
+                ->json();
+
+            return $response['success'] ?? false;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

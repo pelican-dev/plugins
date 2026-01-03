@@ -37,4 +37,14 @@ return [
     'theme_light' => 'Light',
     'password' => 'Password Protection',
     'password_helper' => 'Optional - 4-100 characters',
+
+    // Custom Domain
+    'section_custom_domain' => 'Custom Domain',
+    'section_custom_domain_description' => 'Use your own domain for sharing pastes. Requires API key. Manage domains at Dashboard → Custom Domains.',
+    'custom_domain' => 'Custom Domain',
+    'custom_domain_none' => 'None (use pastefox.com)',
+    'custom_domain_helper' => 'Select a verified domain to use for paste URLs',
+    'custom_domain_no_api_key' => 'API key required for custom domains',
+    'custom_domain_fetch_error' => 'Could not fetch domains',
+    'custom_domain_inactive' => 'inactive',
 ];

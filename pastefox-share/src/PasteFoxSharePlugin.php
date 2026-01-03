@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Panel;
 use Filament\Schemas\Components\Section;
+use Illuminate\Support\Facades\Http;
 
 class PasteFoxSharePlugin implements HasPluginSettings, Plugin
 {
@@ -83,7 +84,59 @@ class PasteFoxSharePlugin implements HasPluginSettings, Plugin
                         ->helperText(trans('pastefox-share::messages.password_helper'))
                         ->default(fn () => config('pastefox-share.password')),
                 ]),
+
+            Section::make(trans('pastefox-share::messages.section_custom_domain'))
+                ->description(trans('pastefox-share::messages.section_custom_domain_description'))
+                ->schema([
+                    Select::make('custom_domain')
+                        ->label(trans('pastefox-share::messages.custom_domain'))
+                        ->options(fn () => $this->getCustomDomainOptions())
+                        ->disableOptionWhen(fn (string $value): bool => str_ends_with($value, ':disabled'))
+                        ->default(fn () => config('pastefox-share.custom_domain'))
+                        ->helperText(fn () => filled(config('pastefox-share.api_key'))
+                            ? trans('pastefox-share::messages.custom_domain_helper')
+                            : trans('pastefox-share::messages.custom_domain_no_api_key'))
+                        ->disabled(fn () => blank(config('pastefox-share.api_key'))),
+                ]),
         ];
+    }
+
+    protected function getCustomDomainOptions(): array
+    {
+        $options = ['' => trans('pastefox-share::messages.custom_domain_none')];
+
+        $apiKey = config('pastefox-share.api_key');
+        if (blank($apiKey)) {
+            return $options;
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'X-API-Key' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])
+                ->timeout(10)
+                ->get('https://pastefox.com/api/domains')
+                ->json();
+
+            if ($response['success'] ?? false) {
+                foreach ($response['domains'] ?? [] as $domain) {
+                    if ($domain['status'] !== 'ACTIVE') {
+                        continue;
+                    }
+
+                    if ($domain['isActive'] ?? false) {
+                        $options[$domain['domain']] = $domain['domain'];
+                    } else {
+                        $options[$domain['domain'] . ':disabled'] = $domain['domain'] . ' (' . trans('pastefox-share::messages.custom_domain_inactive') . ')';
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Silently fail, just return default options
+        }
+
+        return $options;
     }
 
     public function saveSettings(array $data): void
@@ -94,6 +147,7 @@ class PasteFoxSharePlugin implements HasPluginSettings, Plugin
             'PASTEFOX_EFFECT' => $data['effect'] ?? 'NONE',
             'PASTEFOX_THEME' => $data['theme'] ?? 'dark',
             'PASTEFOX_PASSWORD' => $data['password'] ?? '',
+            'PASTEFOX_CUSTOM_DOMAIN' => $data['custom_domain'] ?? '',
         ]);
 
         Notification::make()
