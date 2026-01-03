@@ -58,7 +58,7 @@ class Subdomain extends Model implements HasLabel
             Notification::make()
                 ->success()
                 ->title(trans('subdomains::strings.notifications.cloudflare_record_created_title'))
-                ->body(trans('subdomains::strings.notifications.cloudflare_record_created', ['subdomain' => $model->name . '.' . ($model->domain?->name ?? 'unknown'), 'record_type' => $model->record_type]))
+                ->body(trans('subdomains::strings.notifications.cloudflare_record_created', ['subdomain' => $model->name . '.' . ($model->domain->name ?? 'unknown'), 'record_type' => $model->record_type]))
                 ->send();
 
             return true;
@@ -73,7 +73,7 @@ class Subdomain extends Model implements HasLabel
             Notification::make()
                 ->success()
                 ->title(trans('subdomains::strings.notifications.cloudflare_record_updated_title'))
-                ->body(trans('subdomains::strings.notifications.cloudflare_record_updated', ['subdomain' => $model->name . '.' . ($model->domain?->name ?? 'unknown'), 'record_type' => $model->record_type]))
+                ->body(trans('subdomains::strings.notifications.cloudflare_record_updated', ['subdomain' => $model->name . '.' . ($model->domain->name ?? 'unknown'), 'record_type' => $model->record_type]))
                 ->send();
 
             return true;
@@ -88,7 +88,7 @@ class Subdomain extends Model implements HasLabel
             Notification::make()
                 ->success()
                 ->title(trans('subdomains::strings.notifications.cloudflare_record_deleted_title'))
-                ->body(trans('subdomains::strings.notifications.cloudflare_record_deleted', ['subdomain' => $model->name . '.' . ($model->domain?->name ?? 'unknown')]))
+                ->body(trans('subdomains::strings.notifications.cloudflare_record_deleted', ['subdomain' => $model->name . '.' . ($model->domain->name ?? 'unknown')]))
                 ->send();
 
             return true;
@@ -140,7 +140,7 @@ class Subdomain extends Model implements HasLabel
             Notification::make()
                 ->danger()
                 ->title(trans('subdomains::strings.notifications.cloudflare_missing_zone_title'))
-                ->body(trans('subdomains::strings.notifications.cloudflare_missing_zone', ['domain' => $this->domain?->name ?? 'unknown', 'subdomain' => $this->name . '.' . ($this->domain?->name ?? 'unknown')]))
+                ->body(trans('subdomains::strings.notifications.cloudflare_missing_zone', ['domain' => $this->domain->name ?? 'unknown', 'subdomain' => $this->name . '.' . ($this->domain->name ?? 'unknown')]))
                 ->send();
 
             return false;
@@ -154,7 +154,7 @@ class Subdomain extends Model implements HasLabel
                 Notification::make()
                     ->danger()
                     ->title(trans('subdomains::strings.notifications.cloudflare_missing_srv_port_title'))
-                    ->body(trans('subdomains::strings.notifications.cloudflare_missing_srv_port', ['server' => $this->server?->name ?? 'unassigned']))
+                    ->body(trans('subdomains::strings.notifications.cloudflare_missing_srv_port', ['server' => $this->server->name ?? 'unassigned']))
                     ->send();
 
                 return false;
@@ -162,22 +162,22 @@ class Subdomain extends Model implements HasLabel
 
             $serviceRecordType = ServiceRecordType::fromServer($this->server);
             if (!$serviceRecordType) {
-                Log::warning('Unable to determine service record type for SRV record', ['server_id' => $this->server?->id, 'server' => $this->server?->name]);
+                Log::warning('Unable to determine service record type for SRV record', ['server_id' => $this->server->id ?? 'unknown', 'server' => $this->server->name ?? 'unknown']);
                 Notification::make()
                     ->danger()
                     ->title(trans('subdomains::strings.notifications.cloudflare_invalid_service_record_type_title'))
-                    ->body(trans('subdomains::strings.notifications.cloudflare_invalid_service_record_type', ['subdomain' => $this->name . '.' . ($this->domain?->name ?? 'unknown')]))
+                    ->body(trans('subdomains::strings.notifications.cloudflare_invalid_service_record_type', ['subdomain' => $this->name . '.' . ($this->domain->name ?? 'unknown')]))
                     ->send();
 
                 return false;
             }
 
-            if (empty($this->server?->node?->srv_target)) {
+            if (empty($this->server?->node->srv_target)) {
                 Log::warning('Node missing SRV target for SRV record', ['node_id' => $this->server->node?->id]);
                 Notification::make()
                     ->danger()
                     ->title(trans('subdomains::strings.notifications.cloudflare_missing_srv_target_title'))
-                    ->body(trans('subdomains::strings.notifications.cloudflare_missing_srv_target', ['node' => $this->server->node?->name ?? 'unknown']))
+                    ->body(trans('subdomains::strings.notifications.cloudflare_missing_srv_target', ['node' => $this->server->node->name ?? 'unknown']))
                     ->send();
 
                 return false;
@@ -198,7 +198,7 @@ class Subdomain extends Model implements HasLabel
             Notification::make()
                 ->danger()
                 ->title(trans('subdomains::strings.notifications.cloudflare_upsert_failed_title'))
-                ->body(trans('subdomains::strings.notifications.cloudflare_upsert_failed', ['subdomain' => $this->name . '.' . ($this->domain?->name ?? 'unknown'), 'errors' => json_encode($result['errors'] ?? $result['body'] ?? [])]))
+                ->body(trans('subdomains::strings.notifications.cloudflare_upsert_failed', ['subdomain' => $this->name . '.' . ($this->domain->name ?? 'unknown'), 'errors' => json_encode($result['errors'] ?? $result['body'] ?? [])]))
                 ->send();
 
             return false;

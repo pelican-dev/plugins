@@ -80,9 +80,9 @@ class SubdomainResource extends Resource
                     ->state(fn (Subdomain $subdomain) => $subdomain->getLabel()),
                 TextColumn::make('record_type')
                     ->label(trans('subdomains::strings.record_type'))
-                    ->icon(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node?->srv_target) ? 'tabler-alert-triangle' : null)
-                    ->color(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node?->srv_target) ? 'danger' : null)
-                    ->helperText(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node?->srv_target) ? trans('subdomains::strings.srv_target_missing') : null),
+                    ->icon(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node->srv_target) ? 'tabler-alert-triangle' : null)
+                    ->color(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node->srv_target) ? 'danger' : null)
+                    ->tooltip(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server?->node->srv_target) ? trans('subdomains::strings.srv_target_missing') : null),
             ])
             ->recordActions([
                 EditAction::make()
@@ -111,7 +111,7 @@ class SubdomainResource extends Resource
                 TextInput::make('name')
                     ->label(trans('subdomains::strings.name'))
                     ->required()
-                    ->suffix(fn (callable $get) => CloudflareDomain::find($get('domain_id'))?->name)
+                    ->suffix(fn (callable $get) => CloudflareDomain::find($get('domain_id'))->name)
                     ->unique(),
                 Select::make('domain_id')
                     ->label(trans_choice('subdomains::strings.domain', 1))
@@ -119,7 +119,7 @@ class SubdomainResource extends Resource
                     ->required()
                     ->relationship('domain', 'name')
                     ->preload()
-                    ->default(fn () => CloudflareDomain::first()?->id ?? null)
+                    ->default(fn () => CloudflareDomain::first()->id ?? null)
                     ->searchable(),
                 Toggle::make('srv_record')
                     ->label(trans('subdomains::strings.srv_record'))

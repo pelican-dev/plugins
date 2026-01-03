@@ -29,8 +29,7 @@ class SetSrvTargetAction extends Action
                     ->default(fn () => $node?->srv_target)
                     ->placeholder('play.example.com OR IPv4/IPv6 address')
                     ->helperText(trans('subdomains::strings.srv_target_confirmation'))
-                    - requireConfirmation()
-                        ->rules(['nullable', 'string', 'regex:/^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(?:\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/']),
+                    ->rules(['nullable', 'string', 'regex:/^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(?:\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/']),
             ];
         });
 
@@ -43,6 +42,6 @@ class SetSrvTargetAction extends Action
                 ->body(trans('subdomains::strings.notifications.srv_target_updated'))
                 ->warning()
                 ->send();
-        })->requiresConfirmation()->modalIconColor('danger')->modalDescription(trans('subdomains::strings.srv_target_confirmation')->toString());
+        })->requiresConfirmation()->modalIconColor('danger');
     }
 }
