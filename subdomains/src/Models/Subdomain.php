@@ -48,7 +48,10 @@ class Subdomain extends Model implements HasLabel
 
         static::creating(function (self $model) {
             // Relation does not exist yet, so we need to set it manually.
-            $model->setRelation('server', Filament::getTenant());
+            if (!$model->relationLoaded('server') && $model->server_id) {
+                $model->loadMissing('server.allocation');
+                $model->setRelation('server', $model->server);
+            }
 
             $registrarUpdated = $model->upsertOnCloudflare();
             if (!$registrarUpdated) {
