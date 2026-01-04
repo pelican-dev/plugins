@@ -120,7 +120,7 @@ class CloudflareService
         } catch (\Throwable $e) {
             Log::error('Cloudflare upsert exception: ' . $e->getMessage(), ['zone' => $zoneId, 'payload' => $payload, 'status' => $e->getCode()]);
 
-            return ['success' => false, 'errors' => ['exception' => $e->getMessage()], 'status' => $e->getCode(), 'body' => $e->getTraceAsString()];
+            return ['success' => false, 'id' => null, 'errors' => ['exception' => $e->getMessage()], 'status' => $e->getCode(), 'body' => $e->getTraceAsString()];
         }
     }
 
@@ -130,7 +130,7 @@ class CloudflareService
     public function deleteDnsRecord(string $zoneId, string $recordId): array
     {
         if (empty($zoneId) || empty($recordId)) {
-            return ['success' => false, 'errors' => ['missing_parameters' => true], 'status' => 0, 'body' => null];
+            return ['success' => false, 'id' => null, 'errors' => ['missing_parameters' => true], 'status' => 0, 'body' => null];
         }
 
         try {
@@ -149,7 +149,7 @@ class CloudflareService
         } catch (\Throwable $e) {
             Log::error('Cloudflare delete exception: ' . $e->getMessage(), ['zone' => $zoneId, 'id' => $recordId, 'status' => $e->getCode()]);
 
-            return ['success' => false, 'errors' => ['exception' => $e->getMessage()], 'status' => $e->getCode(), 'body' => $e->getTraceAsString()];
+            return ['success' => false, 'id' => null, 'errors' => ['exception' => $e->getMessage()], 'status' => $e->getCode(), 'body' => $e->getTraceAsString()];
         }
     }
 

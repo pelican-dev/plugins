@@ -172,9 +172,9 @@ class Subdomain extends Model implements HasLabel
                 return false;
             }
 
-            // @phpstan-ignore variable.undefined
+            // @phpstan-ignore property.undefined
             if (empty($this->server->node->srv_target)) {
-                Log::warning('Node missing SRV target for SRV record', ['node_id' => $this->server->node?->id]);
+                Log::warning('Node missing SRV target for SRV record', ['node_id' => $this->server->node->id]);
                 Notification::make()
                     ->danger()
                     ->title(trans('subdomains::strings.notifications.cloudflare_missing_srv_target_title'))
@@ -185,7 +185,7 @@ class Subdomain extends Model implements HasLabel
             }
 
             $recordName = sprintf('%s.%s.%s', $serviceRecordType->service(), $serviceRecordType->protocol(), $this->name);
-            // @phpstan-ignore variable.undefined
+            // @phpstan-ignore property.undefined
             $result = $registrar->upsertDnsRecord($zoneId, $recordName, 'SRV', $this->server->node->srv_target, $this->cloudflare_id, $port);
 
             if ($result['success'] && !empty($result['id'])) {
@@ -255,7 +255,7 @@ class Subdomain extends Model implements HasLabel
             Notification::make()
                 ->danger()
                 ->title(trans('subdomains::strings.notifications.cloudflare_delete_failed_title'))
-                ->body(trans('subdomains::strings.notifications.cloudflare_delete_failed', ['subdomain' => $this->name . '.' . ($this->domain?->name ?? 'unknown'), 'errors' => json_encode($result['errors'])]))
+                ->body(trans('subdomains::strings.notifications.cloudflare_delete_failed', ['subdomain' => $this->name . '.' . ($this->domain->name ?? 'unknown'), 'errors' => json_encode($result['errors'])]))
                 ->send();
 
             return false;

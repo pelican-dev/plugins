@@ -1,6 +1,6 @@
 <?php
 
-namespace Boy132\Subdomains\Filament\Admin\Resources\Users\RelationManagers;
+namespace Boy132\Subdomains\Filament\Admin\Resources\Servers\RelationManagers;
 
 use App\Models\Server;
 use Boy132\Subdomains\Models\CloudflareDomain;

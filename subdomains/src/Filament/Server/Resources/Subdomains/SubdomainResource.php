@@ -36,8 +36,13 @@ class SubdomainResource extends Resource
     {
         /** @var Server $server */
         $server = Filament::getTenant();
+        $ip = $server->allocation?->ip ?? null;
 
-        return parent::canAccess() && $server->allocation && $server->allocation->ip !== '0.0.0.0' && $server->allocation->ip !== '::' && CloudflareDomain::count() > 0;
+        return parent::canAccess()
+            && $ip !== null
+            && $ip !== '0.0.0.0'
+            && $ip !== '::'
+            && CloudflareDomain::count() > 0;
     }
 
     public static function getNavigationLabel(): string
@@ -80,9 +85,9 @@ class SubdomainResource extends Resource
                     ->state(fn (Subdomain $subdomain) => $subdomain->getLabel()),
                 TextColumn::make('record_type')
                     ->label(trans('subdomains::strings.record_type'))
-                    ->icon(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server->node->srv_target) ? 'tabler-alert-triangle' : null) // @phpstan-ignore variable.undefined
-                    ->color(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server->node->srv_target) ? 'danger' : null) // @phpstan-ignore variable.undefined
-                    ->tooltip(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server->node->srv_target) ? trans('subdomains::strings.srv_target_missing') : null), // @phpstan-ignore variable.undefined
+                    ->icon(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server->node->srv_target) ? 'tabler-alert-triangle' : null) // @phpstan-ignore property.undefined
+                    ->color(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server->node->srv_target) ? 'danger' : null) // @phpstan-ignore property.undefined
+                    ->tooltip(fn (Subdomain $subdomain) => $subdomain->srv_record && empty($subdomain->server->node->srv_target) ? trans('subdomains::strings.srv_target_missing') : null), // @phpstan-ignore property.undefined
             ])
             ->recordActions([
                 EditAction::make()
@@ -123,9 +128,9 @@ class SubdomainResource extends Resource
                     ->searchable(),
                 Toggle::make('srv_record')
                     ->label(trans('subdomains::strings.srv_record'))
-                    ->helperText(fn () => Filament::getTenant()->node->srv_target ? trans('subdomains::strings.srv_record_help') : trans('subdomains::strings.srv_target_missing')) // @phpstan-ignore variable.undefined
+                    ->helperText(fn () => Filament::getTenant()->node->srv_target ? trans('subdomains::strings.srv_record_help') : trans('subdomains::strings.srv_target_missing')) // @phpstan-ignore property.undefined
                     ->reactive()
-                    ->disabled(fn () => empty(Filament::getTenant()->node->srv_target)), // @phpstan-ignore variable.undefined
+                    ->disabled(fn () => empty(Filament::getTenant()->node->srv_target)), // @phpstan-ignore property.undefined
             ]);
     }
 
