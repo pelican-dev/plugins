@@ -2,7 +2,7 @@
     "id": "subdomains",
     "name": "Subdomains",
     "author": "Boy132",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Allows users to create subdomains for their servers",
     "category": "plugin",
     "url": "https://github.com/pelican-dev/plugins/tree/main/subdomains",

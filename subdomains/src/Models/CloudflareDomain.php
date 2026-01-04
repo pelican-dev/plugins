@@ -2,6 +2,8 @@
 
 namespace Boy132\Subdomains\Models;
 
+use Boy132\Subdomains\Services\CloudflareService;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Http;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Http;
  * @property int $id
  * @property string $name
  * @property ?string $cloudflare_id
+ * @property ?string $srv_target
  */
 class CloudflareDomain extends Model
 {
@@ -23,7 +26,24 @@ class CloudflareDomain extends Model
         parent::boot();
 
         static::created(function (self $model) {
-            $model->fetchCloudflareId();
+            $service = new CloudflareService();
+
+            $zoneId = $service->getZoneId($model->name);
+            if (!$zoneId) {
+                Notification::make()
+                    ->title(trans('subdomains::strings.notifications.cloudflare_zone_fetch_failed', ['domain' => $model->name]))
+                    ->danger()
+                    ->send();
+            } else {
+                Notification::make()
+                    ->title(trans('subdomains::strings.notifications.cloudflare_domain_saved', ['domain' => $model->name]))
+                    ->success()
+                    ->send();
+
+                $model->update([
+                    'cloudflare_id' => $zoneId,
+                ]);
+            }
         });
     }
 
