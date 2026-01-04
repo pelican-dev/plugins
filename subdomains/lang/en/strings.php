@@ -43,13 +43,16 @@ return [
         'cloudflare_missing_srv_target' => 'SRV target is missing from :node. ',
 
         'cloudflare_record_created_title' => 'Cloudflare: Record Created',
-        'cloudflare_record_created' => 'Successfully created :subdomain record of type :record',
+        'cloudflare_record_created' => 'Successfully created :subdomain record',
 
         'cloudflare_record_updated_title' => 'Cloudflare: Record Updated',
         'cloudflare_record_updated' => 'Successfully updated :subdomain record to :record_type',
 
         'cloudflare_record_deleted_title' => 'Cloudflare: Record Deleted',
         'cloudflare_record_deleted' => 'Successfully deleted Cloudflare record for :subdomain.',
+
+        'cloudflare_delete_failed_title' => 'Cloudflare: Delete Failed',
+        'cloudflare_delete_failed' => 'Failed to delete Cloudflare record for :subdomain.',
 
         'cloudflare_missing_ip_title' => 'Cloudflare: Missing IP',
         'cloudflare_missing_ip' => 'Server allocation IP is missing or invalid for :subdomain. Cannot save A/AAAA record.',

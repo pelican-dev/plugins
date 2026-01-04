@@ -2,12 +2,46 @@
 
 namespace Boy132\Subdomains\Services;
 
+use Boy132\Subdomains\Enums\ServiceRecordType;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class CloudflareService
 {
+    /**
+     * @return array{success: bool, id: string|null, errors: array<string, mixed>, status: int, body: mixed|null}
+     */
+    public function getRecord(string $zoneId, string $name, string $recordType): ?array
+    {
+        if (empty($zoneId) || empty($name) || empty($recordType)) {
+            Log::error('Cloudflare getRecord called with missing parameters', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
+
+            return null;
+        }
+
+        try {
+            // @phpstan-ignore staticMethod.notFound
+            $response = Http::cloudflare()->get("zones/{$zoneId}/dns_records?type={$recordType}&name={$name}");
+        } catch (\Throwable $e) {
+            Log::error('Cloudflare getRecord request failed: ' . $e->getMessage(), ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
+
+            return null;
+        }
+
+        $parsed = $this->parseCloudflareHttpResponse($response);
+
+        if ($parsed['success']) {
+            return $parsed;
+        }
+
+        if (!empty($parsed['errors'])) {
+            Log::warning('Cloudflare getRecord returned errors', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType, 'status' => $response->status(), 'errors' => $parsed['errors']]);
+        }
+
+        return null;
+    }
+
     public function getZoneId(string $domainName): ?string
     {
         if (empty($domainName)) {
@@ -43,7 +77,7 @@ class CloudflareService
     /**
      * @return array{success: bool, id: string|null, errors: array<string, mixed>, status: int, body: mixed|null}
      */
-    public function upsertDnsRecord(string $zoneId, string $name, string $recordType, string $target, ?string $recordId = null, ?int $port = null): array
+    public function upsertDnsRecord(string $zoneId, string $domainName, string $name, string $recordType, string $target, ?string $recordId, ?int $port, ?ServiceRecordType $serviceRecordType): array
     {
         if (empty($zoneId) || empty($name) || empty($recordType)) {
             Log::error('Cloudflare upsertDnsRecord missing required parameters', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
@@ -60,14 +94,15 @@ class CloudflareService
 
         // Build payload based on type
         if ($recordType === 'SRV') {
-            if (empty($port) || empty($target)) {
-                Log::error('Cloudflare upsert missing SRV target or port', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
+            if (empty($port) || empty($target) || empty($serviceRecordType)) {
+                Log::error('Cloudflare upsert missing SRV target, port or service record information', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType, 'port' => $port, 'target' => $target, 'serviceRecordType' => $serviceRecordType]);
 
                 return ['success' => false, 'id' => null, 'errors' => ['missing_srv_target_or_port' => true], 'status' => 0, 'body' => null];
             }
 
+            $fqdn = sprintf('%s.%s.%s.%s', $serviceRecordType->service(), $serviceRecordType->protocol(), $name, $domainName);
             $payload = [
-                'name' => $name,
+                'name' => $fqdn,
                 'ttl' => $ttl,
                 'type' => 'SRV',
                 'comment' => $comment,
@@ -81,6 +116,7 @@ class CloudflareService
                 ],
             ];
         } else {
+            $fqdn = sprintf('%s.%s', $name, $domainName);
             $payload = [
                 'name' => $name,
                 'ttl' => $ttl,
@@ -89,6 +125,11 @@ class CloudflareService
                 'content' => $target,
                 'proxied' => $proxied,
             ];
+        }
+
+        $response = $this->getRecord($zoneId, $fqdn, $recordType);
+        if ($response && !empty($response['body']['result']) && count($response['body']['result']) > 0) {
+            return ['success' => false, 'id' => $response['body']['result'][0]['id'], 'errors' => ['record_exists' => true], 'status' => 409, 'body' => $response['body']];
         }
 
         try {
