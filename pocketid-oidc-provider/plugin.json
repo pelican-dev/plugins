@@ -11,5 +11,7 @@
     "class": "PocketIDProviderPlugin",
     "panels": null,
     "panel_version": null,
-    "composer_packages": null
+    "composer_packages": {
+        "kovah/laravel-socialite-oidc": "^0.5"
+    }
 }
