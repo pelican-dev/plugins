@@ -120,7 +120,7 @@ class Subdomain extends Model implements HasLabel
         if ($isSrvRecord) {
             $this->attributes['record_type'] = 'SRV';
         } else {
-            $ip = $this->server?->allocation->ip;
+            $ip = $this->server->allocation?->ip;
             if (!empty($ip) && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                 $this->attributes['record_type'] = 'AAAA';
             } else {
@@ -142,7 +142,7 @@ class Subdomain extends Model implements HasLabel
             Notification::make()
                 ->danger()
                 ->title(trans('subdomains::strings.notifications.cloudflare_missing_zone_title'))
-                ->body(trans('subdomains::strings.notifications.cloudflare_missing_zone', ['domain' => $domainName ?? 'unknown', 'subdomain' => $this->getLabel() ?? 'unknown']))
+                ->body(trans('subdomains::strings.notifications.cloudflare_missing_zone', ['domain' => $domainName, 'subdomain' => $this->getLabel() ?? 'unknown']))
                 ->send();
 
             return false;
