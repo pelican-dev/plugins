@@ -1,4 +1,3 @@
-// pocketid-oidc-provider/src/Socialite/Provider.php
 <?php
 
 namespace SocialiteProviders\PocketID;
