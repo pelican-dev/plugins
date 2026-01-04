@@ -26,6 +26,7 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 - [Theme Customizer](/theme-customizer) - Customize panel font and colors
 - [Tickets](/tickets) - Simple ticket system for user support
 - [User Creatable Servers](/user-creatable-servers) - Allow users to create their own servers
+- [PocketID Provider](/pocketid-provider) - Allows you to use PocketID as an OAuth provider
 
 ## Themes
 
