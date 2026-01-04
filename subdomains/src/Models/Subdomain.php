@@ -172,7 +172,6 @@ class Subdomain extends Model implements HasLabel
                 return false;
             }
 
-            // @phpstan-ignore property.undefined
             if (empty($this->server->node->srv_target)) {
                 Log::warning('Node missing SRV target for SRV record', ['node_id' => $this->server->node->id]);
                 Notification::make()
