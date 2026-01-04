@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
  * @property int $id
  * @property string $name
  * @property string $record_type
- * @property ?string $cloudflare_id
+ * @property string $cloudflare_id
  * @property int $domain_id
  * @property CloudflareDomain $domain
  * @property int $server_id
@@ -241,8 +241,13 @@ class Subdomain extends Model implements HasLabel
 
     protected function deleteOnCloudflare(): bool
     {
-        if ($this->cloudflare_id && $this->domain->cloudflare_id) {
-            $registrar = app(CloudflareService::class);
+        if (empty($this->cloudflare_id)) {
+            Log::warning('Subdomain deleteOnCloudflare called but no cloudflare_id set', ['subdomain_id' => $this->id]);
+
+            return true;
+        }
+
+        $registrar = app(CloudflareService::class);
 
             $result = $registrar->deleteDnsRecord($this->domain->cloudflare_id, $this->cloudflare_id);
 

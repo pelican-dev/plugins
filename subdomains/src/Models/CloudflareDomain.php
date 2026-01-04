@@ -11,8 +11,7 @@ use Illuminate\Support\Facades\Http;
 /**
  * @property int $id
  * @property string $name
- * @property ?string $cloudflare_id
- * @property ?string $srv_target
+ * @property string $cloudflare_id
  */
 class CloudflareDomain extends Model
 {
