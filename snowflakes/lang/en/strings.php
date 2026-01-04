@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'enabled' => 'Enable Snowflakes',
+    'enabled_help' => 'Toggle snowflakes on or off.',
     'size' => 'Size',
     'size_help' => 'Size of the snowflakes.',
     'speed' => 'Speed',

@@ -3,14 +3,16 @@
 namespace Boy132\Snowflakes;
 
 use App\Contracts\Plugins\HasPluginSettings;
+use App\Contracts\Plugins\HasUserCustomization;
 use App\Traits\EnvironmentWriterTrait;
 use Filament\Contracts\Plugin;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Slider;
 use Filament\Notifications\Notification;
 use Filament\Panel;
 use Filament\Schemas\Components\Group;
 
-class SnowflakesPlugin implements HasPluginSettings, Plugin
+class SnowflakesPlugin implements HasPluginSettings, HasUserCustomization, Plugin
 {
     use EnvironmentWriterTrait;
 
@@ -26,6 +28,11 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
     public function getSettingsForm(): array
     {
         $schema = [
+            Checkbox::make('SNOWFLAKES_ENABLED')
+                ->label(trans('snowflakes::strings.enabled'))
+                ->hintIcon('tabler-question-mark')
+                ->hintIconTooltip(trans('snowflakes::strings.enabled_help'))
+                ->default(fn () => config('snowflakes.enabled')),
             Slider::make('SNOWFLAKES_SIZE')
                 ->label(trans('snowflakes::strings.size'))
                 ->range(minValue: 0.5, maxValue: 4)
@@ -88,5 +95,16 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
             ->title(trans('admin/setting.save_success'))
             ->success()
             ->send();
+    }
+
+    public function getCustomizationForm(): array
+    {
+        return [
+            Checkbox::make('snowflakes_enabled')
+                ->label(trans('snowflakes::strings.enabled'))
+                ->hintIcon('tabler-question-mark')
+                ->hintIconTooltip(trans('snowflakes::strings.enabled_help'))
+                ->default(true),
+        ];
     }
 }
