@@ -12,6 +12,6 @@
     "panels": null,
     "panel_version": null,
     "composer_packages": {
-        "kovah/laravel-socialite-oidc": "^0.5"
+        "socialiteproviders/pocketid": "^3.0"
     }
 }
