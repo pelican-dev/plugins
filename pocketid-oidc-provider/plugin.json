@@ -12,6 +12,6 @@
     "panels": null,
     "panel_version": null,
     "composer_packages": {
-        "socialiteproviders/pocketid": "^3.0"
+        "socialiteproviders/pocketid": "^5.0"
     }
 }
