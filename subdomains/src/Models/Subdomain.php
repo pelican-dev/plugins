@@ -171,7 +171,7 @@ class Subdomain extends Model implements HasLabel
 
         // SRV: target comes from node, port from server allocation
         if ($this->record_type === 'SRV') {
-            $port = $this->server->allocation?->port;
+            $port = $this->server->allocation?->port; // @phpstan-ignore nullsafe.neverNull
             if (empty($port)) {
                 Log::warning('Server missing allocation with port', $this->toArray());
                 Notification::make()
@@ -230,7 +230,7 @@ class Subdomain extends Model implements HasLabel
         }
 
         // A/AAAA
-        $ip = $this->server->allocation?->ip;
+        $ip = $this->server->allocation?->ip; // @phpstan-ignore nullsafe.neverNull
         if (empty($ip) || $ip === '0.0.0.0' || $ip === '::') {
             Log::warning('Server allocation missing or invalid IP', ['server_id' => $this->server_id]);
             Notification::make()
