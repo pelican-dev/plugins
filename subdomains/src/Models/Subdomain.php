@@ -47,9 +47,8 @@ class Subdomain extends Model implements HasLabel
 
         static::creating(function (self $model) {
             // Relation does not exist yet, so we need to set it manually.
-            if (!$model->relationLoaded('server') && $model->server_id) {
+            if ($model->server_id) {
                 $model->loadMissing('server.allocation');
-                $model->setRelation('server', $model->server);
             }
 
             $registrarUpdated = $model->upsertOnCloudflare();
