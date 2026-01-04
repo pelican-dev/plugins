@@ -134,8 +134,8 @@ class Subdomain extends Model implements HasLabel
     {
         $registrar = app(CloudflareService::class);
 
-        $zoneId = $this->domain?->cloudflare_id;
-        $domainName = $this->domain?->name;
+        $zoneId = $this->domain?->cloudflare_id; // @phpstan-ignore nullsafe.neverNull
+        $domainName = $this->domain?->name; // @phpstan-ignore nullsafe.neverNull
 
         if (empty($this->server) || empty($this->server->node)) {
             Log::warning('Subdomain server/node relation is null', ['subdomain_id' => $this->id]);
