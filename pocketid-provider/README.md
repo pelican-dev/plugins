@@ -9,4 +9,4 @@ This plugin allows you to use PocketID as OAuth Provider.
 
 ## Credits to devilr33f
 
-I used his `PocketIDSchema.php` file from https://github.com/devilr33f/
+I used the `PocketIDSchema.php` file from [devilr33f's pelican-pocketid repository](https://github.com/devilr33f/pelican-pocketid/blob/51292e9d52f31fd185fd1ba5a6d8fd34bf23a42c/patch/PocketIDSchema.php).
