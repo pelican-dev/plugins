@@ -49,7 +49,6 @@ final class PocketIDSchema extends OAuthSchema
                         ->label('Callback URL')
                         ->dehydrated()
                         ->disabled()
-                        ->hintCopy()
                         ->default(fn () => url('/auth/oauth/callback/pocketid')),
                 ]),
         ], parent::getSetupSteps());
