@@ -10,7 +10,7 @@ return new class extends Migration
     {
         // Can safely delete any Cloudflare domains without IDs as they're useless anyway
         DB::table('cloudflare_domains')->whereNull('cloudflare_id')->delete();
-        DB::table('subdomains')->whereNull('cloudflare_id')->update(['cloudflare_id' => null]);
+        DB::table('subdomains')->whereNull('cloudflare_id')->delete();
 
         Schema::table('cloudflare_domains', function (Blueprint $table) {
             $table->dropColumn('srv_target');
