@@ -17,6 +17,7 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 - [Minecraft Modrinth](/minecraft-modrinth) - Download Minecraft mods & plugins from Modrinth
 - [PasteFox Share](/pastefox-share) - Share console logs via pastefox.com
 - [Player Counter](/player-counter) - Show connected players count for game servers
+- [PocketID Provider](/pocketid-provider) - Allows you to use PocketID as an OAuth provider
 - [Register](/register) - Enable user self-registration on all panels
 - [Robo Avatars](/robo-avatars) - Adds RoboHash as avatar provider
 - [Rust uMod](/rust-umod) - Download Rust plugins from uMod
@@ -26,8 +27,6 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 - [Theme Customizer](/theme-customizer) - Customize panel font and colors
 - [Tickets](/tickets) - Simple ticket system for user support
 - [User Creatable Servers](/user-creatable-servers) - Allow users to create their own servers
- - [PocketID Provider](/pocketid-provider) - Allows you to use PocketID as an OAuth provider
- - [Register](/register) - Enable user self-registration on all panels
 
 ## Themes
 

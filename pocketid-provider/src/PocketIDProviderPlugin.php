@@ -12,12 +12,7 @@ class PocketIDProviderPlugin implements Plugin
         return 'pocketid-provider';
     }
 
-    public function register(Panel $panel): void
-    {
-        $id = str($panel->getId())->title();
-
-        $panel->discoverResources(plugin_path($this->getId(), "src/Filament/$id/Resources"), "Ebnater\\PocketIDProvider\\Filament\\$id\\Resources");
-    }
+    public function register(Panel $panel): void {}
 
     public function boot(Panel $panel): void {}
 }

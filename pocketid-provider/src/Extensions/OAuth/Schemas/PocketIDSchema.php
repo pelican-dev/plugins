@@ -85,7 +85,7 @@ final class PocketIDSchema extends OAuthSchema
 
     public function getIcon(): string
     {
-        return 'heroicon-o-identification';
+        return 'tabler-id';
     }
 
     public function getHexColor(): string
