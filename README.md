@@ -6,6 +6,17 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 
 [Download the repository archive](https://github.com/pelican-dev/plugins/archive/refs/heads/main.zip) and extract the folders of the plugins you want to install to your panels `plugins` folder (`/var/www/pelican/plugins` by default). Finally, open your panel and head to the plugins page and click on "Install".
 
+### Themes
+
+For themes you have to install NodeJs 22+ and Yarn beforehand. Example:
+
+```bash
+curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash - 
+sudo apt install -y nodejs
+
+npm i -g yarn
+```
+
 ## Plugins
 
 - [Announcements](/announcements) - Create panel wide announcements to inform your users
