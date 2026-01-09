@@ -46,7 +46,7 @@ return [
     'users' => [
         'is_self' => 'Ye can\'t send yerself to the briny deep by deletin\' yer own user account.',
         'has_servers' => 'Ye can\'t delete a user while they\'ve got servers sailin\' under their flag. Sink their servers first, then come back.',
-        'node_revocation_failed' => 'Failed to revoke keys on <a href=":link">Node #:node</a>. :error',
+        'node_revocation_failed' => 'Failed to revoke keys on <a href=":link">Harbor #:node</a>. :error',
     ],
     'deployment' => [
         'no_viable_nodes' => 'No nodes meetin\' the demands for automatic deployment could be found in these waters.',
