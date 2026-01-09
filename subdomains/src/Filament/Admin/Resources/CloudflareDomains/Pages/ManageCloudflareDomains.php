@@ -14,7 +14,8 @@ class ManageCloudflareDomains extends ManageRecords
     {
         return [
             CreateAction::make()
-                ->createAnother(false),
+                ->createAnother(false)
+                ->successNotification(null),
         ];
     }
 }

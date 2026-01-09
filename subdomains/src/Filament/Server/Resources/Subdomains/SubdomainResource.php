@@ -12,9 +12,9 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
@@ -78,10 +78,17 @@ class SubdomainResource extends Resource
                 TextColumn::make('label')
                     ->label(trans('subdomains::strings.name'))
                     ->state(fn (Subdomain $subdomain) => $subdomain->getLabel()),
+                TextColumn::make('record_type')
+                    ->label(trans('subdomains::strings.record_type'))
+                    ->icon(fn (Subdomain $subdomain) => $subdomain->srv_record && !$subdomain->server->node->srv_target ? 'tabler-alert-triangle' : null) // @phpstan-ignore property.notFound
+                    ->color(fn (Subdomain $subdomain) => $subdomain->srv_record && !$subdomain->server->node->srv_target ? 'danger' : null) // @phpstan-ignore property.notFound
+                    ->tooltip(fn (Subdomain $subdomain) => $subdomain->srv_record && !$subdomain->server->node->srv_target ? trans('subdomains::strings.srv_target_missing') : null), // @phpstan-ignore property.notFound
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->successNotification(null),
+                DeleteAction::make()
+                    ->successNotification(null),
             ])
             ->toolbarActions([
                 CreateAction::make()
@@ -92,6 +99,7 @@ class SubdomainResource extends Resource
                     ->createAnother(false)
                     ->hiddenLabel()
                     ->iconButton()
+                    ->successNotification(null)
                     ->iconSize(IconSize::ExtraLarge),
             ]);
     }
@@ -103,6 +111,7 @@ class SubdomainResource extends Resource
                 TextInput::make('name')
                     ->label(trans('subdomains::strings.name'))
                     ->required()
+                    ->suffix(fn (callable $get) => CloudflareDomain::find($get('domain_id'))?->name)
                     ->unique(),
                 Select::make('domain_id')
                     ->label(trans_choice('subdomains::strings.domain', 1))
@@ -110,14 +119,13 @@ class SubdomainResource extends Resource
                     ->required()
                     ->relationship('domain', 'name')
                     ->preload()
+                    ->default(fn () => CloudflareDomain::first()?->id)
                     ->searchable(),
-                Hidden::make('record_type')
-                    ->default(function () {
-                        /** @var Server $server */
-                        $server = Filament::getTenant();
-
-                        return is_ipv6($server->allocation->ip) ? 'AAAA' : 'A';
-                    }),
+                Toggle::make('srv_record')
+                    ->label(trans('subdomains::strings.srv_record'))
+                    ->helperText(fn () => Filament::getTenant()->node->srv_target ? trans('subdomains::strings.srv_record_help') : trans('subdomains::strings.srv_target_missing')) // @phpstan-ignore property.notFound
+                    ->reactive()
+                    ->disabled(fn () => !Filament::getTenant()->node->srv_target), // @phpstan-ignore property.notFound
             ]);
     }
 

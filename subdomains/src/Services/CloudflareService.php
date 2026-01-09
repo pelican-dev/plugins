@@ -1,0 +1,215 @@
+<?php
+
+namespace Boy132\Subdomains\Services;
+
+use Boy132\Subdomains\Enums\ServiceRecordType;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class CloudflareService
+{
+    /**
+     * @return array{success: bool, id: string|null, errors: array<string, mixed>, status: int, body: mixed|null}
+     */
+    public function getRecord(string $zoneId, string $name, string $recordType): ?array
+    {
+        if (empty($zoneId) || empty($name) || empty($recordType)) {
+            Log::error('Cloudflare getRecord called with missing parameters', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
+
+            return null;
+        }
+
+        try {
+            // @phpstan-ignore staticMethod.notFound
+            $response = Http::cloudflare()->get("zones/{$zoneId}/dns_records?type={$recordType}&name={$name}");
+        } catch (\Throwable $e) {
+            Log::error('Cloudflare getRecord request failed: ' . $e->getMessage(), ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
+
+            return null;
+        }
+
+        $parsed = $this->parseCloudflareHttpResponse($response);
+
+        if ($parsed['success']) {
+            return $parsed;
+        }
+
+        if (!empty($parsed['errors'])) {
+            Log::warning('Cloudflare getRecord returned errors', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType, 'status' => $response->status(), 'errors' => $parsed['errors']]);
+        }
+
+        return null;
+    }
+
+    public function getZoneId(string $domainName): ?string
+    {
+        if (empty($domainName)) {
+            Log::error('Cloudflare getZoneId called with empty domain name', ['domain' => $domainName]);
+
+            return null;
+        }
+
+        try {
+            // @phpstan-ignore staticMethod.notFound
+            $response = Http::cloudflare()->get('zones', [
+                'name' => $domainName,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Cloudflare getZoneId request failed: ' . $e->getMessage(), ['domain' => $domainName]);
+
+            return null;
+        }
+
+        $body = $response->json();
+
+        if ($response->successful() && !empty($body['result']) && count($body['result']) > 0) {
+            return $body['result'][0]['id'] ?? null;
+        }
+
+        if (!empty($body['errors'])) {
+            Log::warning('Cloudflare getZoneId returned errors', ['domain' => $domainName, 'status' => $response->status(), 'errors' => $body['errors']]);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array{success: bool, id: string|null, errors: array<string, mixed>, status: int, body: mixed|null}
+     */
+    public function upsertDnsRecord(string $zoneId, string $domainName, string $name, string $recordType, string $target, ?string $recordId, ?int $port, ?ServiceRecordType $serviceRecordType): array
+    {
+        if (empty($zoneId) || empty($name) || empty($recordType)) {
+            Log::error('Cloudflare upsertDnsRecord missing required parameters', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType]);
+
+            return ['success' => false, 'id' => null, 'errors' => ['missing_parameters' => true], 'status' => 0, 'body' => null];
+        }
+
+        // Hardcoded/derived defaults
+        $priority = 0;
+        $weight = 0;
+        $ttl = 1;
+        $comment = 'Created by Pelican Subdomains plugin';
+        $proxied = false;
+
+        // Build payload based on type
+        if ($recordType === 'SRV') {
+            if (empty($port) || empty($target) || empty($serviceRecordType)) {
+                Log::error('Cloudflare upsert missing SRV target, port or service record information', ['zone' => $zoneId, 'name' => $name, 'type' => $recordType, 'port' => $port, 'target' => $target, 'serviceRecordType' => $serviceRecordType]);
+
+                return ['success' => false, 'id' => null, 'errors' => ['missing_srv_target_or_port' => true], 'status' => 0, 'body' => null];
+            }
+
+            $fqdn = sprintf('%s.%s.%s.%s', $serviceRecordType->service(), $serviceRecordType->protocol(), $name, $domainName);
+            $payload = [
+                'name' => $fqdn,
+                'ttl' => $ttl,
+                'type' => 'SRV',
+                'comment' => $comment,
+                'content' => sprintf('%d %d %d %s', $priority, $weight, $port, $target),
+                'proxied' => $proxied,
+                'data' => [
+                    'priority' => $priority,
+                    'weight' => $weight,
+                    'port' => (int) $port,
+                    'target' => $target,
+                ],
+            ];
+        } else {
+            $fqdn = sprintf('%s.%s', $name, $domainName);
+            $payload = [
+                'name' => $name,
+                'ttl' => $ttl,
+                'type' => $recordType,
+                'comment' => $comment,
+                'content' => $target,
+                'proxied' => $proxied,
+            ];
+        }
+
+        $response = $this->getRecord($zoneId, $fqdn, $recordType);
+        if ($response && !empty($response['body']['result']) && count($response['body']['result']) > 0) {
+            return ['success' => false, 'id' => $response['body']['result'][0]['id'], 'errors' => ['record_exists' => true], 'status' => 409, 'body' => $response['body']];
+        }
+
+        try {
+            if ($recordId) {
+                // @phpstan-ignore staticMethod.notFound
+                $response = Http::cloudflare()->put("zones/{$zoneId}/dns_records/{$recordId}", $payload);
+                $parsed = $this->parseCloudflareHttpResponse($response);
+
+                if ($parsed['success']) {
+                    return $parsed;
+                }
+
+                Log::error('Cloudflare update failed', ['zone' => $zoneId, 'recordId' => $recordId, 'response' => $parsed]);
+
+                return $parsed;
+            }
+
+            // @phpstan-ignore staticMethod.notFound
+            $response = Http::cloudflare()->post("zones/{$zoneId}/dns_records", $payload);
+            $parsed = $this->parseCloudflareHttpResponse($response);
+
+            if ($parsed['success'] && !empty($parsed['id'])) {
+                return $parsed;
+            }
+
+            Log::error('Cloudflare create failed', ['zone' => $zoneId, 'payload' => $payload, 'response' => $parsed]);
+
+            return $parsed;
+        } catch (\Throwable $e) {
+            Log::error('Cloudflare upsert exception: ' . $e->getMessage(), ['zone' => $zoneId, 'payload' => $payload, 'status' => $e->getCode()]);
+
+            return ['success' => false, 'id' => null, 'errors' => ['exception' => $e->getMessage()], 'status' => $e->getCode(), 'body' => $e->getTraceAsString()];
+        }
+    }
+
+    /**
+     * @return array{success: bool, id: string|null, errors: array<string, mixed>, status: int, body: mixed|null}
+     */
+    public function deleteDnsRecord(string $zoneId, string $recordId): array
+    {
+        if (empty($zoneId) || empty($recordId)) {
+            return ['success' => false, 'id' => null, 'errors' => ['missing_parameters' => true], 'status' => 0, 'body' => null];
+        }
+
+        try {
+            // @phpstan-ignore staticMethod.notFound
+            $response = Http::cloudflare()->delete("zones/{$zoneId}/dns_records/{$recordId}");
+
+            $parsed = $this->parseCloudflareHttpResponse($response);
+
+            if ($parsed['success']) {
+                return $parsed;
+            }
+
+            Log::error('Cloudflare delete failed', ['zone' => $zoneId, 'id' => $recordId, 'response' => $parsed]);
+
+            return $parsed;
+        } catch (\Throwable $e) {
+            Log::error('Cloudflare delete exception: ' . $e->getMessage(), ['zone' => $zoneId, 'id' => $recordId, 'status' => $e->getCode()]);
+
+            return ['success' => false, 'id' => null, 'errors' => ['exception' => $e->getMessage()], 'status' => $e->getCode(), 'body' => $e->getTraceAsString()];
+        }
+    }
+
+    /**
+     * @return array{success: bool, id: string|null, errors: array<string, mixed>, status: int, body: mixed|null}
+     */
+    protected function parseCloudflareHttpResponse(Response $response): array
+    {
+        $status = $response->status();
+        $body = $response->json();
+
+        $success = $response->successful() && ($body['success'] === true || (is_array($body['result']) && count($body['result']) > 0));
+
+        return [
+            'success' => $success,
+            'id' => $body['result']['id'] ?? null,
+            'errors' => $body['errors'] ?? [],
+            'status' => $status,
+            'body' => $body,
+        ];
+    }
+}

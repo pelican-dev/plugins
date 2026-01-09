@@ -47,7 +47,7 @@ class SubdomainsPlugin implements HasPluginSettings, Plugin
         ]);
 
         Notification::make()
-            ->title('Settings saved')
+            ->title(trans('subdomains::strings.notifications.settings_saved'))
             ->success()
             ->send();
     }
