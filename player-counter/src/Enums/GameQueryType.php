@@ -11,10 +11,13 @@ enum GameQueryType: string implements HasLabel
     case CSGO = 'csgo';
     case CSS = 'css';
     case CS16 = 'cs16';
+    case CS15 = 'cs15';
+    case CSCZ = 'cscz';
     case TF2 = 'tf2';
     case L4D = 'l4d';
     case L4D2 = 'l4d2';
     case Gmod = 'gmod';
+    case HL1 = 'hl1';
     case HL2DM = 'hl2dm';
     case DOD = 'dod';
     case DODS = 'dods';
@@ -24,10 +27,16 @@ enum GameQueryType: string implements HasLabel
     case KillingFloor = 'killingfloor';
     case KillingFloor2 = 'killingfloor2';
     case NMRIH = 'nmrih';
+    case NS2 = 'ns2';
+    case Contagion = 'contagion';
+    case FistfulOfFrags = 'fof';
+    case TheShip = 'ship';
+    case Brink = 'brink';
 
     // Minecraft
     case MinecraftJava = 'minecraft';
     case MinecraftBedrock = 'minecraftbe';
+    case MinecraftPE = 'minecraftpe';
 
     // Survival Games
     case Rust = 'rust';
@@ -49,15 +58,20 @@ enum GameQueryType: string implements HasLabel
     case Avorion = 'avorion';
     case Stationeers = 'stationeers';
     case Stormworks = 'stormworks';
+    case Wurm = 'wurm';
 
     // Military Simulators
     case Arma3 = 'arma3';
     case Arma = 'arma';
+    case Arma2OA = 'armedassault2oa';
+    case ArmedAssault3 = 'armedassault3';
     case Squad = 'squad';
     case PostScriptum = 'postscriptum';
     case HellLetLoose = 'hll';
     case Battalion1944 = 'batt1944';
     case ProjectReality = 'projectrealitybf2';
+    case AmericasArmy3 = 'aa3';
+    case AmericasArmyPG = 'aapg';
 
     // Battlefield Series
     case BF2 = 'bf2';
@@ -84,28 +98,40 @@ enum GameQueryType: string implements HasLabel
     // Sandbox/Building
     case Terraria = 'terraria';
     case Tshock = 'tshock';
-    case Starbound = 'starbound';
 
     // GTA/Racing
     case SAMP = 'samp';
     case MultiTheftAuto = 'mta';
     case FiveMRedM = 'cfx';
+    case GTA5M = 'gta5m';
     case JustCause2 = 'justcause2';
     case JustCause3 = 'justcause3';
+    case RFactor = 'rfactor';
+    case RFactor2 = 'rf2';
 
     // MMO/RPG
     case Citadel = 'citadel';
-    case Contagion = 'contagion';
+    case Modiverse = 'modiverse';
 
     // Classic FPS
     case Quake2 = 'quake2';
     case Quake3 = 'quake3';
     case Quake4 = 'quake4';
     case QuakeLive = 'quakelive';
+    case EnemyTerritory = 'et';
+    case ETQW = 'etqw';
     case Doom3 = 'doom3';
+    case Crysis = 'crysis';
+    case Crysis2 = 'crysis2';
+    case CrysisWars = 'crysiswars';
+    case Halo = 'halo';
+    case Kingpin = 'kingpin';
+    case MOHAA = 'mohaa';
+    case SOF2 = 'sof2';
+    case SeriousSam = 'serioussam';
+    case SWAT4 = 'swat4';
     case UrbanTerror = 'urbanterror';
     case Warsow = 'warsow';
-    case SeriousSam = 'serioussam';
 
     // Unreal Tournament
     case UT = 'ut';
@@ -117,8 +143,12 @@ enum GameQueryType: string implements HasLabel
     case JediAcademy = 'jediacademy';
     case JediOutcast = 'jedioutcast';
 
+    // Strategy
+    case DawnOfWar = 'dow';
+
     // Other Popular Games
     case RedOrchestra2 = 'redorchestra2';
+    case RedOrchestraOstfront = 'redorchestraostfront';
     case RisingStorm2 = 'risingstorm2';
     case Mordhau = 'mordhau';
     case Pixark = 'pixark';
@@ -126,11 +156,14 @@ enum GameQueryType: string implements HasLabel
     case Soldat = 'soldat';
     case Teeworlds = 'teeworlds';
     case OpenTTD = 'openttd';
+    case Tibia = 'tibia';
+    case CS2D = 'cs2d';
 
     // Voice Servers
     case Teamspeak3 = 'teamspeak3';
     case Teamspeak2 = 'teamspeak2';
     case Mumble = 'mumble';
+    case Ventrilo = 'ventrilo';
 
     public function getLabel(): string
     {
@@ -182,30 +215,85 @@ enum GameQueryType: string implements HasLabel
 
     /**
      * Get the default query port offset for this game type.
+     * Based on the $port_diff property in GameQ protocol files.
      * Returns null if no offset is needed (port = server port).
-     * Returns 1 for games that use server port + 1 for queries.
      */
     public function getDefaultQueryPortOffset(): ?int
     {
         return match($this) {
-            // Games that use query port = server port + 1
-            self::Rust,
-            self::ArkSe,
-            self::ArkSa,
-            self::Squad,
-            self::HellLetLoose,
-            self::PostScriptum,
-            self::Mordhau,
-            self::VRising,
-            self::Valheim,
-            self::ConanExiles,
-            self::SevenDaysToDie,
-            self::TheForest,
-            self::Miscreated,
-            self::Eco,
-            self::Stationeers,
+            // Offset +1
+            self::Arma3,
+            self::Arma2OA,
             self::Barotrauma,
-            self::ProjectZomboid => 1,
+            self::Brink,
+            self::Eco,
+            self::JustCause3,
+            self::KillingFloor,
+            self::NS2,
+            self::Pixark,
+            self::Rust,
+            self::SeriousSam,
+            self::Stormworks,
+            self::SWAT4,
+            self::TheForest,
+            self::UT,
+            self::Unturned,
+            self::Valheim,
+            self::VRising => 1,
+            
+            // Offset +2
+            self::CODMW3,
+            self::LifeIsFeudal,
+            self::Miscreated,
+            self::RFactor2 => 2,
+            
+            // Offset +3
+            self::Battalion1944 => 3,
+            
+            // Offset +10
+            self::PostScriptum => 10,
+            
+            // Offset +15
+            self::HellLetLoose => 15,
+            
+            // Offset +29
+            self::InsurgencySandstorm => 29,
+            
+            // Offset +101
+            self::Terraria => 101,
+            
+            // Offset +123
+            self::MultiTheftAuto,
+            self::Soldat => 123,
+            
+            // Offset +8433
+            self::BF1942 => 8433,
+            
+            // Offset +13333
+            self::BF2 => 13333,
+            
+            // Offset +19238
+            self::ArkSe,
+            self::KillingFloor2,
+            self::RedOrchestra2 => 19238,
+            
+            // Offset +19378
+            self::Squad => 19378,
+            
+            // Offset +22000
+            self::BF3 => 22000,
+            
+            // Offset +29321
+            self::BFBC2 => 29321,
+            
+            // Offset +51800
+            self::Atlas => 51800,
+            
+            // Offset +18243
+            self::AmericasArmy3 => 18243,
+            
+            // Negative offset -36938
+            self::Mumble => -36938,
             
             // All other games use the same port for server and queries
             default => null,
