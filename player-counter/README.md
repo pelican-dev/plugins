@@ -1,4 +1,4 @@
-# Player Counter (by Boy132)
+# Player Counter (by Boy132 & Royal Multi Gamers)
 
 Show the amount of connected players to game servers with real-time querying capabilities.
 
