@@ -73,6 +73,7 @@ class DocumentService
      */
     protected function queryDocumentsForServer(Server $server, array $allowedTypes): Collection
     {
+        /** @phpstan-ignore-next-line Relationship added by plugin */
         $attachedDocs = $server->documents()
             ->where('is_published', true)
             ->whereIn('type', $allowedTypes)
@@ -143,7 +144,8 @@ class DocumentService
      */
     public function isServerMod(User $user, Server $server): bool
     {
-        if (!enum_exists(\App\Enums\SubuserPermission::class)) { // @phpstan-ignore booleanNot.alwaysFalse
+        /** @phpstan-ignore-next-line Runtime check for enum existence */
+        if (!enum_exists(\App\Enums\SubuserPermission::class)) {
             return false;
         }
 

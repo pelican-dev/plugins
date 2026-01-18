@@ -277,6 +277,7 @@ class Document extends Model
     {
         $allowedTypes = app(DocumentService::class)->getAllowedTypesForUser($user, $server);
 
+        /** @phpstan-ignore-next-line Scope methods on Document model */
         return $query
             ->forServer($server)
             ->published()

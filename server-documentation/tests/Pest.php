@@ -42,30 +42,21 @@ expect()->extend('toBeValidDocumentType', function () {
 |
 */
 
-/**
- * @phpstan-param array<string, mixed> $attributes
- * @phpstan-return \Starter\ServerDocumentation\Models\Document
- */
+/** @phpstan-param array<string, mixed> $attributes */
 function createDocument(array $attributes = []): \Starter\ServerDocumentation\Models\Document
 {
     /** @var \Starter\ServerDocumentation\Models\Document */
     return \Starter\ServerDocumentation\Models\Document::factory()->create($attributes);
 }
 
-/**
- * @phpstan-param array<string, mixed> $attributes
- * @phpstan-return \App\Models\User
- */
+/** @phpstan-param array<string, mixed> $attributes */
 function createUser(array $attributes = []): \App\Models\User
 {
     /** @var \App\Models\User */
     return \App\Models\User::factory()->create($attributes);
 }
 
-/**
- * @phpstan-param array<string, mixed> $attributes
- * @phpstan-return \App\Models\Server
- */
+/** @phpstan-param array<string, mixed> $attributes */
 function createServer(array $attributes = []): \App\Models\Server
 {
     /** @var \App\Models\Server */
