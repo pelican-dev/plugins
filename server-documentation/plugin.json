@@ -1,0 +1,10 @@
+{
+    "id": "server-documentation",
+    "name": "Server Documentation",
+    "version": "1.0.0",
+    "description": "Attach markdown documentation to servers with versioning and role-based access",
+    "author": "Gavin",
+    "category": "plugin",
+    "namespace": "Starter\\ServerDocumentation",
+    "class": "ServerDocumentationPlugin"
+}
