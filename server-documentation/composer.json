@@ -1,0 +1,27 @@
+{
+    "name": "starter/server-documentation",
+    "description": "Attach markdown documentation to servers with versioning and role-based access",
+    "type": "pelican-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gavin",
+            "email": "gavin@nerdz.cloud"
+        }
+    ],
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Starter\\ServerDocumentation\\": "src/"
+        }
+    },
+    "extra": {
+        "pelican": {
+            "providers": [
+                "Starter\\ServerDocumentation\\Providers\\ServerDocumentationServiceProvider"
+            ]
+        }
+    }
+}
