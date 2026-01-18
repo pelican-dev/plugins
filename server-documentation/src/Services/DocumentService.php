@@ -192,15 +192,17 @@ class DocumentService
         ?string $changeSummary = null,
         ?int $userId = null
     ): ?DocumentVersion {
-        return DB::transaction(function () use ($document, $originalTitle, $originalContent, $changeSummary, $userId) {
+        /** @var DocumentVersion|null */
+        return DB::transaction(function () use ($document, $originalTitle, $originalContent, $changeSummary, $userId): ?DocumentVersion {
+            /** @var DocumentVersion|null $latestVersion */
             $latestVersion = $document->versions()
                 ->lockForUpdate()
                 ->latest()
                 ->first();
 
-            $latestVersionNumber = $latestVersion?->version_number ?? 0;
+            $latestVersionNumber = $latestVersion !== null ? $latestVersion->version_number : 0;
 
-            if ($latestVersion && $latestVersion->created_at->diffInSeconds(now()) < self::VERSION_DEBOUNCE_SECONDS) {
+            if ($latestVersion !== null && $latestVersion->created_at->diffInSeconds(now()) < self::VERSION_DEBOUNCE_SECONDS) {
                 $latestVersion->update([
                     'title' => $originalTitle ?? $document->title,
                     'content' => $originalContent ?? $document->content,
@@ -216,6 +218,7 @@ class DocumentService
                 return $latestVersion;
             }
 
+            /** @var DocumentVersion $version */
             $version = $document->versions()->create([
                 'title' => $originalTitle ?? $document->title,
                 'content' => $originalContent ?? $document->content,
@@ -234,15 +237,18 @@ class DocumentService
 
     /**
      * Create a new version of a document within a transaction.
+     *
      * @deprecated Use createVersionFromOriginal for model events
      */
     public function createVersion(Document $document, ?string $changeSummary = null, ?int $userId = null): DocumentVersion
     {
-        return DB::transaction(function () use ($document, $changeSummary, $userId) {
+        /** @var DocumentVersion */
+        return DB::transaction(function () use ($document, $changeSummary, $userId): DocumentVersion {
             $latestVersion = $document->versions()
                 ->lockForUpdate()
                 ->max('version_number') ?? 0;
 
+            /** @var DocumentVersion */
             return $document->versions()->create([
                 'title' => $document->getOriginal('title') ?? $document->title,
                 'content' => $document->getOriginal('content') ?? $document->content,
@@ -291,6 +297,7 @@ class DocumentService
      */
     public function clearDocumentCache(Document $document): void
     {
+        /** @var Server $server */
         foreach ($document->servers as $server) {
             $this->clearServerDocumentsCache($server);
         }

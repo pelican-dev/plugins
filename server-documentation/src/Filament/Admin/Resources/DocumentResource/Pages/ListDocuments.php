@@ -63,6 +63,8 @@ class ListDocuments extends ListRecords
 
     /**
      * Import a Markdown file and create a new document.
+     *
+     * @param array{markdown_file: TemporaryUploadedFile, use_frontmatter?: bool} $data
      */
     protected function importMarkdownFile(array $data): void
     {
@@ -161,7 +163,7 @@ class ListDocuments extends ListRecords
         if (DocumentType::isValid($type)) {
             $enumType = DocumentType::tryFromLegacy($type);
 
-            return $enumType?->value ?? DocumentType::Player->value;
+            return $enumType !== null ? $enumType->value : DocumentType::Player->value;
         }
 
         logger()->warning('Invalid document type in import', [

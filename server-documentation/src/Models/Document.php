@@ -18,6 +18,33 @@ use Starter\ServerDocumentation\Database\Factories\DocumentFactory;
 use Starter\ServerDocumentation\Enums\DocumentType;
 use Starter\ServerDocumentation\Services\DocumentService;
 
+/**
+ * @property int $id
+ * @property string $uuid
+ * @property string $title
+ * @property string $slug
+ * @property string $content
+ * @property string $type
+ * @property bool $is_global
+ * @property bool $is_published
+ * @property int|null $author_id
+ * @property int|null $last_edited_by
+ * @property int $sort_order
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property-read User|null $author
+ * @property-read User|null $lastEditor
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Server> $servers
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, DocumentVersion> $versions
+ *
+ * @method static Builder|Document forServer(Server $server)
+ * @method static Builder|Document forTypes(array $types)
+ * @method static Builder|Document published()
+ * @method static Builder|Document global()
+ * @method static Builder|Document search(string $term)
+ * @method static Builder|Document visibleTo(?User $user, Server $server)
+ */
 class Document extends Model
 {
     /** @use HasFactory<DocumentFactory> */
@@ -36,6 +63,8 @@ class Document extends Model
 
     /**
      * Temporary storage for original values before update (for versioning).
+     *
+     * @var array{title?: string, content?: string, dirty_fields?: array<string>}
      */
     protected array $originalValuesForVersion = [];
 
@@ -110,9 +139,9 @@ class Document extends Model
         static::updated(function (Document $document) {
             if (!empty($document->originalValuesForVersion)) {
                 $changeSummary = app(DocumentService::class)->generateChangeSummary(
-                    $document->originalValuesForVersion['dirty_fields'],
+                    $document->originalValuesForVersion['dirty_fields'] ?? [],
                     $document->originalValuesForVersion['content'] ?? '',
-                    $document->content ?? ''
+                    $document->content
                 );
 
                 app(DocumentService::class)->createVersionFromOriginal(

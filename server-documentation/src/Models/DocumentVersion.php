@@ -10,6 +10,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Starter\ServerDocumentation\Database\Factories\DocumentVersionFactory;
 
+/**
+ * @property int $id
+ * @property int $document_id
+ * @property string $title
+ * @property string $content
+ * @property int $version_number
+ * @property int|null $edited_by
+ * @property string|null $change_summary
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read Document $document
+ * @property-read User|null $editor
+ * @property-read string $formatted_version
+ */
 class DocumentVersion extends Model
 {
     /** @use HasFactory<DocumentVersionFactory> */

@@ -8,7 +8,6 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
-use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -34,7 +33,9 @@ class ViewDocumentVersions extends Page implements HasTable
 
     public function mount(int|string $record): void
     {
-        $this->record = $this->resolveRecord($record);
+        /** @var Document $resolved */
+        $resolved = $this->resolveRecord($record);
+        $this->record = $resolved;
     }
 
     public function getTitle(): string|Htmlable
@@ -87,7 +88,7 @@ class ViewDocumentVersions extends Page implements HasTable
             ])
             ->defaultSort('version_number', 'desc')
             ->actions([
-                TableAction::make('preview')
+                Action::make('preview')
                     ->label(trans('server-documentation::strings.versions.preview'))
                     ->icon('tabler-eye')
                     ->modalHeading(fn (DocumentVersion $record): string => 'v' . $record->version_number . ': ' . $record->title)
@@ -97,7 +98,7 @@ class ViewDocumentVersions extends Page implements HasTable
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close'),
 
-                TableAction::make('restore')
+                Action::make('restore')
                     ->label(trans('server-documentation::strings.versions.restore'))
                     ->icon('tabler-restore')
                     ->color('warning')
