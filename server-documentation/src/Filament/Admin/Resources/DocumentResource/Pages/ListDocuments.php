@@ -48,15 +48,15 @@ class ListDocuments extends ListRecords
                     $this->importMarkdownFile($data);
                 }),
             Action::make('help')
-                ->label('Permission Guide')
+                ->label(trans('server-documentation::strings.permission_guide.title'))
                 ->icon('tabler-help')
                 ->color('gray')
-                ->modalHeading('Document Permission Guide')
+                ->modalHeading(trans('server-documentation::strings.permission_guide.modal_heading'))
                 ->modalDescription(new HtmlString(
                     view('server-documentation::filament.partials.permission-guide', ['showExamples' => true])->render() // @phpstan-ignore argument.type
                 ))
                 ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Close'),
+                ->modalCancelActionLabel(trans('server-documentation::strings.actions.close')),
             CreateAction::make(),
         ];
     }

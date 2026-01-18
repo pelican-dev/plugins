@@ -23,9 +23,12 @@ class DocumentsRelationManager extends RelationManager
 
     protected static string $relationship = 'documents';
 
-    protected static ?string $title = 'Documents';
-
     protected static string|\BackedEnum|null $icon = 'tabler-file-text';
+
+    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    {
+        return trans('server-documentation::strings.document.plural');
+    }
 
     public function table(Table $table): Table
     {

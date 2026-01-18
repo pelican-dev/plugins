@@ -63,6 +63,7 @@ return [
 
     'permission_guide' => [
         'title' => 'Permission Guide',
+        'modal_heading' => 'Document Permission Guide',
         'description' => 'Understanding document visibility',
         'type_controls' => 'controls who can see the document.',
         'all_servers_controls' => 'controls where it appears.',
@@ -120,6 +121,7 @@ return [
         'export' => 'Export as Markdown',
         'import' => 'Import Markdown',
         'back_to_document' => 'Back to Document',
+        'close' => 'Close',
     ],
 
     'import' => [

@@ -318,6 +318,8 @@ class MarkdownConverter
                         $value = true;
                     } elseif ($value === 'false') {
                         $value = false;
+                    } else {
+                        $value = $this->unquoteYamlValue($value);
                     }
 
                     $metadata[$key] = $value;
@@ -328,5 +330,18 @@ class MarkdownConverter
         }
 
         return [[], $markdown];
+    }
+
+    /**
+     * Unquote a YAML value that was quoted by addFrontmatter.
+     */
+    protected function unquoteYamlValue(string $value): string
+    {
+        if (strlen($value) >= 2 && $value[0] === '"' && $value[strlen($value) - 1] === '"') {
+            $value = substr($value, 1, -1);
+            $value = str_replace(['\\n', '\\t', '\\"', '\\\\'], ["\n", "\t", '"', '\\'], $value);
+        }
+
+        return $value;
     }
 }
