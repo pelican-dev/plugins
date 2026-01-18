@@ -33,10 +33,10 @@ class Documents extends Page
 
     public static function canAccess(): bool
     {
-        /** @var Server $server */
+        /** @var Server|null $server */
         $server = Filament::getTenant();
 
-        if (!$server) {
+        if ($server === null) {
             return false;
         }
 
