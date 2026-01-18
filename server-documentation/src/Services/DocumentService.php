@@ -68,6 +68,8 @@ class DocumentService
 
     /**
      * Query documents for a server without caching.
+     *
+     * @phpstan-param array<string> $allowedTypes
      */
     protected function queryDocumentsForServer(Server $server, array $allowedTypes): Collection
     {
@@ -141,7 +143,7 @@ class DocumentService
      */
     public function isServerMod(User $user, Server $server): bool
     {
-        if (!enum_exists(\App\Enums\SubuserPermission::class)) {
+        if (!enum_exists(\App\Enums\SubuserPermission::class)) { // @phpstan-ignore booleanNot.alwaysFalse
             return false;
         }
 
@@ -153,6 +155,8 @@ class DocumentService
 
     /**
      * Generate a change summary for version history.
+     *
+     * @phpstan-param array<string> $dirtyFields
      */
     public function generateChangeSummary(array $dirtyFields, string $oldContent, string $newContent): string
     {
@@ -333,6 +337,8 @@ class DocumentService
 
     /**
      * Generate cache key for server documents.
+     *
+     * @phpstan-param array<string> $allowedTypes
      */
     protected function getServerDocumentsCacheKey(Server $server, array $allowedTypes): string
     {
@@ -396,6 +402,8 @@ class DocumentService
 
     /**
      * Log an audit event for document operations.
+     *
+     * @phpstan-param array<string, mixed> $context
      */
     protected function logAudit(string $action, Document $document, array $context = []): void
     {

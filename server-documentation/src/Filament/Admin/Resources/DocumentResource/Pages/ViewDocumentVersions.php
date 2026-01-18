@@ -93,7 +93,7 @@ class ViewDocumentVersions extends Page implements HasTable
                     ->icon('tabler-eye')
                     ->modalHeading(fn (DocumentVersion $record): string => 'v' . $record->version_number . ': ' . $record->title)
                     ->modalContent(fn (DocumentVersion $record): HtmlString => new HtmlString(
-                        view('server-documentation::filament.pages.version-preview', ['version' => $record])->render()
+                        view('server-documentation::filament.pages.version-preview', ['version' => $record])->render() // @phpstan-ignore argument.type
                     ))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close'),

@@ -53,7 +53,7 @@ class ListDocuments extends ListRecords
                 ->color('gray')
                 ->modalHeading('Document Permission Guide')
                 ->modalDescription(new HtmlString(
-                    view('server-documentation::filament.partials.permission-guide', ['showExamples' => true])->render()
+                    view('server-documentation::filament.partials.permission-guide', ['showExamples' => true])->render() // @phpstan-ignore argument.type
                 ))
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Close'),
@@ -63,6 +63,8 @@ class ListDocuments extends ListRecords
 
     /**
      * Import a Markdown file and create a new document.
+     *
+     * @phpstan-param array<string, mixed> $data
      */
     protected function importMarkdownFile(array $data): void
     {

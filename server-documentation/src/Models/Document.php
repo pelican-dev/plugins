@@ -247,6 +247,7 @@ class Document extends Model
         });
     }
 
+    /** @phpstan-param array<string> $types */
     public function scopeForTypes(Builder $query, array $types): Builder
     {
         return $query->whereIn('type', $types);

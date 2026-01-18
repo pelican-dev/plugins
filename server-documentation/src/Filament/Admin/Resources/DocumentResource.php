@@ -181,7 +181,7 @@ class DocumentResource extends Resource
                         Placeholder::make('help')
                             ->label('')
                             ->content(new HtmlString(
-                                view('server-documentation::filament.partials.permission-guide', ['showExamples' => false])->render()
+                                view('server-documentation::filament.partials.permission-guide', ['showExamples' => false])->render() // @phpstan-ignore argument.type
                             )),
                     ])->columnSpanFull(),
             ]);

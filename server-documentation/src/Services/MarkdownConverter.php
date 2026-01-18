@@ -263,6 +263,8 @@ class MarkdownConverter
 
     /**
      * Add YAML frontmatter to markdown content.
+     *
+     * @phpstan-param array<string, mixed> $metadata
      */
     public function addFrontmatter(string $markdown, array $metadata): string
     {
