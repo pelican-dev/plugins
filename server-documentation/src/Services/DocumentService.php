@@ -144,7 +144,7 @@ class DocumentService
      */
     public function isServerMod(User $user, Server $server): bool
     {
-        /** @phpstan-ignore-next-line Runtime check for enum existence */
+        // @phpstan-ignore-next-line
         if (!enum_exists(\App\Enums\SubuserPermission::class)) {
             return false;
         }
