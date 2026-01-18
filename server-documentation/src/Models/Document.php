@@ -49,12 +49,8 @@ class Document extends Model
 {
     /** @use HasFactory<DocumentFactory> */
     use HasFactory;
-    use SoftDeletes;
 
-    protected static function newFactory(): DocumentFactory
-    {
-        return DocumentFactory::new();
-    }
+    use SoftDeletes;
 
     /**
      * Resource name for API/permission references.
@@ -108,6 +104,11 @@ class Document extends Model
             'is_published' => 'boolean',
             'sort_order' => 'integer',
         ];
+    }
+
+    protected static function newFactory(): DocumentFactory
+    {
+        return DocumentFactory::new();
     }
 
     protected static function booted(): void
