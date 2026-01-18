@@ -144,10 +144,6 @@ class DocumentService
      */
     public function isServerMod(User $user, Server $server): bool
     {
-        if (!enum_exists(\App\Enums\SubuserPermission::class)) { // @phpstan-ignore-line
-            return false;
-        }
-
         return $user->can(\App\Enums\SubuserPermission::ControlConsole, $server) ||
             $user->can(\App\Enums\SubuserPermission::ControlStart, $server) ||
             $user->can(\App\Enums\SubuserPermission::ControlStop, $server) ||
