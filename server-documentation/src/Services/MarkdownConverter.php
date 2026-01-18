@@ -275,7 +275,9 @@ class MarkdownConverter
             } elseif (is_array($value)) {
                 $value = implode(', ', $value);
             } elseif (is_string($value) && $this->needsYamlQuoting($value)) {
-                $value = '"' . addcslashes($value, '"\\') . '"';
+                $escaped = addcslashes($value, '"\\');
+                $escaped = str_replace(["\r\n", "\r", "\n", "\t"], ['\\n', '\\n', '\\n', '\\t'], $escaped);
+                $value = '"' . $escaped . '"';
             }
             $frontmatter .= "{$key}: {$value}\n";
         }

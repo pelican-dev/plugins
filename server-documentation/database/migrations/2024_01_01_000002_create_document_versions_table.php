@@ -14,11 +14,9 @@ return new class extends Migration
             $table->string('title');
             $table->longText('content');
             $table->unsignedInteger('version_number');
-            $table->unsignedBigInteger('edited_by')->nullable();
+            $table->foreignId('edited_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('change_summary')->nullable();
             $table->timestamps();
-
-            $table->foreign('edited_by')->references('id')->on('users')->nullOnDelete();
             $table->index(['document_id', 'version_number']);
         });
     }

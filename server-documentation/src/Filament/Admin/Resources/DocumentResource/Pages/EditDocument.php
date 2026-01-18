@@ -14,12 +14,15 @@ use Starter\ServerDocumentation\Models\Document;
 use Starter\ServerDocumentation\Services\MarkdownConverter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * @property Document $record
- */
 class EditDocument extends EditRecord
 {
     protected static string $resource = DocumentResource::class;
+
+    public function getRecord(): Document
+    {
+        /** @var Document */
+        return $this->record;
+    }
 
     /** @return array<Action|ActionGroup> */
     protected function getHeaderActions(): array
@@ -37,8 +40,8 @@ class EditDocument extends EditRecord
                 ->icon('tabler-history')
                 ->iconButton()
                 ->iconSize(IconSize::ExtraLarge)
-                ->url(fn () => DocumentResource::getUrl('versions', ['record' => $this->record]))
-                ->badge(fn () => $this->record->versions()->count() ?: null),
+                ->url(fn () => DocumentResource::getUrl('versions', ['record' => $this->getRecord()]))
+                ->badge(fn () => $this->getRecord()->versions()->count() ?: null),
             $this->getSaveFormAction()
                 ->formId('form')
                 ->iconButton()
@@ -56,7 +59,7 @@ class EditDocument extends EditRecord
     public function exportAsMarkdown(): StreamedResponse
     {
         $converter = new MarkdownConverter();
-        $document = $this->record;
+        $document = $this->getRecord();
 
         $markdown = $converter->toMarkdown($document->content);
         $markdown = $converter->addFrontmatter($markdown, [

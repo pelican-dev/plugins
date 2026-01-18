@@ -33,8 +33,11 @@ return new class extends Migration
         } elseif ($driver === 'pgsql') {
             // PostgreSQL: Use a partial unique index
             DB::statement('CREATE UNIQUE INDEX idx_documents_slug_active ON documents(slug) WHERE deleted_at IS NULL');
+        } elseif ($driver === 'sqlite') {
+            // SQLite 3.9+: Use a partial unique index
+            DB::statement('CREATE UNIQUE INDEX idx_documents_slug_active ON documents(slug) WHERE deleted_at IS NULL');
         } else {
-            // SQLite and others: Just use regular unique (less ideal but functional)
+            // Fallback for unsupported drivers: regular unique (slug reuse after soft delete won't work)
             Schema::table('documents', function (Blueprint $table) {
                 $table->unique('slug');
             });
@@ -60,6 +63,8 @@ return new class extends Migration
             DB::statement('DROP INDEX idx_documents_slug_active ON documents');
             DB::statement('ALTER TABLE documents DROP COLUMN slug_unique');
         } elseif ($driver === 'pgsql') {
+            DB::statement('DROP INDEX idx_documents_slug_active');
+        } elseif ($driver === 'sqlite') {
             DB::statement('DROP INDEX idx_documents_slug_active');
         } else {
             Schema::table('documents', function (Blueprint $table) {

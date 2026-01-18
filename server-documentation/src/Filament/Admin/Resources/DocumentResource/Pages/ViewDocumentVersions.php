@@ -19,9 +19,6 @@ use Starter\ServerDocumentation\Filament\Admin\Resources\DocumentResource;
 use Starter\ServerDocumentation\Models\Document;
 use Starter\ServerDocumentation\Models\DocumentVersion;
 
-/**
- * @property Document $record
- */
 class ViewDocumentVersions extends Page implements HasTable
 {
     use InteractsWithRecord;
@@ -38,9 +35,15 @@ class ViewDocumentVersions extends Page implements HasTable
         $this->record = $resolved;
     }
 
+    public function getRecord(): Document
+    {
+        /** @var Document */
+        return $this->record;
+    }
+
     public function getTitle(): string|Htmlable
     {
-        return trans('server-documentation::strings.versions.title') . ': ' . $this->record->title;
+        return trans('server-documentation::strings.versions.title') . ': ' . $this->getRecord()->title;
     }
 
     public static function getNavigationLabel(): string
@@ -54,14 +57,14 @@ class ViewDocumentVersions extends Page implements HasTable
             Action::make('back')
                 ->label(trans('server-documentation::strings.actions.back_to_document'))
                 ->icon('tabler-arrow-left')
-                ->url(fn () => DocumentResource::getUrl('edit', ['record' => $this->record])),
+                ->url(fn () => DocumentResource::getUrl('edit', ['record' => $this->getRecord()])),
         ];
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn (): Builder => DocumentVersion::query()->where('document_id', $this->record->id))
+            ->query(fn (): Builder => DocumentVersion::query()->where('document_id', $this->getRecord()->id))
             ->columns([
                 TextColumn::make('version_number')
                     ->label(trans('server-documentation::strings.versions.version_number'))
@@ -106,7 +109,7 @@ class ViewDocumentVersions extends Page implements HasTable
                     ->modalHeading(trans('server-documentation::strings.versions.restore'))
                     ->modalDescription(trans('server-documentation::strings.versions.restore_confirm'))
                     ->action(function (DocumentVersion $record): void {
-                        $this->record->restoreVersion($record);
+                        $this->getRecord()->restoreVersion($record);
 
                         Notification::make()
                             ->title(trans('server-documentation::strings.versions.restored'))

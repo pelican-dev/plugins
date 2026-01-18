@@ -39,19 +39,19 @@
 
     @if($showExamples ?? false)
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-4 mb-2">
-            <strong>{{ trans('server-documentation::strings.labels.all_servers') }} Toggle:</strong>
+            <strong>{{ trans('server-documentation::strings.permission_guide.toggle_title') }}</strong>
         </p>
         <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1 list-disc list-inside">
-            <li><strong>On</strong> → Document appears on every server</li>
-            <li><strong>Off</strong> → Must attach to specific servers</li>
+            <li><strong>{{ trans('server-documentation::strings.permission_guide.toggle_on') }}</strong> → {{ trans('server-documentation::strings.permission_guide.toggle_on_desc') }}</li>
+            <li><strong>{{ trans('server-documentation::strings.permission_guide.toggle_off') }}</strong> → {{ trans('server-documentation::strings.permission_guide.toggle_off_desc') }}</li>
         </ul>
 
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-4 mb-2"><strong>Examples:</strong></p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-4 mb-2"><strong>{{ trans('server-documentation::strings.permission_guide.examples_title') }}</strong></p>
         <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1 list-disc list-inside">
-            <li><strong>Player + All Servers</strong> → Welcome guide everyone sees everywhere</li>
-            <li><strong>Player + Specific Server</strong> → Rules for one server only</li>
-            <li><strong>Server Admin + All Servers</strong> → Company-wide admin procedures</li>
-            <li><strong>Server Mod + Specific Server</strong> → Mod notes for one server</li>
+            <li><strong>{{ trans('server-documentation::strings.permission_guide.example_player_all') }}</strong> → {{ trans('server-documentation::strings.permission_guide.example_player_all_desc') }}</li>
+            <li><strong>{{ trans('server-documentation::strings.permission_guide.example_player_specific') }}</strong> → {{ trans('server-documentation::strings.permission_guide.example_player_specific_desc') }}</li>
+            <li><strong>{{ trans('server-documentation::strings.permission_guide.example_admin_all') }}</strong> → {{ trans('server-documentation::strings.permission_guide.example_admin_all_desc') }}</li>
+            <li><strong>{{ trans('server-documentation::strings.permission_guide.example_mod_specific') }}</strong> → {{ trans('server-documentation::strings.permission_guide.example_mod_specific_desc') }}</li>
         </ul>
     @endif
 
