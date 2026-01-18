@@ -68,8 +68,6 @@ class DocumentService
 
     /**
      * Query documents for a server without caching.
-     *
-     * @param array<string> $allowedTypes
      */
     protected function queryDocumentsForServer(Server $server, array $allowedTypes): Collection
     {
@@ -155,8 +153,6 @@ class DocumentService
 
     /**
      * Generate a change summary for version history.
-     *
-     * @param array<string> $dirtyFields
      */
     public function generateChangeSummary(array $dirtyFields, string $oldContent, string $newContent): string
     {
@@ -337,8 +333,6 @@ class DocumentService
 
     /**
      * Generate cache key for server documents.
-     *
-     * @param array<string> $allowedTypes
      */
     protected function getServerDocumentsCacheKey(Server $server, array $allowedTypes): string
     {
@@ -402,8 +396,6 @@ class DocumentService
 
     /**
      * Log an audit event for document operations.
-     *
-     * @param array<string, mixed> $context
      */
     protected function logAudit(string $action, Document $document, array $context = []): void
     {

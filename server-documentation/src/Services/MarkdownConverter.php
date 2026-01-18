@@ -42,8 +42,6 @@ class MarkdownConverter
 
     /**
      * Convert Markdown content to HTML.
-     *
-     * @param bool $sanitize Whether to sanitize the output HTML (default: true)
      */
     public function toHtml(string $markdown, bool $sanitize = true): string
     {
@@ -265,8 +263,6 @@ class MarkdownConverter
 
     /**
      * Add YAML frontmatter to markdown content.
-     *
-     * @param array<string, mixed> $metadata
      */
     public function addFrontmatter(string $markdown, array $metadata): string
     {

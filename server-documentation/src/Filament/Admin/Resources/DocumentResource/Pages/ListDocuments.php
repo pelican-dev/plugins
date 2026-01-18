@@ -63,8 +63,6 @@ class ListDocuments extends ListRecords
 
     /**
      * Import a Markdown file and create a new document.
-     *
-     * @param array{markdown_file: TemporaryUploadedFile, use_frontmatter?: bool} $data
      */
     protected function importMarkdownFile(array $data): void
     {
