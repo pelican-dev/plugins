@@ -39,7 +39,7 @@ use Starter\ServerDocumentation\Services\DocumentService;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, DocumentVersion> $versions
  *
  * @method static Builder|Document forServer(Server $server)
- * @method static Builder|Document forTypes(array $types)
+ * @method static Builder|Document forTypes(array<string> $types)
  * @method static Builder|Document published()
  * @method static Builder|Document global()
  * @method static Builder|Document search(string $term)
@@ -114,7 +114,7 @@ class Document extends Model
     {
         static::creating(function (Document $document) {
             $document->uuid ??= Str::uuid()->toString();
-            if ($document->slug === null) {
+            if (empty($document->slug)) {
                 $document->slug = static::generateUniqueSlug($document->title);
             }
             if ($document->author_id === null && auth()->check()) {

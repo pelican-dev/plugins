@@ -191,9 +191,9 @@ class DocumentService
         ?string $originalContent,
         ?string $changeSummary = null,
         ?int $userId = null
-    ): ?DocumentVersion {
-        /** @var DocumentVersion|null */
-        return DB::transaction(function () use ($document, $originalTitle, $originalContent, $changeSummary, $userId): ?DocumentVersion {
+    ): DocumentVersion {
+        /** @var DocumentVersion */
+        return DB::transaction(function () use ($document, $originalTitle, $originalContent, $changeSummary, $userId): DocumentVersion {
             /** @var DocumentVersion|null $latestVersion */
             $latestVersion = $document->versions()
                 ->lockForUpdate()
