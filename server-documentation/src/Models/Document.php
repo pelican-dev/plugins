@@ -267,8 +267,8 @@ class Document extends Model
 
         return $query->where(function (Builder $q) use ($term) {
             $q->where('title', 'like', "%{$term}%")
-              ->orWhere('slug', 'like', "%{$term}%")
-              ->orWhere('content', 'like', "%{$term}%");
+                ->orWhere('slug', 'like', "%{$term}%")
+                ->orWhere('content', 'like', "%{$term}%");
         });
     }
 
