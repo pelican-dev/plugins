@@ -75,8 +75,8 @@ class DocumentsRelationManager extends RelationManager
             ->groupedBulkActions([
                 DetachBulkAction::make(),
             ])
-            ->emptyStateHeading(trans('server-documentation::strings.relation_managers.no_servers_linked'))
-            ->emptyStateDescription(trans('server-documentation::strings.relation_managers.attach_servers_description'))
+            ->emptyStateHeading(trans('server-documentation::strings.relation_managers.no_documents_linked'))
+            ->emptyStateDescription(trans('server-documentation::strings.relation_managers.attach_documents_description'))
             ->emptyStateIcon('tabler-file-off');
     }
 }

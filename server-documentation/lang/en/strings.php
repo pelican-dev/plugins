@@ -146,6 +146,8 @@ return [
         'linked_servers' => 'Linked Servers',
         'no_servers_linked' => 'No servers linked',
         'attach_servers_description' => 'Attach servers to make this document visible on those servers.',
+        'no_documents_linked' => 'No documents linked',
+        'attach_documents_description' => 'Attach documents to make them visible on this server.',
         'sort_order_helper' => 'Order this document appears for this server',
     ],
 ];

@@ -135,8 +135,8 @@ class DocumentService
     public function isServerAdmin(User $user, Server $server): bool
     {
         return $server->owner_id === $user->id ||
-            $user->can('update server') ||
-            $user->can('create server');
+            $user->can('update server', $server) ||
+            $user->can('create server', $server);
     }
 
     /**
