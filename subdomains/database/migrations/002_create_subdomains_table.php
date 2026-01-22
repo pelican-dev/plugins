@@ -1,5 +1,6 @@
 <?php
 
+use Boy132\Subdomains\Models\Subdomain;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -28,6 +29,13 @@ return new class extends Migration
 
     public function down(): void
     {
+        Subdomain::all()->each(function (Subdomain $subdomain) {
+            try {
+                $subdomain->delete();
+            } catch (Exception) {
+            }
+        });
+
         Schema::dropIfExists('subdomains');
     }
 };
