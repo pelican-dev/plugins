@@ -59,21 +59,21 @@ class CreateServerAction extends Action
                     ->label(trans('user-creatable-servers::strings.cpu'))
                     ->required()
                     ->numeric()
-                    ->minValue(1)
+                    ->minValue(0)
                     ->maxValue($userResourceLimits->getCpuLeft())
                     ->suffix('%'),
                 TextInput::make('memory')
                     ->label(trans('user-creatable-servers::strings.memory'))
                     ->required()
                     ->numeric()
-                    ->minValue(1)
+                    ->minValue(0)
                     ->maxValue($userResourceLimits->getMemoryLeft())
                     ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB'),
                 TextInput::make('disk')
                     ->label(trans('user-creatable-servers::strings.disk'))
                     ->required()
                     ->numeric()
-                    ->minValue(1)
+                    ->minValue(0)
                     ->maxValue($userResourceLimits->getDiskLeft())
                     ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB'),
             ];

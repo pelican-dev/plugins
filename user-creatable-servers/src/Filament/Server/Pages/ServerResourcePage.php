@@ -69,7 +69,7 @@ class ServerResourcePage extends ServerFormPage
                     ->hint(fn ($state) => $userResourceLimits->cpu > 0 ? ($maxCpu - $state . '% ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
                     ->hintColor(fn ($state) => $userResourceLimits->cpu > 0 && $maxCpu - $state < 0 ? 'danger' : null)
                     ->numeric()
-                    ->minValue(1)
+                    ->minValue(0)
                     ->maxValue($userResourceLimits->cpu > 0 ? $maxCpu : null)
                     ->suffix('%'),
                 TextInput::make('memory')
@@ -79,7 +79,7 @@ class ServerResourcePage extends ServerFormPage
                     ->hint(fn ($state) => $userResourceLimits->memory > 0 ? ($maxMemory - $state . $suffix . ' ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
                     ->hintColor(fn ($state) => $userResourceLimits->memory > 0 && $maxMemory - $state < 0 ? 'danger' : null)
                     ->numeric()
-                    ->minValue(1)
+                    ->minValue(0)
                     ->maxValue($userResourceLimits->memory > 0 ? $maxMemory : null)
                     ->suffix($suffix),
                 TextInput::make('disk')
@@ -89,7 +89,7 @@ class ServerResourcePage extends ServerFormPage
                     ->hint(fn ($state) => $userResourceLimits->disk > 0 ? ($maxDisk - $state . $suffix . ' ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
                     ->hintColor(fn ($state) => $userResourceLimits->disk > 0 && $maxDisk - $state < 0 ? 'danger' : null)
                     ->numeric()
-                    ->minValue(1)
+                    ->minValue(0)
                     ->maxValue($userResourceLimits->disk > 0 ? $maxDisk : null)
                     ->suffix($suffix),
             ]);
