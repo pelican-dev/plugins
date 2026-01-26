@@ -38,7 +38,9 @@ class SubdomainsPluginProvider extends ServiceProvider
             foreach ($server->subdomains()->get() as $subdomain) {
                 try {
                     $subdomain->delete();
-                } catch (Exception $exception) {}
+                } catch (Exception $exception) {
+                    report($exception);
+                }
             }
         });
     }
