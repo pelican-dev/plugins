@@ -48,7 +48,7 @@ class LegalPages extends Page
 
     public static function canAccess(): bool
     {
-        return user()?->can('view legalPages');
+        return user()?->can('view legalPage');
     }
 
     public function mount(): void
@@ -74,6 +74,7 @@ class LegalPages extends Page
         foreach (LegalPageType::cases() as $legalPageType) {
             $schema[] = MarkdownEditor::make($legalPageType->getId())
                 ->label($legalPageType->getLabel())
+                ->disabled(fn () => !user()?->can('update legalPage'))
                 ->hintActions([
                     Action::make('view')
                         ->label(trans('filament-actions::view.single.label'))
@@ -82,6 +83,7 @@ class LegalPages extends Page
                         ->visible(fn (Get $get) => $get($legalPageType->getId())),
                     Action::make('clear')
                         ->label(trans('legal-pages::strings.clear'))
+                        ->authorize(fn () => user()?->can('update legalPage'))
                         ->color('danger')
                         ->icon('tabler-trash')
                         ->action(fn (Set $set) => $set($legalPageType->getId(), null)),
@@ -101,6 +103,7 @@ class LegalPages extends Page
         return [
             Action::make('save')
                 ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+                ->authorize(fn () => user()?->can('update legalPage'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
         ];

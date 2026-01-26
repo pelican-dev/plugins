@@ -7,18 +7,25 @@ use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Components\Tables\Columns\DateTimeColumn;
 use Boy132\Tickets\Enums\TicketCategory;
 use Boy132\Tickets\Enums\TicketPriority;
-use Boy132\Tickets\Filament\Admin\Resources\Tickets\Pages\ManageTickets;
+use Boy132\Tickets\Enums\TicketStatus;
+use Boy132\Tickets\Filament\Admin\Resources\Tickets\Pages\CreateTicket;
+use Boy132\Tickets\Filament\Admin\Resources\Tickets\Pages\EditTicket;
+use Boy132\Tickets\Filament\Admin\Resources\Tickets\Pages\ListTickets;
+use Boy132\Tickets\Filament\Admin\Resources\Tickets\Pages\ViewTicket;
+use Boy132\Tickets\Filament\Admin\Resources\Tickets\RelationManagers\MessagesRelationManager;
 use Boy132\Tickets\Filament\Components\Actions\AnswerAction;
 use Boy132\Tickets\Filament\Components\Actions\AssignToMeAction;
 use Boy132\Tickets\Models\Ticket;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Markdown;
 use Filament\Tables\Columns\TextColumn;
@@ -50,7 +57,7 @@ class TicketResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) Ticket::where('is_answered', false)->count();
+        return (string) Ticket::whereNot('status', TicketStatus::Closed->value)->count();
     }
 
     public static function table(Table $table): Table
@@ -73,6 +80,10 @@ class TicketResource extends Resource
                     ->toggleable(),
                 TextColumn::make('priority')
                     ->label(trans('tickets::tickets.priority'))
+                    ->badge()
+                    ->toggleable(),
+                TextColumn::make('status')
+                    ->label(trans('tickets::tickets.status'))
                     ->badge()
                     ->toggleable(),
                 TextColumn::make('assignedUser.username')
@@ -101,6 +112,7 @@ class TicketResource extends Resource
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),
+                    EditAction::make(),
                     AnswerAction::make(),
                     AssignToMeAction::make(),
                     DeleteAction::make(),
@@ -111,6 +123,8 @@ class TicketResource extends Resource
                     ->label(trans('tickets::tickets.category')),
                 Group::make('priority')
                     ->label(trans('tickets::tickets.priority')),
+                Group::make('status')
+                    ->label(trans('tickets::tickets.status')),
                 Group::make('server.name')
                     ->label(trans('tickets::tickets.server')),
                 Group::make('author.username')
@@ -124,7 +138,6 @@ class TicketResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->columns(3)
             ->schema([
                 TextInput::make('title')
                     ->label(trans_choice('tickets::tickets.title', 1))
@@ -133,15 +146,24 @@ class TicketResource extends Resource
                 Select::make('category')
                     ->label(trans('tickets::tickets.category'))
                     ->required()
+                    ->selectablePlaceholder(false)
                     ->options(TicketCategory::class),
                 Select::make('priority')
                     ->label(trans('tickets::tickets.priority'))
                     ->required()
+                    ->selectablePlaceholder(false)
                     ->options(TicketPriority::class)
                     ->default(TicketPriority::Normal),
+                Select::make('status')
+                    ->label(trans('tickets::tickets.status'))
+                    ->required()
+                    ->selectablePlaceholder(false)
+                    ->options(TicketStatus::class)
+                    ->default(TicketStatus::Open),
                 Select::make('server_id')
                     ->label(trans('tickets::tickets.server'))
                     ->required()
+                    ->selectablePlaceholder(false)
                     ->relationship('server', 'name'),
                 MarkdownEditor::make('description')
                     ->label(trans('tickets::tickets.description'))
@@ -153,48 +175,70 @@ class TicketResource extends Resource
     {
         return $schema
             ->components([
-                TextEntry::make('title')
-                    ->label(trans_choice('tickets::tickets.title', 1))
-                    ->columnSpanFull(),
-                TextEntry::make('category')
-                    ->label(trans('tickets::tickets.category'))
-                    ->badge(),
-                TextEntry::make('priority')
-                    ->label(trans('tickets::tickets.priority'))
-                    ->badge(),
-                TextEntry::make('description')
-                    ->label(trans('tickets::tickets.description'))
+                Section::make()
                     ->columnSpanFull()
-                    ->markdown()
-                    ->placeholder(trans('tickets::tickets.no_description')),
-                TextEntry::make('answer')
-                    ->visible(fn (Ticket $ticket) => $ticket->is_answered)
-                    ->label(trans('tickets::tickets.answer_noun'))
+                    ->columns(['default' => 1, 'md' => 2, 'lg' => 4])
+                    ->schema([
+                        TextEntry::make('title')
+                            ->label(trans_choice('tickets::tickets.title', 1))
+                            ->columnSpanFull(),
+                        TextEntry::make('category')
+                            ->label(trans('tickets::tickets.category'))
+                            ->badge(),
+                        TextEntry::make('priority')
+                            ->label(trans('tickets::tickets.priority'))
+                            ->badge(),
+                        TextEntry::make('status')
+                            ->label(trans('tickets::tickets.status'))
+                            ->badge(),
+                        TextEntry::make('assignedUser.username')
+                            ->label(trans('tickets::tickets.assigned_to'))
+                            ->icon('tabler-user')
+                            ->placeholder(trans('tickets::tickets.noone'))
+                            ->url(fn (Ticket $ticket) => $ticket->assignedUser && auth()->user()->can('update user', $ticket->assignedUser) ? EditUser::getUrl(['record' => $ticket->assignedUser]) : null),
+                        TextEntry::make('server.name')
+                            ->label(trans('tickets::tickets.server'))
+                            ->icon('tabler-brand-docker')
+                            ->url(fn (Ticket $ticket) => auth()->user()->can('update server', $ticket->server) ? EditServer::getUrl(['record' => $ticket->server]) : null),
+                        TextEntry::make('server.user.username')
+                            ->label(trans('tickets::tickets.owner'))
+                            ->icon('tabler-user')
+                            ->url(fn (Ticket $ticket) => auth()->user()->can('update user', $ticket->server->user) ? EditUser::getUrl(['record' => $ticket->server->user]) : null),
+                        TextEntry::make('author.username')
+                            ->label(trans('tickets::tickets.created_by'))
+                            ->icon('tabler-user')
+                            ->placeholder(trans('tickets::tickets.unknown'))
+                            ->url(fn (Ticket $ticket) => $ticket->author && auth()->user()->can('update user', $ticket->author) ? EditUser::getUrl(['record' => $ticket->author]) : null),
+                        TextEntry::make('created_at')
+                            ->label(trans('tickets::tickets.created_at'))
+                            ->since(timezone: auth()->user()->timezone ?? config('app.timezone', 'UTC'))
+                            ->dateTimeTooltip(timezone: auth()->user()->timezone ?? config('app.timezone', 'UTC')),
+                    ]),
+                Section::make(trans('tickets::tickets.description'))
                     ->columnSpanFull()
-                    ->markdown(),
-                TextEntry::make('server.name')
-                    ->label(trans('tickets::tickets.server'))
-                    ->icon('tabler-brand-docker')
-                    ->url(fn (Ticket $ticket) => auth()->user()->can('update server', $ticket->server) ? EditServer::getUrl(['record' => $ticket->server]) : null),
-                TextEntry::make('server.user.username')
-                    ->label(trans('tickets::tickets.owner'))
-                    ->icon('tabler-user')
-                    ->url(fn (Ticket $ticket) => auth()->user()->can('update user', $ticket->server->user) ? EditUser::getUrl(['record' => $ticket->server->user]) : null),
-                TextEntry::make('author.username')
-                    ->label(trans('tickets::tickets.created_by'))
-                    ->icon('tabler-user')
-                    ->placeholder(trans('tickets::tickets.unknown'))
-                    ->url(fn (Ticket $ticket) => $ticket->author && auth()->user()->can('update user', $ticket->author) ? EditUser::getUrl(['record' => $ticket->author]) : null),
-                TextEntry::make('created_at')
-                    ->label(trans('tickets::tickets.created_at'))
-                    ->dateTime(timezone: auth()->user()->timezone ?? config('app.timezone', 'UTC')),
+                    ->schema([
+                        TextEntry::make('description')
+                            ->hiddenLabel()
+                            ->markdown()
+                            ->placeholder(trans('tickets::tickets.no_description')),
+                    ]),
             ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ManageTickets::route('/'),
+            'index' => ListTickets::route('/'),
+            'create' => CreateTicket::route('/create'),
+            'view' => ViewTicket::route('/{record}'),
+            'edit' => EditTicket::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            MessagesRelationManager::class,
         ];
     }
 }

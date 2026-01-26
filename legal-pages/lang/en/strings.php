@@ -4,9 +4,11 @@ return [
     'legal_page' => 'Legal Page|Legal Pages',
     'clear' => 'Clear',
 
-    'imprint' => 'Imprint',
-    'terms_of_service' => 'Terms of Service',
-    'privacy_policy' => 'Privacy Policy',
+    'pages' => [
+        'imprint' => 'Imprint',
+        'terms-of-service' => 'Terms of Service',
+        'privacy-policy' => 'Privacy Policy',
+    ],
 
     'notifications' => [
         'saved' => 'Legal Pages saved',

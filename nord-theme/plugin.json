@@ -1,0 +1,15 @@
+{
+    "id": "nord-theme",
+    "name": "Nord Theme",
+    "author": "Boy132 (& andreia)",
+    "version": "1.0.0",
+    "description": "A light and dark arctic Nord theme.",
+    "category": "theme",
+    "url": "https://github.com/pelican-dev/plugins/tree/main/nord-theme",
+    "update_url": null,
+    "namespace": "Boy132\\NordTheme",
+    "class": "NordThemePlugin",
+    "panels": null,
+    "panel_version": null,
+    "composer_packages": null
+}

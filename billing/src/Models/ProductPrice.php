@@ -14,6 +14,7 @@ use Stripe\StripeClient;
  * @property ?string $stripe_id
  * @property string $name
  * @property int $cost
+ * @property bool $renewable
  * @property PriceInterval $interval_type
  * @property int $interval_value
  * @property int $product_id
@@ -26,6 +27,7 @@ class ProductPrice extends Model implements HasLabel
         'product_id',
         'name',
         'cost',
+        'renewable',
         'interval_type',
         'interval_value',
     ];
@@ -33,6 +35,7 @@ class ProductPrice extends Model implements HasLabel
     protected function casts(): array
     {
         return [
+            'renewable' => 'bool',
             'interval_type' => PriceInterval::class,
         ];
     }
@@ -89,8 +92,17 @@ class ProductPrice extends Model implements HasLabel
         }
     }
 
+    public function isFree(): bool
+    {
+        return !$this->cost;
+    }
+
     public function formatCost(): string
     {
+        if ($this->isFree()) {
+            return 'Free';
+        }
+
         $formatter = new NumberFormatter(user()->language ?? 'en', NumberFormatter::CURRENCY);
 
         return $formatter->formatCurrency($this->cost, config('billing.currency'));

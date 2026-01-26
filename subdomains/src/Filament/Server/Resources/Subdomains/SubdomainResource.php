@@ -8,16 +8,20 @@ use App\Traits\Filament\HasLimitBadge;
 use Boy132\Subdomains\Filament\Server\Resources\Subdomains\Pages\ListSubdomains;
 use Boy132\Subdomains\Models\CloudflareDomain;
 use Boy132\Subdomains\Models\Subdomain;
+use Boy132\Subdomains\Services\SubdomainService;
+use Exception;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -78,9 +82,25 @@ class SubdomainResource extends Resource
                 TextColumn::make('label')
                     ->label(trans('subdomains::strings.name'))
                     ->state(fn (Subdomain $subdomain) => $subdomain->getLabel()),
+                TextColumn::make('record_type')
+                    ->label(trans('subdomains::strings.record_type')),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->action(function (array $data, Subdomain $subdomain, SubdomainService $service) {
+                        try {
+                            return $service->handle($data, $subdomain);
+                        } catch (Exception $exception) {
+                            Notification::make()
+                                ->title(trans('subdomains::strings.notifications.not_synced'))
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->persistent()
+                                ->send();
+
+                            throw new Halt();
+                        }
+                    }),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -92,7 +112,26 @@ class SubdomainResource extends Resource
                     ->createAnother(false)
                     ->hiddenLabel()
                     ->iconButton()
-                    ->iconSize(IconSize::ExtraLarge),
+                    ->iconSize(IconSize::ExtraLarge)
+                    ->action(function (array $data, SubdomainService $service) {
+                        try {
+                            /** @var Server $server */
+                            $server = Filament::getTenant();
+
+                            $data['server_id'] = $server->id;
+
+                            return $service->handle($data);
+                        } catch (Exception $exception) {
+                            Notification::make()
+                                ->title(trans('subdomains::strings.notifications.not_synced'))
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->persistent()
+                                ->send();
+
+                            throw new Halt();
+                        }
+                    }),
             ]);
     }
 
@@ -103,15 +142,48 @@ class SubdomainResource extends Resource
                 TextInput::make('name')
                     ->label(trans('subdomains::strings.name'))
                     ->required()
-                    ->unique(),
+                    ->unique()
+                    ->alphaNum()
+                    ->columnSpanFull()
+                    ->suffix(fn (Get $get) => '.' . CloudflareDomain::find($get('domain_id'))?->name),
                 Select::make('domain_id')
                     ->label(trans_choice('subdomains::strings.domain', 1))
                     ->disabledOn('edit')
+                    ->hidden(fn () => CloudflareDomain::count() <= 1)
+                    ->dehydratedWhenHidden()
                     ->required()
+                    ->selectablePlaceholder(false)
+                    ->default(fn () => CloudflareDomain::first()?->id)
                     ->relationship('domain', 'name')
                     ->preload()
-                    ->searchable(),
-                Hidden::make('record_type')
+                    ->searchable()
+                    ->live(),
+                Select::make('record_type')
+                    ->label(trans('subdomains::strings.record_type'))
+                    ->disabledOn('edit')
+                    ->hidden(function () {
+                        /** @var Server $server */
+                        $server = Filament::getTenant();
+
+                        // @phpstan-ignore property.notFound
+                        return is_null($server->node->srv_target);
+                    })
+                    ->dehydratedWhenHidden()
+                    ->required()
+                    ->selectablePlaceholder(false)
+                    ->options(function () {
+                        /** @var Server $server */
+                        $server = Filament::getTenant();
+
+                        $types = is_ipv6($server->allocation->ip) ? ['AAAA' => 'AAAA'] : ['A' => 'A'];
+
+                        // @phpstan-ignore property.notFound
+                        if (!is_null($server->node->srv_target)) {
+                            $types['SRV'] = 'SRV';
+                        }
+
+                        return $types;
+                    })
                     ->default(function () {
                         /** @var Server $server */
                         $server = Filament::getTenant();

@@ -7,13 +7,24 @@ return [
     'no_subdomains' => 'No Subdomains',
     'subdomain' => 'Subdomain|Subdomains',
     'limit' => 'Limit',
-    'change_limit' => 'Change Limit',
+    'change_limit' => 'Change limit',
     'limit_changed' => 'Limit changed',
-    'limit_reached' => 'Subdomain Limit Reached',
+    'limit_reached' => 'Subdomain limit reached',
     'create_subdomain' => 'Create Subdomain',
 
     'name' => 'Name',
+    'record_type' => 'Record type',
+    'is_synced' => 'Is Synced?',
+    'srv_target' => 'SRV target',
+    'no_srv_target' => 'No SRV target',
+
+    'sync' => 'Sync',
 
     'api_token' => 'Cloudflare API Token',
-    'api_token_help' => 'The token needs to have read permissions for Zone.Zone and write for Zone.Dns. For better security you can also set the "Zone Resources" to exclude certain domains and add the panel ip to the "Client IP Adress Filtering".',
+    'api_token_help' => 'The token needs to have read permissions for Zone.Zone and write for Zone.Dns. For better security you can also set the "Zone Resources" to exclude certain domains and add the panel ip to the "Client IP Address Filtering".',
+
+    'notifications' => [
+        'synced' => 'Domain synced with cloudflare',
+        'not_synced' => 'Could not sync domain with cloudflare',
+    ],
 ];

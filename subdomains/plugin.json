@@ -1,7 +1,7 @@
 {
     "id": "subdomains",
     "name": "Subdomains",
-    "author": "Boy132",
+    "author": "Boy132 & HarlequinSin",
     "version": "1.0.0",
     "description": "Allows users to create subdomains for their servers",
     "category": "plugin",

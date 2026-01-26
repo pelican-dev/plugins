@@ -21,6 +21,9 @@ return [
     'add_to_ops' => 'Add to OPs',
     'remove_from_ops' => 'Remove from OPs',
 
+    'use_alias' => 'Use allocation alias?',
+    'use_alias_hint' => 'If checked, queries will use the allocation alias instead of the ip',
+
     'table' => [
         'no_players' => 'No players found',
         'no_players_description' => 'Either no players are online or query is disabled on this server',
@@ -28,6 +31,8 @@ return [
     ],
 
     'notifications' => [
+        'settings_saved' => 'Setting saved',
+
         'player_kicked' => 'Player kicked from server',
         'player_kick_failed' => 'Could not kick player',
 

@@ -10,18 +10,22 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->increments('id');
+
             $table->string('title');
             $table->string('category');
             $table->string('priority');
+            $table->string('status');
             $table->text('description')->nullable();
-            $table->boolean('is_answered')->default(false);
-            $table->text('answer')->nullable();
+
             $table->unsignedInteger('server_id');
             $table->foreign('server_id')->references('id')->on('servers')->cascadeOnDelete();
+
             $table->unsignedInteger('author_id')->nullable();
             $table->foreign('author_id')->references('id')->on('users')->nullOnDelete();
+
             $table->unsignedInteger('assigned_user_id')->nullable();
             $table->foreign('assigned_user_id')->references('id')->on('users')->nullOnDelete();
+
             $table->timestamps();
         });
     }

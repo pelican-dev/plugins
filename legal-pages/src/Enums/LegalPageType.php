@@ -16,12 +16,12 @@ enum LegalPageType: string implements HasLabel
 
     public function getId(): string
     {
-        return Str::snake($this->name);
+        return Str::snake($this->name, '-');
     }
 
     public function getLabel(): string
     {
-        return trans('legal-pages::strings.' . $this->getId());
+        return trans('legal-pages::strings.pages.' . $this->getId());
     }
 
     public function getUrl(): string

@@ -4,13 +4,15 @@ namespace Boy132\Subdomains\Filament\Admin\Resources\CloudflareDomains;
 
 use Boy132\Subdomains\Filament\Admin\Resources\CloudflareDomains\Pages\ManageCloudflareDomains;
 use Boy132\Subdomains\Models\CloudflareDomain;
+use Exception;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -39,7 +41,7 @@ class CloudflareDomainResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return trans('admin/dashboard.advanced');
+        return trans_choice('subdomains::strings.subdomain', 2);
     }
 
     public static function getNavigationBadge(): ?string
@@ -56,11 +58,36 @@ class CloudflareDomainResource extends Resource
                 TextColumn::make('subdomains_count')
                     ->label(trans_choice('subdomains::strings.subdomain', 2))
                     ->counts('subdomains'),
+                IconColumn::make('is_synced')
+                    ->label(trans('subdomains::strings.is_synced'))
+                    ->state(fn (CloudflareDomain $domain) => !is_null($domain->cloudflare_id))
+                    ->boolean()
+                    ->trueIcon('tabler-refresh')
+                    ->falseIcon('tabler-refresh-off')
+                    ->tooltip(fn (CloudflareDomain $domain) => $domain->cloudflare_id),
             ])
             ->recordActions([
-                ViewAction::make()
-                    ->hidden(fn ($record) => static::canEdit($record)),
-                EditAction::make(),
+                Action::make('sync')
+                    ->label(trans('subdomains::strings.sync'))
+                    ->icon('tabler-refresh')
+                    ->visible(fn (CloudflareDomain $domain) => is_null($domain->cloudflare_id))
+                    ->action(function (CloudflareDomain $domain) {
+                        try {
+                            $domain->fetchCloudflareId();
+
+                            Notification::make()
+                                ->title(trans('subdomains::strings.notifications.synced'))
+                                ->success()
+                                ->send();
+                        } catch (Exception $exception) {
+                            Notification::make()
+                                ->title(trans('subdomains::strings.notifications.not_synced'))
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->persistent()
+                                ->send();
+                        }
+                    }),
                 DeleteAction::make(),
             ])
             ->emptyStateIcon('tabler-world-www')

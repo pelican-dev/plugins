@@ -6,16 +6,29 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 
 [Download the repository archive](https://github.com/pelican-dev/plugins/archive/refs/heads/main.zip) and extract the folders of the plugins you want to install to your panels `plugins` folder (`/var/www/pelican/plugins` by default). Finally, open your panel and head to the plugins page and click on "Install".
 
+### Themes
+
+For themes you have to install NodeJs 22+ and Yarn beforehand. Example:
+
+```bash
+curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash - 
+sudo apt install -y nodejs
+
+npm i -g yarn
+```
+
 ## Plugins
 
 - [Announcements](/announcements) - Create panel wide announcements to inform your users
-- [Billing](/billing) - Allows users to purchase servers via Stripe
+- [Arma Reforger Workshop](/arma-reforger-workshop) - Manage Arma Reforger workshop mods in server config
+- [Billing](/billing) - Allows users to purchase servers via Stripe - **Proof of Concept - Do absolutely NOT use in production!**
 - [Generic OIDC Providers](/generic-oidc-providers) - Create generic OIDC providers for authentication
 - [Legal Pages](/legal-pages) - Adds legal pages (Imprint, Privacy Policy, ToS) to the panel
 - [MCLogs Uploader](/mclogs-uploader) - Upload console logs to mclo.gs
 - [Minecraft Modrinth](/minecraft-modrinth) - Download Minecraft mods & plugins from Modrinth
 - [PasteFox Share](/pastefox-share) - Share console logs via pastefox.com
 - [Player Counter](/player-counter) - Show connected players count for game servers
+- [PocketID Provider](/pocketid-provider) - Allows you to use PocketID as an OAuth provider
 - [Register](/register) - Enable user self-registration on all panels
 - [Robo Avatars](/robo-avatars) - Adds RoboHash as avatar provider
 - [Rust uMod](/rust-umod) - Download Rust plugins from uMod
@@ -29,6 +42,8 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 ## Themes
 
 - [Fluffy Theme](/fluffy-theme) - A super nice and super fluffy theme
+- [Neobrutalism Theme](/neobrutalism-theme) - Transform your panel with thick borders, pronounced shadows, and geometric aesthetics inspired by the neobrutalism design movement
+- [Nord Theme](/nord-theme) - A light and dark arctic Nord theme
 - [Pterodactyl Theme](/pterodactyl-theme) - Pterodactyl like colors and font
 
 ## Language Packs

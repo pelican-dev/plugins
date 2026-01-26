@@ -8,4 +8,9 @@ use Filament\Resources\Pages\ListRecords;
 class ListSubdomains extends ListRecords
 {
     protected static string $resource = SubdomainResource::class;
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
 }

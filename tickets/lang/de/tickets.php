@@ -3,13 +3,15 @@
 return [
     'no_tickets' => 'Keine Tickets',
     'ticket' => 'Ticket|Tickets',
+    'message' => 'Nachricht|Nachrichten',
     'title' => 'Titel',
     'category' => 'Kategorie',
     'priority' => 'Priorität',
+    'status' => 'Status',
     'description' => 'Beschreibung',
     'no_description' => 'Keine Beschreibung',
-    'answered' => 'Beantwortet',
-    'unanswered' => 'Unbeantwortet',
+    'open' => 'Offen',
+    'closed' => 'Geschlossen',
     'all' => 'Alle',
     'answer_verb' => 'Antworten',
     'answer_noun' => 'Antwort',
@@ -17,6 +19,9 @@ return [
     'owner' => 'Server Besitzer',
     'created_at' => 'Erstellt am',
     'created_by' => 'Erstellt von',
+    'author' => 'Author',
+    'admin' => 'Admin',
+    'hidden' => 'Versteckt',
     'unknown' => 'Unbekannt',
     'assigned_to' => 'Zugewiesen an',
     'noone' => 'Niemand',
@@ -24,7 +29,7 @@ return [
     'assigned_to_me' => 'Mir zugewiesene',
 
     'notifications' => [
-        'answered' => 'Ticket wurde beantwortet',
+        'closed' => 'Ticket wurde geschlossen',
         'assigned_to_you' => 'Ticket wurde dir zugewiesen',
     ],
 ];

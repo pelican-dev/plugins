@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('display_color', 6)->nullable();
             $table->string('base_url');
             $table->string('client_id');
-            $table->string('client_secret');
+            $table->text('client_secret');
             $table->boolean('verify_jwt')->default(false);
             $table->text('jwt_public_key')->nullable();
             $table->timestamps();

@@ -2,8 +2,7 @@
 
 Create panel-wide announcements to inform your users about important updates, maintenance schedules, or any other information.
 
-> [!WARNING]
-> Alert banners are currently bugged. See https://github.com/pelican-dev/panel/issues/1492
+_Alert banners are currently bugged and require a page refresh to show. see <https://github.com/pelican-dev/panel/issues/1492>._
 
 ## Features
 

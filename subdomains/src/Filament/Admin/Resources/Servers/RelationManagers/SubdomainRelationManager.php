@@ -1,20 +1,23 @@
 <?php
 
-namespace Boy132\Subdomains\Filament\Admin\Resources\Users\RelationManagers;
+namespace Boy132\Subdomains\Filament\Admin\Resources\Servers\RelationManagers;
 
 use App\Models\Server;
 use Boy132\Subdomains\Models\CloudflareDomain;
 use Boy132\Subdomains\Models\Subdomain;
+use Boy132\Subdomains\Services\SubdomainService;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -33,9 +36,25 @@ class SubdomainRelationManager extends RelationManager
                 TextColumn::make('label')
                     ->label(trans('subdomains::strings.name'))
                     ->state(fn (Subdomain $subdomain) => $subdomain->getLabel()),
+                TextColumn::make('record_type')
+                    ->label(trans('subdomains::strings.record_type')),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->action(function (array $data, Subdomain $subdomain, SubdomainService $service) {
+                        try {
+                            return $service->handle($data, $subdomain);
+                        } catch (Exception $exception) {
+                            Notification::make()
+                                ->title(trans('subdomains::strings.notifications.not_synced'))
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->persistent()
+                                ->send();
+
+                            throw new Halt();
+                        }
+                    }),
                 DeleteAction::make(),
             ])
             ->headerActions([
@@ -64,7 +83,23 @@ class SubdomainRelationManager extends RelationManager
                 CreateAction::make()
                     ->visible(fn () => CloudflareDomain::count() > 0)
                     ->disabled(fn () => !$this->getOwnerRecord()->allocation || $this->getOwnerRecord()->allocation->ip === '0.0.0.0' || $this->getOwnerRecord()->allocation->ip === '::')
-                    ->createAnother(false),
+                    ->createAnother(false)
+                    ->action(function (array $data, SubdomainService $service) {
+                        try {
+                            $data['server_id'] = $this->getOwnerRecord()->id;
+
+                            return $service->handle($data);
+                        } catch (Exception $exception) {
+                            Notification::make()
+                                ->title(trans('subdomains::strings.notifications.not_synced'))
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->persistent()
+                                ->send();
+
+                            throw new Halt();
+                        }
+                    }),
             ]);
     }
 
@@ -75,15 +110,39 @@ class SubdomainRelationManager extends RelationManager
                 TextInput::make('name')
                     ->label(trans('subdomains::strings.name'))
                     ->required()
-                    ->unique(),
+                    ->unique()
+                    ->alphaNum()
+                    ->columnSpanFull()
+                    ->suffix(fn (Get $get) => '.' . CloudflareDomain::find($get('domain_id'))?->name),
                 Select::make('domain_id')
                     ->label(trans_choice('subdomains::strings.domain', 1))
                     ->disabledOn('edit')
+                    ->hidden(fn () => CloudflareDomain::count() <= 1)
+                    ->dehydratedWhenHidden()
                     ->required()
+                    ->selectablePlaceholder(false)
+                    ->default(fn () => CloudflareDomain::first()?->id)
                     ->relationship('domain', 'name')
                     ->preload()
-                    ->searchable(),
-                Hidden::make('record_type')
+                    ->searchable()
+                    ->live(),
+                Select::make('record_type')
+                    ->label(trans('subdomains::strings.record_type'))
+                    ->disabledOn('edit')
+                    ->hidden(fn () => is_null($this->getOwnerRecord()->node->srv_target)) // @phpstan-ignore property.notFound
+                    ->dehydratedWhenHidden()
+                    ->required()
+                    ->selectablePlaceholder(false)
+                    ->options(function () {
+                        $types = is_ipv6($this->getOwnerRecord()->allocation->ip) ? ['AAAA' => 'AAAA'] : ['A' => 'A'];
+
+                        // @phpstan-ignore property.notFound
+                        if (!is_null($this->getOwnerRecord()->node->srv_target)) {
+                            $types['SRV'] = 'SRV';
+                        }
+
+                        return $types;
+                    })
                     ->default(fn () => is_ipv6($this->getOwnerRecord()->allocation->ip) ? 'AAAA' : 'A'),
             ]);
     }

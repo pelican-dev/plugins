@@ -2,6 +2,7 @@
 
 namespace Boy132\Billing\Filament\App\Widgets;
 
+use App\Filament\Server\Pages\Console;
 use Boy132\Billing\Models\Customer;
 use Boy132\Billing\Models\Order;
 use Boy132\Billing\Models\Product;
@@ -46,6 +47,13 @@ class ProductWidget extends Widget implements HasActions, HasSchemas
                         'customer_id' => $customer->id,
                         'product_price_id' => $price->id,
                     ]);
+
+                    if ($price->isFree()) {
+                        $order->activate(null);
+                        $order->refresh();
+
+                        return redirect(Console::getUrl(panel: 'server', tenant: $order->server));
+                    }
 
                     return $this->redirect($order->getCheckoutSession()->url);
                 });

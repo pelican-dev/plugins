@@ -88,7 +88,7 @@ class OrdersResource extends Resource
                     ->requiresConfirmation()
                     ->action(fn (Order $order) => $order->close()),
                 Action::make('renew')
-                    ->visible(fn (Order $order) => $order->status === OrderStatus::Expired)
+                    ->visible(fn (Order $order) => $order->status === OrderStatus::Expired && $order->productPrice->renewable)
                     ->color('warning')
                     ->requiresConfirmation()
                     ->action(fn (Order $order) => redirect($order->getCheckoutSession()->url)),

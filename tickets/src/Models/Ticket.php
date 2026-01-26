@@ -6,22 +6,24 @@ use App\Models\Server;
 use App\Models\User;
 use Boy132\Tickets\Enums\TicketCategory;
 use Boy132\Tickets\Enums\TicketPriority;
-use Boy132\Tickets\Filament\Server\Resources\Tickets\Pages\ManageTickets;
+use Boy132\Tickets\Enums\TicketStatus;
+use Boy132\Tickets\Filament\Server\Resources\Tickets\Pages\ListTickets;
 use Carbon\Carbon;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Support\Markdown;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
  * @property string $title
  * @property TicketCategory $category
  * @property TicketPriority $priority
+ * @property TicketStatus $status
  * @property ?string $description
- * @property bool $is_answered
- * @property ?string $answer
  * @property int $server_id
  * @property Server $server
  * @property ?int $author_id
@@ -37,19 +39,31 @@ class Ticket extends Model
         'title',
         'category',
         'priority',
+        'status',
         'description',
-        'is_answered',
-        'answer',
         'server_id',
         'author_id',
         'assigned_user_id',
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (self $model) {
+            $model->status = TicketStatus::Open;
+
+            $model->server_id ??= Filament::getTenant()?->getKey();
+            $model->author_id ??= auth()->user()?->id;
+        });
+    }
 
     protected function casts(): array
     {
         return [
             'category' => TicketCategory::class,
             'priority' => TicketPriority::class,
+            'status' => TicketStatus::class,
         ];
     }
 
@@ -68,25 +82,36 @@ class Ticket extends Model
         return $this->belongsTo(User::class, 'assigned_user_id');
     }
 
-    public function answer(string $answer): void
+    public function messages(): HasMany
     {
-        $this->is_answered = true;
-        $this->answer = $answer;
+        return $this->hasMany(TicketMessage::class);
+    }
+
+    public function close(?string $answer = null): void
+    {
+        if ($answer) {
+            $this->messages()->create([
+                'message' => $answer,
+                'author_id' => auth()->user()?->id,
+            ]);
+        }
+
+        $this->status = TicketStatus::Closed;
 
         $this->save();
 
         // Send notification to author if existing and is the owner or a subuser of the server
         if ($this->author && collect($this->author->directAccessibleServers()->pluck('id')->all())->contains($this->server->id)) {
             Notification::make()
-                ->title(trans('tickets::tickets.notifications.answered'))
-                ->body(Markdown::inline($this->answer))
+                ->title(trans('tickets::tickets.notifications.closed'))
+                ->body($answer ? Markdown::inline($answer) : null)
                 ->actions([
                     Action::make('view')
                         ->label(trans(('filament-actions::view.single.label')))
                         ->button()
                         ->markAsRead()
-                        ->url(fn () => ManageTickets::getUrl([
-                            'activeTab' => 'answered',
+                        ->url(fn () => ListTickets::getUrl([
+                            'tab' => 'closed',
                             'tableAction' => 'view',
                             'tableActionRecord' => $this->id,
                         ], panel: 'server', tenant: $this->server)),
@@ -95,9 +120,13 @@ class Ticket extends Model
         }
     }
 
-    public function assignTo(User $user): void
+    public function assignTo(User $user, bool $setStatus = true): void
     {
         $this->assigned_user_id = $user->id;
+
+        if ($setStatus) {
+            $this->status = TicketStatus::InProgress;
+        }
 
         $this->save();
     }

@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('stripe_id')->nullable();
             $table->string('name');
             $table->float('cost', 2);
+            $table->boolean('renewable')->default(true);
             $table->string('interval_type')->default(PriceInterval::Month);
             $table->unsignedInteger('interval_value')->default(1);
 

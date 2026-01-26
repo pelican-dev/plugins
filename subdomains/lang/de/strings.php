@@ -13,7 +13,18 @@ return [
     'create_subdomain' => 'Subdomain erstellen',
 
     'name' => 'Name',
+    'record_type' => 'Record Typ',
+    'is_synced' => 'Ist synchronisiert?',
+    'srv_target' => 'SRV Ziel',
+    'no_srv_target' => 'Kein SRV Ziel',
+
+    'sync' => 'Synchronisieren',
 
     'api_token' => 'Cloudflare API Token',
     'api_token_help' => 'Der Token benötigt Leseberechtigung für Zone.Zone und Schreibberechtigung für Zone.Dns. Für eine verbesserte Sicherheit können mit "Zone Resources" bestimmte Domains ausgeschlossen werden und die Panel-IP zum "Client IP Adress Filtering" hinzugefügt werden.',
+
+    'notifications' => [
+        'synced' => 'Domain wurde erfolgreich mit Cloudflare synchronisiert',
+        'not_synced' => 'Domain konnte nicht mit Cloudflare synchronisiert werden',
+    ],
 ];

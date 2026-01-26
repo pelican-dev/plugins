@@ -125,7 +125,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             }
 
                             $schema[] = Section::make($versionData['name'])
-                                ->description($versionData['version_number'] . ($primaryFile ? ' (' . convert_bytes_to_readable($primaryFile['size']) . ')' : ' (No file found)'))
+                                ->description($versionData['version_number'] . ($primaryFile ? ' (' . convert_bytes_to_readable($primaryFile['size']) . ')' : ' (' . trans('minecraft-modrinth::strings.version.no_file_found') . ')'))
                                 ->collapsed(!$versionData['featured'])
                                 ->collapsible()
                                 ->icon($versionData['version_type'] === 'alpha' ? 'tabler-circle-letter-a' : ($versionData['version_type'] === 'beta' ? 'tabler-circle-letter-b' : 'tabler-circle-letter-r'))
@@ -156,7 +156,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                                 $fileRepository->setServer($server)->pull($primaryFile['url'], ModrinthProjectType::fromServer($server)->getFolder());
 
                                                 Notification::make()
-                                                    ->title('Download started')
+                                                    ->title(trans('minecraft-modrinth::strings.notifications.download_started'))
                                                     ->body($versionData['name'])
                                                     ->success()
                                                     ->send();
@@ -164,7 +164,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                                 report($exception);
 
                                                 Notification::make()
-                                                    ->title('Download could not be started')
+                                                    ->title(trans('minecraft-modrinth::strings.notifications.download_failed'))
                                                     ->body($exception->getMessage())
                                                     ->danger()
                                                     ->send();
@@ -187,7 +187,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
         return [
             Action::make('open_folder')
-                ->label(fn () => 'Open ' . $folder . ' folder')
+                ->label(fn () => trans('minecraft-modrinth::strings.page.open_folder', ['folder' => $folder]))
                 ->url(fn () => ListFiles::getUrl(['path' => $folder]), true),
         ];
     }
@@ -202,13 +202,13 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                 Grid::make(3)
                     ->schema([
                         TextEntry::make('Minecraft Version')
-                            ->state(fn () => MinecraftModrinth::getMinecraftVersion($server) ?? 'Unknown')
+                            ->state(fn () => MinecraftModrinth::getMinecraftVersion($server) ?? trans('minecraft-modrinth::strings.page.unknown'))
                             ->badge(),
                         TextEntry::make('Loader')
-                            ->state(fn () => MinecraftLoader::fromServer($server)?->getLabel() ?? 'Unknown')
+                            ->state(fn () => MinecraftLoader::fromServer($server)?->getLabel() ?? trans('minecraft-modrinth::strings.page.unknown'))
                             ->badge(),
                         TextEntry::make('installed')
-                            ->label(fn () => 'Installed ' . ModrinthProjectType::fromServer($server)->getLabel())
+                            ->label(fn () => trans('minecraft-modrinth::strings.page.installed', ['type' => ModrinthProjectType::fromServer($server)->getLabel()]))
                             ->state(function (DaemonFileRepository $fileRepository) use ($server) {
                                 try {
                                     $files = $fileRepository->setServer($server)->getDirectory(ModrinthProjectType::fromServer($server)->getFolder());
@@ -223,7 +223,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 } catch (Exception $exception) {
                                     report($exception);
 
-                                    return 'Unknown';
+                                    return trans('minecraft-modrinth::strings.page.unknown');
                                 }
                             })
                             ->badge(),

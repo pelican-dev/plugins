@@ -24,11 +24,21 @@ class PlayerCounterSeeder extends Seeder
                     'game_query_id' => $minecraftQuery->id,
                 ]);
             } elseif (in_array('source', $tags)) {
-                EggGameQuery::firstOrCreate([
-                    'egg_id' => $egg->id,
-                ], [
-                    'game_query_id' => $sourceQuery->id,
-                ]);
+                if ($egg->name === 'Rust') {
+                    $rustQuery = GameQuery::firstOrCreate(['query_type' => 'rust']);
+
+                    EggGameQuery::firstOrCreate([
+                        'egg_id' => $egg->id,
+                    ], [
+                        'game_query_id' => $rustQuery->id,
+                    ]);
+                } else {
+                    EggGameQuery::firstOrCreate([
+                        'egg_id' => $egg->id,
+                    ], [
+                        'game_query_id' => $sourceQuery->id,
+                    ]);
+                }
             }
         }
 

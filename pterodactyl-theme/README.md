@@ -2,7 +2,7 @@
 
 A nostalgic theme that applies Pterodactyl-like colors and fonts to the panel for users familiar with the classic look.
 
-## Features
+## Preview
 
-- Pterodactyl-inspired color scheme
-- IBM Plex Sans font for a clean, professional look
+![preview_light](preview-light.png)
+![preview_dark](preview-dark.png)

@@ -21,6 +21,8 @@ class ServerResourcePage extends ServerFormPage
 {
     protected static string|\BackedEnum|null $navigationIcon = 'tabler-cube-plus';
 
+    protected static ?int $navigationSort = 20;
+
     protected static ?string $navigationLabel = 'Resource Limits';
 
     protected static ?string $title = 'Resource Limits';
@@ -41,14 +43,11 @@ class ServerResourcePage extends ServerFormPage
         return parent::canAccess();
     }
 
-    protected static ?int $navigationSort = 20;
-
     public function form(Schema $schema): Schema
     {
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        /** @var UserResourceLimits $userResourceLimits */
         $userResourceLimits = UserResourceLimits::where('user_id', $server->owner_id)->firstOrFail();
 
         $maxCpu = $server->cpu + $userResourceLimits->getCpuLeft();
@@ -57,7 +56,7 @@ class ServerResourcePage extends ServerFormPage
 
         $suffix = config('panel.use_binary_prefix') ? 'MiB' : 'MB';
 
-        return $schema
+        return parent::form($schema)
             ->columns([
                 'default' => 1,
                 'lg' => 3,
@@ -111,7 +110,7 @@ class ServerResourcePage extends ServerFormPage
         return [
             Action::make('save')
                 ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
-                ->submit('save')
+                ->action('save')
                 ->formId('form')
                 ->keyBindings(['mod+s']),
             Action::make('delete_server')

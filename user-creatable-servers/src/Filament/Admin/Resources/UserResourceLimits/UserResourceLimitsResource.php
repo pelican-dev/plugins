@@ -97,7 +97,8 @@ class UserResourceLimitsResource extends Resource
                     ->searchable(['username', 'email'])
                     ->getOptionLabelFromRecordUsing(fn (User $user) => "$user->username ($user->email)")
                     ->selectablePlaceholder(false)
-                    ->hiddenOn('edit'),
+                    ->hiddenOn('edit')
+                    ->columnSpanFull(),
                 TextInput::make('cpu')
                     ->label(trans('user-creatable-servers::strings.cpu'))
                     ->required()

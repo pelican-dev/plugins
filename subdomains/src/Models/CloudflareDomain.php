@@ -2,6 +2,7 @@
 
 namespace Boy132\Subdomains\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Http;
@@ -32,6 +33,7 @@ class CloudflareDomain extends Model
         return $this->hasMany(Subdomain::class, 'domain_id');
     }
 
+    /** @throws Exception */
     public function fetchCloudflareId(): void
     {
         // @phpstan-ignore staticMethod.notFound
@@ -46,6 +48,12 @@ class CloudflareDomain extends Model
                 $this->update([
                     'cloudflare_id' => $zones[0]['id'],
                 ]);
+            } else {
+                throw new Exception("No zone with name $this->name found.");
+            }
+        } else {
+            if ($response['errors'] && count($response['errors']) > 0) {
+                throw new Exception($response['errors'][0]['message']);
             }
         }
     }

@@ -2,11 +2,14 @@
 
 Show the amount of connected players to game servers with real-time querying capabilities.
 
-> [!IMPORTANT]
-> You need to have the bz2 php extension and zip/7zip installed!
+## Setup
 
-> [!IMPORTANT]
-> For Minecraft servers you need to set `enable-query` to true and the `query-port` to your server port! (in `server.properties`)
+**IMPORTANT**: You need to have the bz2 php extension and zip/7zip installed!
+
+Make sure your server has an allocation with a public ip.
+
+For Minecraft servers you need to set `enable-query` to true and the `query-port` to your server port! (in `server.properties`)  
+Game query for FiveM/RedM is currently not available due to a [bug with GameQ](https://github.com/pelican-dev/plugins/issues/48).
 
 ## Features
 

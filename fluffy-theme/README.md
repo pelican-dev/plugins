@@ -2,7 +2,7 @@
 
 A super nice and super fluffy theme that transforms the panel with playful colors and a fun font.
 
-## Features
+## Preview
 
-- Custom "Finger Paint" font for a playful appearance
-- Unique color palette with soft, fluffy tones
+![preview_light](preview-light.png)
+![preview_dark](preview-dark.png)

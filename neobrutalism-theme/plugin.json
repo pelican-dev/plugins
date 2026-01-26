@@ -1,0 +1,15 @@
+{
+    "id": "neobrutalism-theme",
+    "name": "Neobrutalism Theme",
+    "author": "Boy132 (& caresome)",
+    "version": "1.0.0",
+    "description": "Transform your panel with thick borders, pronounced shadows, and geometric aesthetics inspired by the neobrutalism design movement.",
+    "category": "theme",
+    "url": "https://github.com/pelican-dev/plugins/tree/main/neobrutalism-theme",
+    "update_url": null,
+    "namespace": "Boy132\\NeobrutalismTheme",
+    "class": "NeobrutalismThemePlugin",
+    "panels": null,
+    "panel_version": null,
+    "composer_packages": null
+}

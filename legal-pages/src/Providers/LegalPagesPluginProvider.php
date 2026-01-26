@@ -3,22 +3,24 @@
 namespace Boy132\LegalPages\Providers;
 
 use App\Enums\CustomRenderHooks;
+use App\Models\Role;
 use Boy132\LegalPages\Enums\LegalPageType;
 use Boy132\LegalPages\LegalPagesPlugin;
 use Filament\Support\Facades\FilamentView;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 
-class LegalPagesPluginProvider extends RouteServiceProvider
+class LegalPagesPluginProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->routes(function () {
-            foreach (LegalPageType::cases() as $legalPageType) {
-                Route::get($legalPageType->getId(), $legalPageType->getClass())->name($legalPageType->getId())->withoutMiddleware(['auth']);
-            }
-        });
+        Role::registerCustomPermissions([
+            'legalPage' => [
+                'view',
+                'update',
+            ],
+        ]);
+        Role::registerCustomModelIcon('legalPage', 'tabler-gavel');
 
         $footer = null;
 

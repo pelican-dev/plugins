@@ -10,8 +10,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -27,12 +29,17 @@ class PriceRelationManager extends RelationManager
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->required(),
+                    ->required()
+                    ->label('Internal Name')
+                    ->columnSpanFull(),
                 TextInput::make('cost')
                     ->required()
                     ->suffix(config('billing.currency'))
                     ->numeric()
                     ->minValue(0),
+                Toggle::make('renewable')
+                    ->label('Can be renewed?')
+                    ->inline(false),
                 Select::make('interval_type')
                     ->required()
                     ->selectablePlaceholder(false)
@@ -49,10 +56,14 @@ class PriceRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Internal Name')
                     ->sortable(),
                 TextColumn::make('cost')
                     ->sortable()
                     ->state(fn (ProductPrice $price) => $price->formatCost()),
+                IconColumn::make('renewable')
+                    ->label('Can be renewed?')
+                    ->boolean(),
                 TextColumn::make('interval')
                     ->state(fn (ProductPrice $price) => $price->interval_value . ' ' . $price->interval_type->name),
             ])

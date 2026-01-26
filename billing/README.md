@@ -2,8 +2,7 @@
 
 A simple billing plugin that allows users to purchase servers using Stripe as the payment processor.
 
-> [!CAUTION]
-> This plugin is incomplete! Do NOT use this plugin in production!
+**WARNING: This plugin is incomplete! Do NOT use this plugin in production!**
 
 ## Features
 
