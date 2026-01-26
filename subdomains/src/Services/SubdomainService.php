@@ -14,13 +14,13 @@ class SubdomainService
      */
     public function handle(array $data, ?Subdomain $subdomain = null): Subdomain
     {
-        $newSubdomain = false;
+        $newSubdomain = true;
 
         if (is_null($subdomain)) {
             $subdomain = Subdomain::create($data);
-            $newSubdomain = true;
         } else {
             $subdomain->update($data);
+            $newSubdomain = false;
         }
 
         $subdomain->refresh();
@@ -31,6 +31,7 @@ class SubdomainService
             if ($newSubdomain) {
                 $subdomain->delete();
             }
+
             throw $exception;
         }
 

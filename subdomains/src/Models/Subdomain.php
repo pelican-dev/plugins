@@ -75,7 +75,7 @@ class Subdomain extends Model implements HasLabel
                 throw new Exception('Server has no SRV type');
             }
 
-            $searchName = "{$srvServiceType->value}.{$this->name}";
+            $searchName = "$srvServiceType->value.$this->name";
 
             $payload = [
                 'name' => $searchName,
@@ -111,26 +111,23 @@ class Subdomain extends Model implements HasLabel
             'type' => $this->record_type,
         ])->json();
 
-        if (!$searchResponse['success']) {
-            if (!empty($searchResponse['errors'])) {
-                throw new Exception($searchResponse['errors'][0]['message']);
-            }
-            throw new Exception('Failed to search for existing DNS records');
-        } else {
+        if ($searchResponse['success']) {
             $results = $searchResponse['result'] ?? [];
 
-            if (!empty($results)) {
-                foreach ($results as $record) {
-                    if ($record['id'] !== $this->cloudflare_id) {
-                        throw new Exception('A subdomain with that name already exists');
-                    }
+            foreach ($results as $record) {
+                if ($record['id'] !== $this->cloudflare_id) {
+                    throw new Exception('A subdomain with that name already exists');
                 }
+            }
+        } else {
+            if ($searchResponse['errors'] && count($searchResponse['errors']) > 0) {
+                throw new Exception($searchResponse['errors'][0]['message']);
             }
         }
 
         if ($this->cloudflare_id) {
             // @phpstan-ignore staticMethod.notFound
-            $response = Http::cloudflare()->patch("zones/{$this->domain->cloudflare_id}/dns_records/{$this->cloudflare_id}", $payload)->json();
+            $response = Http::cloudflare()->patch("zones/{$this->domain->cloudflare_id}/dns_records/$this->cloudflare_id", $payload)->json();
         } else {
             // @phpstan-ignore staticMethod.notFound
             $response = Http::cloudflare()->post("zones/{$this->domain->cloudflare_id}/dns_records", $payload)->json();
