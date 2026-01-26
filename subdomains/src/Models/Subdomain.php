@@ -115,6 +115,7 @@ class Subdomain extends Model implements HasLabel
             if (!empty($searchResponse['errors'])) {
                 throw new Exception($searchResponse['errors'][0]['message']);
             }
+            throw new Exception('Failed to search for existing DNS records');
         } else {
             $results = $searchResponse['result'] ?? [];
 
