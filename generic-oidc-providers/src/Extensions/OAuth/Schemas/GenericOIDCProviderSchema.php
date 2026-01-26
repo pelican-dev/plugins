@@ -3,15 +3,18 @@
 namespace Boy132\GenericOIDCProviders\Extensions\OAuth\Schemas;
 
 use App\Extensions\OAuth\Schemas\OAuthSchema;
+use App\Models\User;
 use Boy132\GenericOIDCProviders\Filament\Admin\Resources\GenericOIDCProviders\Pages\EditGenericOIDCProvider;
 use Boy132\GenericOIDCProviders\Models\GenericOIDCProvider;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Wizard\Step;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Contracts\User as OAuthUser;
 use SocialiteProviders\OIDC\Provider;
 
 final class GenericOIDCProviderSchema extends OAuthSchema
 {
-    public function __construct(private GenericOIDCProvider $model) {}
+    public function __construct(private readonly GenericOIDCProvider $model) {}
 
     public function getId(): string
     {
@@ -72,12 +75,19 @@ final class GenericOIDCProviderSchema extends OAuthSchema
         return $this->model->display_color;
     }
 
-    public function shouldCreateMissingUsers(): bool
+    public function isEnabled(): bool
+    {
+        $id = Str::upper($this->getId());
+
+        return env("OAUTH_{$id}_ENABLED", true);
+    }
+
+    public function shouldCreateMissingUser(OAuthUser $user): bool
     {
         return $this->model->create_missing_users;
     }
 
-    public function shouldLinkMissingUsers(): bool
+    public function shouldLinkMissingUser(User $user, OAuthUser $oauthUser): bool
     {
         return $this->model->link_missing_users;
     }
