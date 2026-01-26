@@ -35,8 +35,8 @@ class SubdomainsPluginProvider extends ServiceProvider
         Server::resolveRelationUsing('subdomains', fn (Server $server) => $server->hasMany(Subdomain::class, 'server_id', 'id'));
 
         Server::deleting(function (Server $server) {
-            /** @phpstan-ignore-next-line */
-            foreach ($server->subdomains()->get() as $subdomain) {
+            /** @phpstan-ignore property.notFound */
+            foreach ($server->subdomains as $subdomain) {
                 try {
                     $subdomain->delete();
                 } catch (Exception $exception) {
