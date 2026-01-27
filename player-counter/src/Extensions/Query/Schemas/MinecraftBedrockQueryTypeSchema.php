@@ -18,7 +18,7 @@ class MinecraftBedrockQueryTypeSchema implements QueryTypeSchemaInterface
         return 'Minecraft (Bedrock)';
     }
 
-    /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: array<array{id: string, name: string}>} */
+    /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: ?array<array{id: string, name: string}>} */
     public function process(string $ip, int $port): ?array
     {
         $query = new MinecraftQuery();
@@ -27,9 +27,8 @@ class MinecraftBedrockQueryTypeSchema implements QueryTypeSchemaInterface
             $query->ConnectBedrock($ip, $port, 5, true);
 
             $info = $query->GetInfo();
-            $players = $query->GetPlayers();
 
-            if (!$info || !$players) {
+            if (!$info) {
                 return null;
             }
 
@@ -38,7 +37,7 @@ class MinecraftBedrockQueryTypeSchema implements QueryTypeSchemaInterface
                 'map' => $info['Map'],
                 'current_players' => $info['Players'],
                 'max_players' => $info['MaxPlayers'],
-                'players' => array_map(fn ($player) => ['id' => (string) $player['Id'], 'name' => (string) $player['Name']], $players),
+                'players' => null,
             ];
         } catch (Exception $exception) {
             report($exception);

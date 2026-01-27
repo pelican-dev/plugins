@@ -119,7 +119,7 @@ class PlayersPage extends Page implements HasTable
                 if ($gameQuery) {
                     $data = $gameQuery->runQuery($server->allocation);
 
-                    if ($data) {
+                    if ($data && $data['players']) {
                         $players = $data['players'];
                     }
                 }
@@ -134,7 +134,7 @@ class PlayersPage extends Page implements HasTable
             ->contentGrid([
                 'default' => 1,
                 'lg' => 2,
-                'xl' => 3,
+                'xl' => $isMinecraft ? 2 : 3,
             ])
             ->columns([
                 Split::make([

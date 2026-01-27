@@ -32,7 +32,7 @@ class GameQuery extends Model
         return $this->belongsToMany(Egg::class);
     }
 
-    /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: array<array{id: string, name: string}>} */
+    /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: ?array<array{id: string, name: string}>} */
     public function runQuery(Allocation $allocation): ?array
     {
         $ip = config('player-counter.use_alias') && is_ip($allocation->alias) ? $allocation->alias : $allocation->ip;

@@ -38,13 +38,17 @@ class PlayerCounterController extends ClientApiController
     {
         $data = $this->runQuery($server);
 
+        if (!$data['players']) {
+            abort(Response::HTTP_NOT_ACCEPTABLE, 'Server query has no player list');
+        }
+
         /** @var string[] $players */
         $players = array_map(fn ($player) => $player['name'], $data['players']);
 
         return response()->json($players);
     }
 
-    /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: array<array{id: string, name: string}>} */
+    /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: ?array<array{id: string, name: string}>} */
     private function runQuery(Server $server): ?array
     {
         if (!$server->allocation || $server->allocation->ip === '0.0.0.0' || $server->allocation->ip === '::') {
