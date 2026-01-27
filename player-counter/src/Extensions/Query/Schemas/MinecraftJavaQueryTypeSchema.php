@@ -74,7 +74,7 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
                 'map' => $info['Map'],
                 'current_players' => $info['Players'],
                 'max_players' => $info['MaxPlayers'],
-                'players' => $players,
+                'players' => array_map(fn ($player) => ['id' => (string) $player, 'name' => (string) $player], $players),
             ];
         } catch (Exception $exception) {
             report($exception);
