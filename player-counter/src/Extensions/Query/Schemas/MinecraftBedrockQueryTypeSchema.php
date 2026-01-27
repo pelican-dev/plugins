@@ -29,6 +29,10 @@ class MinecraftBedrockQueryTypeSchema implements QueryTypeSchemaInterface
             $info = $query->GetInfo();
             $players = $query->GetPlayers();
 
+            if (!$info || !$players) {
+                return null;
+            }
+
             return [
                 'hostname' => $info['HostName'],
                 'map' => $info['Map'],

@@ -33,7 +33,7 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
             $data = $ping->Query();
 
             if (!$data) {
-                throw new Exception('Query function returned false');
+                return null;
             }
 
             return [
@@ -64,6 +64,10 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
 
             $info = $query->GetInfo();
             $players = $query->GetPlayers();
+
+            if (!$info || !$players) {
+                return false;
+            }
 
             return [
                 'hostname' => $info['HostName'],
