@@ -35,6 +35,10 @@ class GameQuery extends Model
     /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: ?array<array{id: string, name: string}>} */
     public function runQuery(Allocation $allocation): ?array
     {
+        if (!static::canRunQuery($allocation)) {
+            return null;
+        }
+
         $ip = config('player-counter.use_alias') && is_ip($allocation->alias) ? $allocation->alias : $allocation->ip;
         $ip = is_ipv6($ip) ? '[' . $ip . ']' : $ip;
 
@@ -42,5 +46,16 @@ class GameQuery extends Model
         $service = app(QueryTypeService::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
 
         return $service->get($this->query_type)->process($ip, $allocation->port + ($this->query_port_offset ?? 0));
+    }
+
+    public static function canRunQuery(?Allocation $allocation): bool
+    {
+        if (!$allocation) {
+            return false;
+        }
+
+        $ip = config('player-counter.use_alias') && is_ip($allocation->alias) ? $allocation->alias : $allocation->ip;
+
+        return !in_array($ip, ['0.0.0.0', '::']);
     }
 }

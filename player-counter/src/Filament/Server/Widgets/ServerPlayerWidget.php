@@ -21,7 +21,7 @@ class ServerPlayerWidget extends StatsOverviewWidget
             return false;
         }
 
-        if (!$server->allocation || $server->allocation->ip === '0.0.0.0' || $server->allocation->ip === '::') {
+        if (!GameQuery::canRunQuery($server->allocation)) {
             return false;
         }
 

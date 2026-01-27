@@ -51,7 +51,7 @@ class PlayerCounterController extends ClientApiController
     /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: ?array<array{id: string, name: string}>} */
     private function runQuery(Server $server): ?array
     {
-        if (!$server->allocation || $server->allocation->ip === '0.0.0.0' || $server->allocation->ip === '::') {
+        if (!GameQuery::canRunQuery($server->allocation)) {
             abort(Response::HTTP_NOT_ACCEPTABLE, 'Server has invalid allocation');
         }
 
