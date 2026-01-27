@@ -25,7 +25,7 @@ class CitizenFXQueryTypeSchema implements QueryTypeSchemaInterface
             $this->resolveSRV($ip, $port);
 
             $http = Http::acceptJson()
-                ->connectTimeout(5)
+                ->timeout(5)
                 ->throw()
                 ->baseUrl("http://$ip:$port/");
 
