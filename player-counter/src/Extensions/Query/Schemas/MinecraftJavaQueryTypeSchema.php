@@ -36,8 +36,8 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
                 return null;
             }
 
-            return [
-                'hostname' => $data['description']['text'],
+            return [                
+                'hostname' => is_string($data['description']) ? $data['description'] : $data['description']['text'],
                 'map' => 'world', // No map from MinecraftPing
                 'current_players' => $data['players']['online'],
                 'max_players' => $data['players']['max'],
