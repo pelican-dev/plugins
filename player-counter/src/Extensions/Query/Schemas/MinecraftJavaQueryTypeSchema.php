@@ -41,7 +41,7 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
                 'map' => 'world', // No map from MinecraftPing
                 'current_players' => $data['players']['online'],
                 'max_players' => $data['players']['max'],
-                'players' => $data['players']['sample'],
+                'players' => $data['players']['sample'] ?? [],
             ];
         } catch (Exception $exception) {
             report($exception);
@@ -74,7 +74,7 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
                 'map' => $info['Map'],
                 'current_players' => $info['Players'],
                 'max_players' => $info['MaxPlayers'],
-                'players' => array_map(fn ($player) => ['id' => $player['Id'], 'name' => $player['Name']], $players),
+                'players' => $players,
             ];
         } catch (Exception $exception) {
             report($exception);
