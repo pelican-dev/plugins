@@ -38,7 +38,7 @@ class PlayerCounterController extends ClientApiController
     {
         $data = $this->runQuery($server);
 
-        if (!$data['players']) {
+        if (is_null($data['players'])) {
             abort(Response::HTTP_NOT_ACCEPTABLE, 'Server query has no player list');
         }
 

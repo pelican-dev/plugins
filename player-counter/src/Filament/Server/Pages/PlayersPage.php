@@ -119,8 +119,8 @@ class PlayersPage extends Page implements HasTable
                 if ($gameQuery) {
                     $data = $gameQuery->runQuery($server->allocation);
 
-                    if ($data && $data['players']) {
-                        $players = $data['players'];
+                    if ($data) {
+                        $players = $data['players'] ?? [];
                     }
                 }
 
