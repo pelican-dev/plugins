@@ -43,7 +43,7 @@ class GameQuery extends Model
         $ip = is_ipv6($ip) ? '[' . $ip . ']' : $ip;
 
         /** @var QueryTypeService $service */
-        $service = app(QueryTypeService::class); // @phpstan-ignore myCustomRules.forbiddenGlobalFunctions
+        $service = app(QueryTypeService::class);
 
         return $service->get($this->query_type)->process($ip, $allocation->port + ($this->query_port_offset ?? 0));
     }
