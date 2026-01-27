@@ -65,7 +65,7 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
             $info = $query->GetInfo();
             $players = $query->GetPlayers();
 
-            if (!$info || !$players) {
+            if (!is_array($info) || !is_array($players)) {
                 return false;
             }
 

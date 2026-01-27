@@ -28,7 +28,7 @@ class MinecraftBedrockQueryTypeSchema implements QueryTypeSchemaInterface
 
             $info = $query->GetInfo();
 
-            if (!$info) {
+            if (!is_array($info)) {
                 return null;
             }
 
@@ -37,7 +37,7 @@ class MinecraftBedrockQueryTypeSchema implements QueryTypeSchemaInterface
                 'map' => $info['Map'],
                 'current_players' => $info['Players'],
                 'max_players' => $info['MaxPlayers'],
-                'players' => null,
+                'players' => null, // Bedrock has no player list
             ];
         } catch (Exception $exception) {
             report($exception);

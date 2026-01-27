@@ -32,7 +32,7 @@ class CitizenFXQueryTypeSchema implements QueryTypeSchemaInterface
             $info = $http->get('dynamic.json')->json();
             $players = $http->get('players.json')->json();
 
-            if (!$info || !$players) {
+            if (!is_array($info) || !is_array($players)) {
                 return null;
             }
 
