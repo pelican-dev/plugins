@@ -2,7 +2,7 @@
 
 namespace Boy132\PlayerCounter\Filament\Admin\Resources\GameQueries;
 
-use Boy132\PlayerCounter\Enums\GameQueryType;
+use Boy132\PlayerCounter\Extensions\Query\QueryTypeService;
 use Boy132\PlayerCounter\Filament\Admin\Resources\GameQueries\Pages\ManageGameQueries;
 use Boy132\PlayerCounter\Models\GameQuery;
 use Filament\Actions\DeleteAction;
@@ -48,7 +48,8 @@ class GameQueryResource extends Resource
             ->columns([
                 TextColumn::make('query_type')
                     ->label(trans('player-counter::query.type'))
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn ($state, QueryTypeService $service) => $service->getMappings()[$state] ?? $state),
                 TextColumn::make('query_port_offset')
                     ->label(trans('player-counter::query.port_offset'))
                     ->placeholder(trans('player-counter::query.no_offset')),
@@ -76,8 +77,7 @@ class GameQueryResource extends Resource
                 Select::make('query_type')
                     ->label(trans('player-counter::query.type'))
                     ->required()
-                    ->options(GameQueryType::class)
-                    ->disableOptionWhen(fn (string $value) => $value === GameQueryType::FiveMRedM->value) // see https://github.com/pelican-dev/plugins/issues/48
+                    ->options(fn (QueryTypeService $service) => $service->getMappings())
                     ->selectablePlaceholder(false)
                     ->preload()
                     ->searchable(),

@@ -15,6 +15,7 @@
     ],
     "panel_version": null,
     "composer_packages": {
-        "krymosoftware/gameq": "^4.0"
+        "xpaw/php-minecraft-query": "^5.0.0",
+        "xpaw/php-source-query-class": "^5.0.0"
     }
 }

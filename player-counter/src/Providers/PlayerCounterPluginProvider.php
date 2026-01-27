@@ -6,6 +6,12 @@ use App\Enums\ConsoleWidgetPosition;
 use App\Filament\Server\Pages\Console;
 use App\Models\Egg;
 use App\Models\Role;
+use Boy132\PlayerCounter\Extensions\Query\QueryTypeService;
+use Boy132\PlayerCounter\Extensions\Query\Schemas\CitizenFXQueryTypeSchema;
+use Boy132\PlayerCounter\Extensions\Query\Schemas\GoldSourceQueryTypeSchema;
+use Boy132\PlayerCounter\Extensions\Query\Schemas\MinecraftBedrockQueryTypeSchema;
+use Boy132\PlayerCounter\Extensions\Query\Schemas\MinecraftJavaQueryTypeSchema;
+use Boy132\PlayerCounter\Extensions\Query\Schemas\SourceQueryTypeSchema;
 use Boy132\PlayerCounter\Filament\Server\Widgets\ServerPlayerWidget;
 use Boy132\PlayerCounter\Models\EggGameQuery;
 use Boy132\PlayerCounter\Models\GameQuery;
@@ -19,6 +25,19 @@ class PlayerCounterPluginProvider extends ServiceProvider
         Role::registerCustomModelIcon('game_query', 'tabler-device-desktop-search');
 
         Console::registerCustomWidgets(ConsoleWidgetPosition::AboveConsole, [ServerPlayerWidget::class]);
+
+        $this->app->singleton(QueryTypeService::class, function () {
+            $service = new QueryTypeService();
+
+            // Default Query types
+            $service->register(new SourceQueryTypeSchema());
+            $service->register(new GoldSourceQueryTypeSchema());
+            $service->register(new MinecraftJavaQueryTypeSchema());
+            $service->register(new MinecraftBedrockQueryTypeSchema());
+            $service->register(new CitizenFXQueryTypeSchema());
+
+            return $service;
+        });
     }
 
     public function boot(): void

@@ -24,12 +24,7 @@ class PlayerCounterController extends ClientApiController
     {
         $data = $this->runQuery($server);
 
-        return response()->json([
-            'hostname' => (string) $data['gq_hostname'],
-            'current_players' => (int) $data['gq_numplayers'],
-            'max_players' => (int) $data['gq_maxplayers'],
-            'map' => (string) $data['gq_mapname'],
-        ]);
+        return response()->json(array_except($data, 'players'));
     }
 
     /**
@@ -44,13 +39,13 @@ class PlayerCounterController extends ClientApiController
         $data = $this->runQuery($server);
 
         /** @var string[] $players */
-        $players = array_map(fn ($player) => $player['gq_name'], $data['players']);
+        $players = array_map(fn ($player) => $player['name'], $data['players']);
 
         return response()->json($players);
     }
 
-    /** @return array<mixed> */
-    private function runQuery(Server $server): array
+    /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: array<array{id: string, name: string}>} */
+    private function runQuery(Server $server): ?array
     {
         if (!$server->allocation || $server->allocation->ip === '0.0.0.0' || $server->allocation->ip === '::') {
             abort(Response::HTTP_NOT_ACCEPTABLE, 'Server has invalid allocation');
