@@ -216,6 +216,9 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('No downloadable file found');
                             }
 
+                            // Validate filename from Modrinth API to prevent path traversal
+                            $safeFilename = $this->validateFilename($primaryFile['filename']);
+
                             // Download the file
                             $fileRepository->setServer($server)->pull($primaryFile['url'], ModrinthProjectType::fromServer($server)->getFolder());
 
@@ -228,7 +231,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 $record['title'],
                                 $latestVersion['id'],
                                 $latestVersion['version_number'],
-                                $primaryFile['filename']
+                                $safeFilename
                             );
 
                             if (!$saved) {
@@ -322,6 +325,9 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('No downloadable file found');
                             }
 
+                            // Validate new filename from Modrinth API to prevent path traversal
+                            $safeNewFilename = $this->validateFilename($primaryFile['filename']);
+
                             $folder = ModrinthProjectType::fromServer($server)->getFolder();
 
                             // Download new version first to avoid leaving mod in broken state if download fails
@@ -329,7 +335,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                             // Only delete old version after successful download (if filenames differ)
                             // If filenames are the same, the download already replaced the file
-                            if ($safeFilename !== $primaryFile['filename']) {
+                            if ($safeFilename !== $safeNewFilename) {
                                 Http::daemon($server->node)
                                     ->post("/api/servers/{$server->uuid}/files/delete", [
                                         'root' => '/',
@@ -347,7 +353,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 $record['title'],
                                 $latestVersion['id'],
                                 $latestVersion['version_number'],
-                                $primaryFile['filename']
+                                $safeNewFilename
                             );
 
                             if (!$saved) {

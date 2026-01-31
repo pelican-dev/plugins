@@ -186,12 +186,12 @@ class MinecraftModrinthService
             ];
 
             $metadataPath = $this->getMetadataFilePath($server);
-            $result = $fileRepository->setServer($server)->putContent(
+            $response = $fileRepository->setServer($server)->putContent(
                 $metadataPath,
                 json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
             );
 
-            if ($result === false) {
+            if ($response->failed()) {
                 return false;
             }
 
@@ -216,12 +216,12 @@ class MinecraftModrinthService
                 ->toArray();
 
             $metadataPath = $this->getMetadataFilePath($server);
-            $result = $fileRepository->setServer($server)->putContent(
+            $response = $fileRepository->setServer($server)->putContent(
                 $metadataPath,
                 json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
             );
 
-            if ($result === false) {
+            if ($response->failed()) {
                 return false;
             }
 
