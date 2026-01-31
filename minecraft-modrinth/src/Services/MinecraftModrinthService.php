@@ -88,12 +88,22 @@ class MinecraftModrinthService
 
         return cache()->remember("modrinth_versions:$projectId:$minecraftVersion:$minecraftLoader", now()->addMinutes(30), function () use ($projectId, $data) {
             try {
-                return Http::asJson()
+                $versions = Http::asJson()
                     ->timeout(5)
                     ->connectTimeout(5)
                     ->throw()
                     ->get("https://api.modrinth.com/v2/project/$projectId/version", $data)
                     ->json();
+
+                // Defensive: sort by date_published if available to ensure latest version is first
+                // The API likely returns sorted results, but this provides additional safety
+                if (!empty($versions) && is_array($versions) && isset($versions[0]['date_published'])) {
+                    usort($versions, function ($a, $b) {
+                        return strcmp($b['date_published'] ?? '', $a['date_published'] ?? '');
+                    });
+                }
+
+                return $versions;
             } catch (Exception $exception) {
                 report($exception);
 
@@ -155,7 +165,6 @@ class MinecraftModrinthService
 
             return $validInstalledMods;
         } catch (Exception $exception) {
-            // File doesn't exist yet or is invalid, return empty array
             return [];
         }
     }
@@ -175,13 +184,11 @@ class MinecraftModrinthService
                 'installed_mods' => $this->getInstalledModsMetadata($server, $fileRepository),
             ];
 
-            // Remove any existing entry for this project
             $metadata['installed_mods'] = collect($metadata['installed_mods'])
                 ->filter(fn ($mod) => $mod['project_id'] !== $projectId)
                 ->values()
                 ->toArray();
 
-            // Add new entry
             $metadata['installed_mods'][] = [
                 'project_id' => $projectId,
                 'project_slug' => $projectSlug,

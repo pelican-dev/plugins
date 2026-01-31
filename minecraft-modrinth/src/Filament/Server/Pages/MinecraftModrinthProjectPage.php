@@ -198,7 +198,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             /** @var Server $server */
                             $server = Filament::getTenant();
 
-                            // Get latest version
                             $versions = MinecraftModrinth::getModrinthVersions($record['project_id'], $server);
 
                             if (empty($versions)) {
@@ -225,10 +224,8 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('Server does not support Modrinth mods or plugins');
                             }
 
-                            // Download the file
                             $fileRepository->setServer($server)->pull($primaryFile['url'], $type->getFolder());
 
-                            // Save metadata
                             $saved = MinecraftModrinth::saveModMetadata(
                                 $server,
                                 $fileRepository,
@@ -241,10 +238,24 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             );
 
                             if (!$saved) {
+                                // Rollback: delete the downloaded file to maintain consistency
+                                try {
+                                    Http::daemon($server->node)
+                                        ->post("/api/servers/{$server->uuid}/files/delete", [
+                                            'root' => '/',
+                                            'files' => [$type->getFolder() . '/' . $safeFilename],
+                                        ])
+                                        ->throw();
+                                } catch (Exception $rollbackException) {
+                                    // Log rollback failure but continue with the original exception
+                                    report($rollbackException);
+                                }
+
                                 throw new Exception('Failed to save mod metadata');
                             }
 
                             $this->installedModsMetadata = null;
+                            $this->versionsCache = [];
 
                             Notification::make()
                                 ->title(trans('minecraft-modrinth::strings.notifications.install_success'))
@@ -257,8 +268,8 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                         } catch (Exception $exception) {
                             report($exception);
 
-                            // Invalidate cache to prevent stale UI state
                             $this->installedModsMetadata = null;
+                            $this->versionsCache = [];
 
                             Notification::make()
                                 ->title(trans('minecraft-modrinth::strings.notifications.install_failed'))
@@ -285,7 +296,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             return false;
                         }
 
-                        // Check if latest version is different from installed
                         return $installedMod['version_id'] !== $versions[0]['id'];
                     })
                     ->requiresConfirmation()
@@ -312,7 +322,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                             $safeFilename = $this->validateFilename($installedMod['filename']);
 
-                            // Get latest version
                             $versions = MinecraftModrinth::getModrinthVersions($record['project_id'], $server);
 
                             if (empty($versions)) {
@@ -344,18 +353,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             // Download new version first to avoid leaving mod in broken state if download fails
                             $fileRepository->setServer($server)->pull($primaryFile['url'], $folder);
 
-                            // Only delete old version after successful download (if filenames differ)
-                            // If filenames are the same, the download already replaced the file
-                            if ($safeFilename !== $safeNewFilename) {
-                                Http::daemon($server->node)
-                                    ->post("/api/servers/{$server->uuid}/files/delete", [
-                                        'root' => '/',
-                                        'files' => [$folder . '/' . $safeFilename],
-                                    ])
-                                    ->throw();
-                            }
-
-                            // Update metadata
+                            // Update metadata before deleting old file to maintain consistency
                             $saved = MinecraftModrinth::saveModMetadata(
                                 $server,
                                 $fileRepository,
@@ -368,10 +366,35 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             );
 
                             if (!$saved) {
+                                // Rollback: delete the newly downloaded file to restore original state
+                                try {
+                                    Http::daemon($server->node)
+                                        ->post("/api/servers/{$server->uuid}/files/delete", [
+                                            'root' => '/',
+                                            'files' => [$folder . '/' . $safeNewFilename],
+                                        ])
+                                        ->throw();
+                                } catch (Exception $rollbackException) {
+                                    // Log rollback failure but continue with the original exception
+                                    report($rollbackException);
+                                }
+
                                 throw new Exception('Failed to save mod metadata');
                             }
 
+                            // Only delete old version after successful metadata save (if filenames differ)
+                            // If filenames are the same, the download already replaced the file
+                            if ($safeFilename !== $safeNewFilename) {
+                                Http::daemon($server->node)
+                                    ->post("/api/servers/{$server->uuid}/files/delete", [
+                                        'root' => '/',
+                                        'files' => [$folder . '/' . $safeFilename],
+                                    ])
+                                    ->throw();
+                            }
+
                             $this->installedModsMetadata = null;
+                            $this->versionsCache = [];
 
                             Notification::make()
                                 ->title(trans('minecraft-modrinth::strings.notifications.update_success'))
@@ -383,8 +406,8 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                         } catch (Exception $exception) {
                             report($exception);
 
-                            // Invalidate cache to prevent stale UI state
                             $this->installedModsMetadata = null;
+                            $this->versionsCache = [];
 
                             Notification::make()
                                 ->title(trans('minecraft-modrinth::strings.notifications.update_failed'))
@@ -409,10 +432,9 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                         $versions = $this->getCachedVersions($record['project_id']);
 
                         if (empty($versions)) {
-                            return true; // Show installed if we can't check for updates
+                            return true;
                         }
 
-                        // Show installed badge only if this is the latest version
                         return $installedMod['version_id'] === $versions[0]['id'];
                     }),
                 Action::make('uninstall')
@@ -453,7 +475,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('Server does not support Modrinth mods or plugins');
                             }
 
-                            // Delete the JAR file after metadata is removed
                             $folder = $type->getFolder();
 
                             Http::daemon($server->node)
@@ -464,6 +485,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 ->throw();
 
                             $this->installedModsMetadata = null;
+                            $this->versionsCache = [];
 
                             Notification::make()
                                 ->title(trans('minecraft-modrinth::strings.notifications.uninstall_success'))
@@ -473,8 +495,8 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                         } catch (Exception $exception) {
                             report($exception);
 
-                            // Invalidate cache to prevent stale UI state
                             $this->installedModsMetadata = null;
+                            $this->versionsCache = [];
 
                             Notification::make()
                                 ->title(trans('minecraft-modrinth::strings.notifications.uninstall_failed'))
