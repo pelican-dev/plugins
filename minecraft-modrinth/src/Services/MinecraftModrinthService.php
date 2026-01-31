@@ -102,11 +102,18 @@ class MinecraftModrinthService
         });
     }
 
+    /**
+     * @throws Exception
+     */
     protected function getMetadataFilePath(Server $server): string
     {
-        $folder = ModrinthProjectType::fromServer($server)->getFolder();
+        $type = ModrinthProjectType::fromServer($server);
 
-        return $folder . '/.modrinth-metadata.json';
+        if (!$type) {
+            throw new Exception("Server {$server->id} does not support Modrinth mods or plugins");
+        }
+
+        return $type->getFolder() . '/.modrinth-metadata.json';
     }
 
     /** @return array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}> */
