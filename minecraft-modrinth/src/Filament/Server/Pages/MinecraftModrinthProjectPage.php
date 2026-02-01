@@ -32,17 +32,29 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
     use BlockAccessInConflict;
     use InteractsWithTable;
 
+    public const VIEW_ALL = 'all';
+    public const VIEW_INSTALLED = 'installed';
+
     /** @var array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}>|null */
     protected ?array $installedModsMetadata = null;
 
     /** @var array<string, array<int, mixed>> Cache for version data by project_id */
     protected array $versionsCache = [];
 
+    public string $activeView = self::VIEW_ALL;
+
     protected static string|\BackedEnum|null $navigationIcon = 'tabler-packages';
 
     protected static ?string $slug = 'modrinth';
 
     protected static ?int $navigationSort = 30;
+
+    protected function queryString(): array
+    {
+        return [
+            'activeView' => ['as' => 'view', 'except' => self::VIEW_ALL],
+        ];
+    }
 
     public static function canAccess(): bool
     {
@@ -134,8 +146,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
     }
 
     /**
-     * Validate and sanitize filename to prevent path traversal
-     *
      * @throws Exception
      */
     protected function validateFilename(string $filename): string
@@ -145,6 +155,13 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         }
 
         return basename($filename);
+    }
+
+    protected function refreshIfInInstalledView(): void
+    {
+        if ($this->activeView === self::VIEW_INSTALLED) {
+            $this->js('$wire.$refresh()');
+        }
     }
 
     /**
@@ -157,9 +174,18 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                 /** @var Server $server */
                 $server = Filament::getTenant();
 
-                $response = MinecraftModrinth::getModrinthProjects($server, $page, $search);
+                if ($this->activeView === self::VIEW_INSTALLED) {
+                    $installedMods = $this->getInstalledModsMetadata();
+                    $projects = MinecraftModrinth::getInstalledModsFromModrinth($installedMods, $page);
 
-                return new LengthAwarePaginator($response['hits'], $response['total_hits'], 20, $page);
+                    $totalCount = count($installedMods);
+
+                    return new LengthAwarePaginator($projects, $totalCount, 20, $page);
+                } else {
+                    $response = MinecraftModrinth::getModrinthProjects($server, $page, $search);
+
+                    return new LengthAwarePaginator($response['hits'], $response['total_hits'], 20, $page);
+                }
             })
             ->paginated([20])
             ->columns([
@@ -177,11 +203,17 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                     ->toggleable(),
                 TextColumn::make('date_modified')
                     ->icon('tabler-calendar')
-                    ->formatStateUsing(fn ($state) => Carbon::parse($state, 'UTC')->diffForHumans())
-                    ->tooltip(fn ($state) => Carbon::parse($state, 'UTC')->timezone(user()->timezone ?? 'UTC')->format($table->getDefaultDateTimeDisplayFormat()))
+                    ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state, 'UTC')->diffForHumans() : '')
+                    ->tooltip(fn ($state) => $state ? Carbon::parse($state, 'UTC')->timezone(user()->timezone ?? 'UTC')->format($table->getDefaultDateTimeDisplayFormat()) : '')
                     ->toggleable(),
             ])
-            ->recordUrl(fn (array $record) => "https://modrinth.com/{$record['project_type']}/{$record['slug']}", true)
+            ->recordUrl(function (array $record) {
+                if (isset($record['unavailable']) && $record['unavailable']) {
+                    return null;
+                }
+
+                return "https://modrinth.com/{$record['project_type']}/{$record['slug']}";
+            }, true)
             ->recordActions([
                 Action::make('install')
                     ->iconButton()
@@ -216,7 +248,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('No downloadable file found');
                             }
 
-                            // Validate filename from Modrinth API to prevent path traversal
                             $safeFilename = $this->validateFilename($primaryFile['filename']);
 
                             $type = ModrinthProjectType::fromServer($server);
@@ -234,11 +265,11 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 $record['title'],
                                 $latestVersion['id'],
                                 $latestVersion['version_number'],
-                                $safeFilename
+                                $safeFilename,
+                                $record['author'] ?? null
                             );
 
                             if (!$saved) {
-                                // Rollback: delete the downloaded file to maintain consistency
                                 try {
                                     Http::daemon($server->node)
                                         ->post("/api/servers/{$server->uuid}/files/delete", [
@@ -247,7 +278,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                         ])
                                         ->throw();
                                 } catch (Exception $rollbackException) {
-                                    // Log rollback failure but continue with the original exception
                                     report($rollbackException);
                                 }
 
@@ -340,7 +370,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('No downloadable file found');
                             }
 
-                            // Validate new filename from Modrinth API to prevent path traversal
                             $safeNewFilename = $this->validateFilename($primaryFile['filename']);
 
                             $type = ModrinthProjectType::fromServer($server);
@@ -350,10 +379,8 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                             $folder = $type->getFolder();
 
-                            // Download new version first to avoid leaving mod in broken state if download fails
                             $fileRepository->setServer($server)->pull($primaryFile['url'], $folder);
 
-                            // Update metadata before deleting old file to maintain consistency
                             $saved = MinecraftModrinth::saveModMetadata(
                                 $server,
                                 $fileRepository,
@@ -362,11 +389,11 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 $record['title'],
                                 $latestVersion['id'],
                                 $latestVersion['version_number'],
-                                $safeNewFilename
+                                $safeNewFilename,
+                                $record['author'] ?? null
                             );
 
                             if (!$saved) {
-                                // Rollback: delete the newly downloaded file to restore original state
                                 try {
                                     Http::daemon($server->node)
                                         ->post("/api/servers/{$server->uuid}/files/delete", [
@@ -375,15 +402,12 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                         ])
                                         ->throw();
                                 } catch (Exception $rollbackException) {
-                                    // Log rollback failure but continue with the original exception
                                     report($rollbackException);
                                 }
 
                                 throw new Exception('Failed to save mod metadata');
                             }
 
-                            // Only delete old version after successful metadata save (if filenames differ)
-                            // If filenames are the same, the download already replaced the file
                             if ($safeFilename !== $safeNewFilename) {
                                 Http::daemon($server->node)
                                     ->post("/api/servers/{$server->uuid}/files/delete", [
@@ -486,6 +510,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                             $this->installedModsMetadata = null;
                             $this->versionsCache = [];
+                            $this->refreshIfInInstalledView();
 
                             Notification::make()
                                 ->title(trans('minecraft-modrinth::strings.notifications.uninstall_success'))
@@ -497,6 +522,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                             $this->installedModsMetadata = null;
                             $this->versionsCache = [];
+                            $this->refreshIfInInstalledView();
 
                             Notification::make()
                                 ->title(trans('minecraft-modrinth::strings.notifications.uninstall_failed'))
@@ -521,6 +547,24 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         $folder = $type->getFolder();
 
         return [
+            Action::make('view_all')
+                ->label(trans('minecraft-modrinth::strings.page.view_all'))
+                ->color($this->activeView === self::VIEW_ALL ? 'primary' : 'gray')
+                ->action(function () {
+                    $this->resetTable();
+                    $this->activeView = self::VIEW_ALL;
+                    $this->js('$wire.$refresh()');
+                })
+                ->button(),
+            Action::make('view_installed')
+                ->label(trans('minecraft-modrinth::strings.page.view_installed'))
+                ->color($this->activeView === self::VIEW_INSTALLED ? 'primary' : 'gray')
+                ->action(function () {
+                    $this->resetTable();
+                    $this->activeView = self::VIEW_INSTALLED;
+                    $this->js('$wire.$refresh()');
+                })
+                ->button(),
             Action::make('open_folder')
                 ->label(fn () => trans('minecraft-modrinth::strings.page.open_folder', ['folder' => $folder]))
                 ->url(fn () => ListFiles::getUrl(['path' => $folder]), true),

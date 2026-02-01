@@ -16,6 +16,9 @@ return [
         'loader' => 'Loader',
         'installed' => 'Installed :type',
         'unknown' => 'Unknown',
+        'view_all' => 'All',
+        'view_installed' => 'Installed',
+        'mod_unavailable' => 'This mod/plugin is no longer available on Modrinth',
     ],
 
     'table' => [

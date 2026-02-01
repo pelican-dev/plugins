@@ -70,6 +70,97 @@ class MinecraftModrinthService
         });
     }
 
+    /**
+     * @param  array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}>  $installedMods
+     * @return array<int, array<string, mixed>>
+     */
+    public function getInstalledModsFromModrinth(array $installedMods, int $page = 1): array
+    {
+        if (empty($installedMods)) {
+            return [];
+        }
+
+        $projectIds = collect($installedMods)->pluck('project_id')->unique()->values()->all();
+
+        $perPage = 20;
+        $offset = ($page - 1) * $perPage;
+        $pageIds = array_slice($projectIds, $offset, $perPage);
+
+        if (empty($pageIds)) {
+            return [];
+        }
+
+        $idsParam = '["' . implode('","', $pageIds) . '"]';
+        $key = 'modrinth_bulk:' . md5($idsParam);
+
+        $modrinthProjects = cache()->remember($key, now()->addMinutes(30), function () use ($idsParam) {
+            try {
+                return Http::asJson()
+                    ->timeout(10)
+                    ->connectTimeout(5)
+                    ->throw()
+                    ->get('https://api.modrinth.com/v2/projects', [
+                        'ids' => $idsParam,
+                    ])
+                    ->json();
+            } catch (Exception $exception) {
+                report($exception);
+
+                return [];
+            }
+        });
+
+        $modrinthMap = [];
+        foreach ($modrinthProjects as $project) {
+            if (isset($project['id'])) {
+                $modrinthMap[$project['id']] = $project;
+            }
+        }
+
+        $results = [];
+        foreach ($pageIds as $projectId) {
+            $installedMod = null;
+            foreach ($installedMods as $mod) {
+                if ($mod['project_id'] === $projectId) {
+                    $installedMod = $mod;
+                    break;
+                }
+            }
+
+            if (!$installedMod) {
+                continue;
+            }
+
+            if (isset($modrinthMap[$projectId])) {
+                $project = $modrinthMap[$projectId];
+                $project['project_id'] = $project['id'];
+                if (isset($project['updated']) && !isset($project['date_modified'])) {
+                    $project['date_modified'] = $project['updated'];
+                }
+                // Use stored author from metadata if available, since bulk API doesn't include it
+                if (isset($installedMod['author']) && !isset($project['author'])) {
+                    $project['author'] = $installedMod['author'];
+                }
+                $results[] = $project;
+            } else {
+                $results[] = [
+                    'project_id' => $installedMod['project_id'],
+                    'slug' => $installedMod['project_slug'],
+                    'title' => $installedMod['project_title'],
+                    'description' => trans('minecraft-modrinth::strings.page.mod_unavailable'),
+                    'icon_url' => null,
+                    'author' => $installedMod['author'] ?? '',
+                    'downloads' => 0,
+                    'date_modified' => $installedMod['installed_at'],
+                    'project_type' => '',
+                    'unavailable' => true,
+                ];
+            }
+        }
+
+        return $results;
+    }
+
     /** @return array<int, mixed> */
     public function getModrinthVersions(string $projectId, Server $server): array
     {
@@ -95,8 +186,6 @@ class MinecraftModrinthService
                     ->get("https://api.modrinth.com/v2/project/$projectId/version", $data)
                     ->json();
 
-                // Defensive: sort by date_published if available to ensure latest version is first
-                // The API likely returns sorted results, but this provides additional safety
                 if (!empty($versions) && is_array($versions) && isset($versions[0]['date_published'])) {
                     usort($versions, function ($a, $b) {
                         return strcmp($b['date_published'] ?? '', $a['date_published'] ?? '');
@@ -149,7 +238,6 @@ class MinecraftModrinthService
                 'installed_at',
             ];
 
-            // Flip once for efficient comparison
             $requiredKeysFlipped = array_flip($requiredKeys);
 
             foreach ($metadata['installed_mods'] as $entry) {
@@ -177,7 +265,8 @@ class MinecraftModrinthService
         string $projectTitle,
         string $versionId,
         string $versionNumber,
-        string $filename
+        string $filename,
+        ?string $author = null
     ): bool {
         try {
             $metadata = [
@@ -189,7 +278,7 @@ class MinecraftModrinthService
                 ->values()
                 ->toArray();
 
-            $metadata['installed_mods'][] = [
+            $modEntry = [
                 'project_id' => $projectId,
                 'project_slug' => $projectSlug,
                 'project_title' => $projectTitle,
@@ -198,6 +287,12 @@ class MinecraftModrinthService
                 'filename' => $filename,
                 'installed_at' => now()->toIso8601String(),
             ];
+            
+            if ($author !== null) {
+                $modEntry['author'] = $author;
+            }
+            
+            $metadata['installed_mods'][] = $modEntry;
 
             $metadataPath = $this->getMetadataFilePath($server);
             $response = $fileRepository->setServer($server)->putContent(
@@ -277,8 +372,6 @@ class MinecraftModrinthService
     }
 
     /**
-     * Get installed mods/plugins filenames from the server (for backward compatibility)
-     *
      * @return array<string>
      */
     public function getInstalledMods(Server $server, DaemonFileRepository $fileRepository): array
