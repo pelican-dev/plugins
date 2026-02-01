@@ -33,9 +33,10 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
     use InteractsWithTable;
 
     public const VIEW_ALL = 'all';
+
     public const VIEW_INSTALLED = 'installed';
 
-    /** @var array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}>|null */
+    /** @var array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string, author?: string}>|null */
     protected ?array $installedModsMetadata = null;
 
     /** @var array<string, array<int, mixed>> Cache for version data by project_id */
@@ -49,6 +50,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
     protected static ?int $navigationSort = 30;
 
+    /** @return array<string, mixed> */
     protected function queryString(): array
     {
         return [
@@ -104,7 +106,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         return $this->installedModsMetadata;
     }
 
-    /** @return array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}|null */
+    /** @return array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string, author?: string}|null */
     protected function getInstalledMod(string $projectId): ?array
     {
         $installedMods = $this->getInstalledModsMetadata();
@@ -208,7 +210,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                     ->toggleable(),
             ])
             ->recordUrl(function (array $record) {
-                if (isset($record['unavailable']) && $record['unavailable']) {
+                if (!empty($record['unavailable'])) {
                     return null;
                 }
 

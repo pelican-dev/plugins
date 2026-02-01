@@ -71,7 +71,7 @@ class MinecraftModrinthService
     }
 
     /**
-     * @param  array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}>  $installedMods
+     * @param  array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string, author?: string}>  $installedMods
      * @return array<int, array<string, mixed>>
      */
     public function getInstalledModsFromModrinth(array $installedMods, int $page = 1): array
@@ -215,7 +215,7 @@ class MinecraftModrinthService
         return $type->getFolder() . '/.modrinth-metadata.json';
     }
 
-    /** @return array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}> */
+    /** @return array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string, author?: string}> */
     public function getInstalledModsMetadata(Server $server, DaemonFileRepository $fileRepository): array
     {
         try {
@@ -287,11 +287,11 @@ class MinecraftModrinthService
                 'filename' => $filename,
                 'installed_at' => now()->toIso8601String(),
             ];
-            
+
             if ($author !== null) {
                 $modEntry['author'] = $author;
             }
-            
+
             $metadata['installed_mods'][] = $modEntry;
 
             $metadataPath = $this->getMetadataFilePath($server);
@@ -342,7 +342,7 @@ class MinecraftModrinthService
         }
     }
 
-    /** @return array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}|null */
+    /** @return array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string, author?: string}|null */
     public function getInstalledMod(Server $server, DaemonFileRepository $fileRepository, string $projectId): ?array
     {
         $installedMods = $this->getInstalledModsMetadata($server, $fileRepository);
