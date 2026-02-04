@@ -12,8 +12,14 @@ enum MinecraftLoader: string implements HasLabel
     case Fabric = 'fabric';
     case Quilt = 'quilt';
     case Paper = 'paper';
+    case Purpur = 'purpur';
+    case Folia = 'folia';
+    case Pufferfish = 'pufferfish';
+    case Spigot = 'spigot';
+    case Bukkit = 'bukkit';
     case Velocity = 'velocity';
     case Bungeecord = 'bungeecord';
+    case Waterfall = 'waterfall';
 
     public function getLabel(): string
     {
@@ -23,45 +29,32 @@ enum MinecraftLoader: string implements HasLabel
     public static function fromServer(Server $server): ?MinecraftLoader
     {
         $server->loadMissing('egg');
-
         $tags = $server->egg->tags ?? [];
-
         return self::fromTags($tags);
     }
 
-    /** @param string[] $tags */
     public static function fromTags(array $tags): ?MinecraftLoader
     {
-        if (in_array('minecraft', $tags)) {
-            if (in_array('neoforge', $tags) || in_array('neoforged', $tags)) {
-                return self::NeoForge;
-            }
-
-            if (in_array('forge', $tags)) {
-                return self::Forge;
-            }
-
-            if (in_array('fabric', $tags)) {
-                return self::Fabric;
-            }
-
-            if (in_array('quilt', $tags)) {
-                return self::Quilt;
-            }
-
-            if (in_array('bukkit', $tags) || in_array('spigot', $tags) || in_array('paper', $tags)) {
-                return self::Paper;
-            }
-
-            if (in_array('velocity', $tags)) {
-                return self::Velocity;
-            }
-
-            if (in_array('waterfall', $tags) || in_array('bungeecord', $tags)) {
-                return self::Bungeecord;
-            }
+        if (!in_array('minecraft', $tags)) {
+            return null;
         }
 
-        return null;
+        return match (true) {
+            in_array('neoforge', $tags) || in_array('neoforged', $tags) => self::NeoForge,
+            in_array('forge', $tags) => self::Forge,
+            in_array('fabric', $tags) => self::Fabric,
+            in_array('quilt', $tags) => self::Quilt,
+            in_array('folia', $tags) => self::Folia,
+            in_array('purpur', $tags) => self::Purpur,
+            in_array('pufferfish', $tags) => self::Pufferfish,
+            in_array('paper', $tags) || in_array('papermc', $tags) => self::Paper,
+            in_array('spigot', $tags) || in_array('spigotmc', $tags) => self::Spigot,
+            in_array('bukkit', $tags) => self::Bukkit,
+            in_array('velocity', $tags) => self::Velocity,
+            in_array('waterfall', $tags) => self::Waterfall,
+            in_array('bungeecord', $tags) || in_array('bungee', $tags) => self::Bungeecord,
+
+            default => null,
+        };
     }
 }
