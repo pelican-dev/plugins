@@ -42,7 +42,7 @@ enum MinecraftLoader: string implements HasLabel
      */
     public static function fromTags(array $tags): ?self
     {
-        if (! in_array('minecraft', $tags)) {
+        if (!in_array('minecraft', $tags)) {
             return null;
         }
 
