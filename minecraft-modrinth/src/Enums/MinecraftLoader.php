@@ -31,11 +31,8 @@ enum MinecraftLoader: string implements HasLabel
     {
         $server->loadMissing('egg');
 
-        /**
-        * @var string[] $tags
-        */
+        /** @var string[] $tags */
         $tags = $server->egg->tags ?? [];
-
 
         return self::fromTags($tags);
     }
@@ -45,7 +42,7 @@ enum MinecraftLoader: string implements HasLabel
      */
     public static function fromTags(array $tags): ?self
     {
-        if (!in_array('minecraft', $tags)) {
+        if (! in_array('minecraft', $tags)) {
             return null;
         }
 
@@ -54,18 +51,15 @@ enum MinecraftLoader: string implements HasLabel
             in_array('forge', $tags) => self::Forge,
             in_array('fabric', $tags) => self::Fabric,
             in_array('quilt', $tags) => self::Quilt,
-
             in_array('folia', $tags) => self::Folia,
             in_array('purpur', $tags) => self::Purpur,
             in_array('pufferfish', $tags) => self::Pufferfish,
             in_array('paper', $tags) || in_array('papermc', $tags) => self::Paper,
             in_array('spigot', $tags) || in_array('spigotmc', $tags) => self::Spigot,
             in_array('bukkit', $tags) => self::Bukkit,
-
             in_array('velocity', $tags) => self::Velocity,
             in_array('waterfall', $tags) => self::Waterfall,
             in_array('bungeecord', $tags) || in_array('bungee', $tags) => self::Bungeecord,
-
             default => null,
         };
     }
