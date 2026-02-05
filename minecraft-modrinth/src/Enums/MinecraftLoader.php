@@ -22,17 +22,11 @@ enum MinecraftLoader: string implements HasLabel
     case Bungeecord = 'bungeecord';
     case Waterfall = 'waterfall';
 
-    /**
-     * Get the label for the loader.
-     */
     public function getLabel(): string
     {
         return Str::title($this->name);
     }
 
-    /**
-     * Get the loader instance from a server.
-     */
     public static function fromServer(Server $server): ?self
     {
         $server->loadMissing('egg');
@@ -43,20 +37,21 @@ enum MinecraftLoader: string implements HasLabel
         return self::fromTags($tags);
     }
 
+    /**
+     * @param  string[]  $tags
+     */
     public static function fromTags(array $tags): ?self
     {
-        if (! in_array('minecraft', $tags)) {
+        if (!in_array('minecraft', $tags)) {
             return null;
         }
 
         return match (true) {
-            // Mod Loaders
             in_array('neoforge', $tags) || in_array('neoforged', $tags) => self::NeoForge,
             in_array('forge', $tags) => self::Forge,
             in_array('fabric', $tags) => self::Fabric,
             in_array('quilt', $tags) => self::Quilt,
 
-            // Server Software (Forks)
             in_array('folia', $tags) => self::Folia,
             in_array('purpur', $tags) => self::Purpur,
             in_array('pufferfish', $tags) => self::Pufferfish,
@@ -64,7 +59,6 @@ enum MinecraftLoader: string implements HasLabel
             in_array('spigot', $tags) || in_array('spigotmc', $tags) => self::Spigot,
             in_array('bukkit', $tags) => self::Bukkit,
 
-            // Proxy Software
             in_array('velocity', $tags) => self::Velocity,
             in_array('waterfall', $tags) => self::Waterfall,
             in_array('bungeecord', $tags) || in_array('bungee', $tags) => self::Bungeecord,
