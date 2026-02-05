@@ -31,8 +31,11 @@ enum MinecraftLoader: string implements HasLabel
     {
         $server->loadMissing('egg');
 
-        /** @var  string[]  $tags */
+        /**
+        * @var string[] $tags
+        */
         $tags = $server->egg->tags ?? [];
+
 
         return self::fromTags($tags);
     }
