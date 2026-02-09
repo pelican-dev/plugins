@@ -23,7 +23,6 @@ class McLogCleanAction extends Action
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->hidden(function () {
             /** @var Server|null $server */
             $server = Filament::getTenant();
@@ -37,7 +36,6 @@ class McLogCleanAction extends Action
         $this->icon('tabler-trash');
         $this->color('danger');
         $this->size(Size::ExtraLarge);
-
         $this->requiresConfirmation()
             ->modalHeading('Delete logs')
             ->modalDescription('Choose which logs should be deleted.')
@@ -54,7 +52,6 @@ class McLogCleanAction extends Action
                     ->default(7)
                     ->required()
                     ->reactive(),
-
                 TextInput::make('custom_days')
                     ->label('Delete logs older than (days)')
                     ->numeric()
@@ -75,7 +72,6 @@ class McLogCleanAction extends Action
             if ($mode !== 'custom') {
                 $mode = (int) $mode;
             }
-
             if ($mode === 'custom') {
                 $days = max(1, (int) $data['custom_days']);
             } elseif ($mode === -1) {
@@ -83,7 +79,6 @@ class McLogCleanAction extends Action
             } else {
                 $days = $mode;
             }
-
             try {
                 $files = Http::daemon($server->node)
                     ->get("/api/servers/{$server->uuid}/files/list-directory", [
@@ -91,33 +86,26 @@ class McLogCleanAction extends Action
                     ])
                     ->throw()
                     ->json();
-
                 if (!is_array($files)) {
                     throw new Exception('Invalid log directory response.');
                 }
-
                 $threshold = now()->subDays($days)->startOfDay();
-
                 $logsToDelete = collect($files)
                     ->filter(fn ($file) => str_ends_with($file['name'], '.log.gz'))
                     ->filter(function ($file) use ($days, $threshold) {
                         if ($days === 0) {
                             return true;
                         }
-
                         $logDate = $this->extractLogDate($file['name']);
-
                         if (!$logDate) {
                             return false;
                         }
-
                         return $logDate->lessThan($threshold);
                     })
                     ->pluck('name')
                     ->map(fn ($name) => 'logs/' . $name)
                     ->values()
                     ->all();
-
                 if (empty($logsToDelete)) {
                     Notification::make()
                         ->title('McLogCleaner')
@@ -126,20 +114,17 @@ class McLogCleanAction extends Action
                         ->send();
                     return;
                 }
-
                 Http::daemon($server->node)
                     ->post("/api/servers/{$server->uuid}/files/delete", [
                         'root'  => '/',
                         'files' => $logsToDelete,
                     ])
                     ->throw();
-
                 Notification::make()
                     ->title('Logfolder cleaned')
                     ->body(count($logsToDelete) . ' files were deleted.')
                     ->success()
                     ->send();
-
             } catch (\Throwable $e) {
                 report($e);
 
