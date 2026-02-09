@@ -9,7 +9,7 @@ use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\Size;
 use Illuminate\Support\Facades\Http;
-use JuggleGaming\McLogCleaner\Enums\CheckEgg;
+use JuggleGaming\McLogCleaner\Enums\EggFeature;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Carbon\Carbon;
@@ -26,8 +26,12 @@ class McLogCleanAction extends Action
         parent::setUp();
 
         $this->hidden(function () {
+            /** `@var` Server|null $server */
             $server = Filament::getTenant();
-            return !CheckEgg::serverSupportsLogCleaner($server);
+            if (!$server instanceof Server) {
+                return true;
+            }
+            return !EggFeature::serverSupportsLogCleaner($server);
         });
 
         $this->label('Delete logs');
@@ -63,8 +67,11 @@ class McLogCleanAction extends Action
             ]);
 
         $this->action(function (array $data) {
+            /** `@var` Server|null $server */
             $server = Filament::getTenant();
-
+            if (!$server instanceof Server) {
+                return true;
+            }
             $mode = $data['mode'];
             if ($mode !== 'custom') {
                 $mode = (int) $mode;
@@ -139,7 +146,7 @@ class McLogCleanAction extends Action
 
                 Notification::make()
                     ->title('Cleanup failed.')
-                    ->body($e->getMessage())
+                    ->body('An error occurred while deleting log files. Please try again later.')
                     ->danger()
                     ->send();
             }
@@ -149,7 +156,8 @@ class McLogCleanAction extends Action
     private function extractLogDate(string $filename): ?Carbon
     {
         if (preg_match('/(\d{4}-\d{2}-\d{2})/', $filename, $matches)) {
-            return Carbon::createFromFormat('Y-m-d', $matches[1])->startOfDay();
+            $date = Carbon::createFromFormat('Y-m-d', $matches[1]);
+            return $date ? $date->startOfDay() : null;
         }
         return null;
     }

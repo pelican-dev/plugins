@@ -2,7 +2,7 @@
 
 McLogCleaner automatically deletes all `.log.gz` files from the server’s `logs` folder.
 
-> **Note:** `latest.yml` will always remain intact and is never deleted.
+> **Note:** `latest.log` will always remain intact and is never deleted.
 
 ### Usage
 To use this plugin, add `mclogcleaner` as a feature to the egg you want to run it with.
