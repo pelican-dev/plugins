@@ -26,7 +26,7 @@ class McLogCleanAction extends Action
         parent::setUp();
 
         $this->hidden(function () {
-            /** `@var` Server|null $server */
+            /** @var Server|null $server */
             $server = Filament::getTenant();
             if (!$server instanceof Server) {
                 return true;
@@ -67,7 +67,7 @@ class McLogCleanAction extends Action
             ]);
 
         $this->action(function (array $data) {
-            /** `@var` Server|null $server */
+            /** @var Server|null $server */
             $server = Filament::getTenant();
             if (!$server instanceof Server) {
                 return true;
