@@ -1,5 +1,4 @@
 <?php
-
 namespace JuggleGaming\McLogCleaner\Filament\Components\Actions;
 
 use App\Models\Server;
