@@ -27,9 +27,6 @@ class McLogCleanAction extends Action
         $this->hidden(function () {
             /** @var Server|null $server */
             $server = Filament::getTenant();
-            if (!$server instanceof Server) {
-                return true;
-            }
 
             return !EggFeature::serverSupportsLogCleaner($server);
         });
@@ -67,9 +64,6 @@ class McLogCleanAction extends Action
         $this->action(function (array $data) {
             /** @var Server|null $server */
             $server = Filament::getTenant();
-            if (!$server instanceof Server) {
-                return true;
-            }
             $mode = $data['mode'];
             if ($mode !== 'custom') {
                 $mode = (int) $mode;
