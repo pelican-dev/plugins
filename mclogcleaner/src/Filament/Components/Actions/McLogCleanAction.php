@@ -144,4 +144,5 @@ class McLogCleanAction extends Action
         }
         return null;
     }
+
 }
