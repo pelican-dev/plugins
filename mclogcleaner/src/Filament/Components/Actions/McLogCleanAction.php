@@ -1,4 +1,5 @@
 <?php
+
 namespace JuggleGaming\McLogCleaner\Filament\Components\Actions;
 
 use App\Models\Server;
@@ -29,6 +30,7 @@ class McLogCleanAction extends Action
             if (!$server instanceof Server) {
                 return true;
             }
+
             return !EggFeature::serverSupportsLogCleaner($server);
         });
 
@@ -44,9 +46,9 @@ class McLogCleanAction extends Action
                 Select::make('mode')
                     ->label('Delete logs')
                     ->options([
-                        7        => 'Older than 7 days',
-                        30       => 'Older than 30 days',
-                        -1       => 'Delete all logs',
+                        7 => 'Older than 7 days',
+                        30 => 'Older than 30 days',
+                        -1 => 'Delete all logs',
                         'custom' => 'Custom (days)',
                     ])
                     ->default(7)
@@ -100,6 +102,7 @@ class McLogCleanAction extends Action
                         if (!$logDate) {
                             return false;
                         }
+
                         return $logDate->lessThan($threshold);
                     })
                     ->pluck('name')
@@ -112,11 +115,12 @@ class McLogCleanAction extends Action
                         ->body('No logs matching your selection were found.')
                         ->success()
                         ->send();
+
                     return;
                 }
                 Http::daemon($server->node)
                     ->post("/api/servers/{$server->uuid}/files/delete", [
-                        'root'  => '/',
+                        'root' => '/',
                         'files' => $logsToDelete,
                     ])
                     ->throw();
@@ -140,9 +144,10 @@ class McLogCleanAction extends Action
     {
         if (preg_match('/(\d{4}-\d{2}-\d{2})/', $filename, $matches)) {
             $date = Carbon::createFromFormat('Y-m-d', $matches[1]);
+
             return $date ? $date->startOfDay() : null;
         }
+
         return null;
     }
-
 }
