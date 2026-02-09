@@ -2,10 +2,11 @@
 
 namespace JuggleGaming\McLogCleaner\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use App\Enums\HeaderActionPosition;
 use App\Filament\Server\Pages\Console;
+use Illuminate\Support\ServiceProvider;
 use JuggleGaming\McLogCleaner\Filament\Components\Actions\McLogCleanAction;
+
 
 class McLogCleanerPluginProvider extends ServiceProvider
 {
