@@ -1,0 +1,15 @@
+{
+    "id": "mclogcleaner",
+    "name": "McLogCleaner",
+    "author": "JuggleGaming",
+    "version": "1.1.0",
+    "description": "Clean your Minecraft-logs with ease",
+    "category": "plugin",
+    "url": "https://github.com/pelican-dev/plugins/tree/main/mclogcleaner",
+    "update_url": null,
+    "namespace": "JuggleGaming\\McLogCleaner",
+    "class": "McLogCleanerPlugin",
+    "panels": null,
+    "panel_version": null,
+    "composer_packages": null
+}

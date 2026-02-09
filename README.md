@@ -24,6 +24,7 @@ npm i -g yarn
 - [Billing](/billing) - Allows users to purchase servers via Stripe - **Proof of Concept - Do absolutely NOT use in production!**
 - [Generic OIDC Providers](/generic-oidc-providers) - Create generic OIDC providers for authentication
 - [Legal Pages](/legal-pages) - Adds legal pages (Imprint, Privacy Policy, ToS) to the panel
+- [McLogCleaner](/mclogcleaner) - Delete old logs with ease
 - [MCLogs Uploader](/mclogs-uploader) - Upload console logs to mclo.gs
 - [Minecraft Modrinth](/minecraft-modrinth) - Download Minecraft mods & plugins from Modrinth
 - [PasteFox Share](/pastefox-share) - Share console logs via pastefox.com
