@@ -127,7 +127,6 @@ class McLogCleanAction extends Action
                     ->send();
             } catch (\Throwable $e) {
                 report($e);
-
                 Notification::make()
                     ->title('Cleanup failed.')
                     ->body('An error occurred while deleting log files. Please try again later.')
