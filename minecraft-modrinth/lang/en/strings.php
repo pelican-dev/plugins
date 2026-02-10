@@ -62,6 +62,7 @@ return [
         'update_failed' => 'Update failed',
         'update_failed_body' => 'An error occurred during the update. Please try again or contact support if the issue persists.',
         'uninstall_success' => 'Uninstall completed',
+        'uninstall_success_body' => 'Successfully uninstalled :name',
         'uninstall_failed' => 'Uninstall failed',
         'uninstall_failed_body' => 'An error occurred during uninstallation. Please try again or contact support if the issue persists.',
     ],

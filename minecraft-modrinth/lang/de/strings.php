@@ -62,6 +62,7 @@ return [
         'update_failed' => 'Aktualisierung fehlgeschlagen',
         'update_failed_body' => 'Bei der Aktualisierung ist ein Fehler aufgetreten. Bitte versuche es erneut oder wende dich an den Support, wenn das Problem weiterhin besteht.',
         'uninstall_success' => 'Deinstallation abgeschlossen',
+        'uninstall_success_body' => ':name erfolgreich deinstalliert',
         'uninstall_failed' => 'Deinstallation fehlgeschlagen',
         'uninstall_failed_body' => 'Bei der Deinstallation ist ein Fehler aufgetreten. Bitte versuche es erneut oder wende dich an den Support, wenn das Problem weiterhin besteht.',
     ],
