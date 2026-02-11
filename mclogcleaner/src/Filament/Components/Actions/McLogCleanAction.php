@@ -28,7 +28,15 @@ class McLogCleanAction extends Action
             /** @var Server|null $server */
             $server = Filament::getTenant();
 
-            return !EggFeature::serverSupportsLogCleaner($server);
+            if (! $server) {
+                return true;
+            }
+
+            $server->loadMissing('egg');
+
+            $features = $server->egg->features ?? [];
+
+            return ! in_array('mclogcleaner', $features, true);
         });
 
         $this->label('Delete logs');
