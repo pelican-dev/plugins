@@ -12,7 +12,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\Size;
 use Illuminate\Support\Facades\Http;
-use JuggleGaming\McLogCleaner\Enums\EggFeature;
 
 class McLogCleanAction extends Action
 {
@@ -27,12 +26,13 @@ class McLogCleanAction extends Action
         $this->hidden(function () {
             /** @var Server|null $server */
             $server = Filament::getTenant();
-            if (! $server) {
+            if (!$server) {
                 return true;
             }
             $server->loadMissing('egg');
             $features = $server->egg->features ?? [];
-            return ! in_array('mclogcleaner', $features, true);
+
+            return !in_array('mclogcleaner', $features, true);
         });
 
         $this->label('Delete logs');
