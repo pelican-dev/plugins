@@ -27,15 +27,11 @@ class McLogCleanAction extends Action
         $this->hidden(function () {
             /** @var Server|null $server */
             $server = Filament::getTenant();
-
             if (! $server) {
                 return true;
             }
-
             $server->loadMissing('egg');
-
             $features = $server->egg->features ?? [];
-
             return ! in_array('mclogcleaner', $features, true);
         });
 
