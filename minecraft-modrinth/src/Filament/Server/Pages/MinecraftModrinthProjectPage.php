@@ -9,6 +9,7 @@ use App\Traits\Filament\BlockAccessInConflict;
 use Boy132\MinecraftModrinth\Enums\MinecraftLoader;
 use Boy132\MinecraftModrinth\Enums\ModrinthProjectType;
 use Boy132\MinecraftModrinth\Facades\MinecraftModrinth;
+use Boy132\MinecraftModrinth\Filament\Components\TabsComponent;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -26,15 +27,21 @@ use Filament\Tables\Table;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+use Livewire\Attributes\Url;
 
 class MinecraftModrinthProjectPage extends Page implements HasTable
 {
     use BlockAccessInConflict;
     use InteractsWithTable;
 
-    public const VIEW_ALL = 'all';
+    private const ALLOWED_TABS = ['all', 'installed'];
 
-    public const VIEW_INSTALLED = 'installed';
+    private const DEFAULT_TAB = 'all';
+
+    protected string $view = 'minecraft-modrinth::modrinth-project-page';
+
+    #[Url(as: 'view', except: self::DEFAULT_TAB)]
+    public string $activeTab = self::DEFAULT_TAB;
 
     /** @var array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string, author?: string}>|null */
     protected ?array $installedModsMetadata = null;
@@ -42,21 +49,11 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
     /** @var array<string, array<int, mixed>> Cache for version data by project_id */
     protected array $versionsCache = [];
 
-    public string $activeView = self::VIEW_ALL;
-
     protected static string|\BackedEnum|null $navigationIcon = 'tabler-packages';
 
     protected static ?string $slug = 'modrinth';
 
     protected static ?int $navigationSort = 30;
-
-    /** @return array<string, mixed> */
-    protected function queryString(): array
-    {
-        return [
-            'activeView' => ['as' => 'view', 'except' => self::VIEW_ALL],
-        ];
-    }
 
     public static function canAccess(): bool
     {
@@ -89,6 +86,31 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
     public function getTitle(): string
     {
         return static::getNavigationLabel();
+    }
+
+    /**
+     * Normalizes a tab value to ensure it's in the allowed list.
+     * Returns the default tab if the value is invalid.
+     */
+    private function normalizeTab(string $tab): string
+    {
+        return in_array($tab, self::ALLOWED_TABS, true) ? $tab : self::DEFAULT_TAB;
+    }
+
+    public function mount(): void
+    {
+        $this->activeTab = $this->normalizeTab($this->activeTab);
+    }
+
+    public function setActiveTab(string $tab): void
+    {
+        $this->activeTab = $this->normalizeTab($tab);
+    }
+
+    public function updatedActiveTab(): void
+    {
+        $this->activeTab = $this->normalizeTab($this->activeTab);
+        $this->resetTable();
     }
 
     /** @return array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}> */
@@ -161,7 +183,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
     protected function refreshIfInInstalledView(): void
     {
-        if ($this->activeView === self::VIEW_INSTALLED) {
+        if ($this->activeTab === 'installed') {
             $this->js('$wire.$refresh()');
         }
     }
@@ -176,7 +198,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                 /** @var Server $server */
                 $server = Filament::getTenant();
 
-                if ($this->activeView === self::VIEW_INSTALLED) {
+                if ($this->activeTab === 'installed') {
                     $installedMods = $this->getInstalledModsMetadata();
                     $projects = MinecraftModrinth::getInstalledModsFromModrinth($installedMods, $page);
 
@@ -549,24 +571,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         $folder = $type->getFolder();
 
         return [
-            Action::make('view_all')
-                ->label(trans('minecraft-modrinth::strings.page.view_all'))
-                ->color($this->activeView === self::VIEW_ALL ? 'primary' : 'gray')
-                ->action(function () {
-                    $this->resetTable();
-                    $this->activeView = self::VIEW_ALL;
-                    $this->js('$wire.$refresh()');
-                })
-                ->button(),
-            Action::make('view_installed')
-                ->label(trans('minecraft-modrinth::strings.page.view_installed'))
-                ->color($this->activeView === self::VIEW_INSTALLED ? 'primary' : 'gray')
-                ->action(function () {
-                    $this->resetTable();
-                    $this->activeView = self::VIEW_INSTALLED;
-                    $this->js('$wire.$refresh()');
-                })
-                ->button(),
             Action::make('open_folder')
                 ->label(fn () => trans('minecraft-modrinth::strings.page.open_folder', ['folder' => $folder]))
                 ->url(fn () => ListFiles::getUrl(['path' => $folder]), true),
@@ -615,6 +619,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             })
                             ->badge(),
                     ]),
+                TabsComponent::make(),
                 EmbeddedTable::make(),
             ]);
     }
