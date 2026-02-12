@@ -14,7 +14,7 @@ return new class extends Migration
             $table->boolean('link_missing_users')->default(false);
             $table->string('display_name');
             $table->string('display_icon')->nullable();
-            $table->string('display_color', 6)->nullable();
+            $table->string('display_color', 7)->nullable();
             $table->string('base_url');
             $table->string('client_id');
             $table->text('client_secret');
