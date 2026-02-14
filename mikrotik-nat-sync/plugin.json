@@ -11,9 +11,5 @@
     "class": "MikroTikNATSyncPlugin",
     "panels": null,
     "panel_version": "1.0.0-beta32",
-    "composer_packages": null,
-    "meta": {
-        "status": "enabled",
-        "status_message": null
-    }
+    "composer_packages": null
 }

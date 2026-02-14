@@ -35,7 +35,7 @@ class MikroTikNATSyncPlugin implements FilamentPlugin, HasPluginSettings
 
         app()->booted(function () {
             $schedule = app(Schedule::class);
-            $interval = env('MIKROTIK_SYNC_INTERVAL', 'everyFiveMinutes');
+            $interval = env('MIKROTIK_NAT_SYNC_INTERVAL', 'everyFiveMinutes');
             
             $schedule->command('mikrotik:sync')
                 ->{$interval}()
@@ -47,39 +47,39 @@ class MikroTikNATSyncPlugin implements FilamentPlugin, HasPluginSettings
     {
         return [
             TextInput::make('mk_ip')
-                ->label('IP MikroTik')
-                ->default(env('MIKROTIK_IP'))
+                ->label('MikroTik IP')
+                ->default(env('MIKROTIK_NAT_SYNC_IP'))
                 ->required(),
             TextInput::make('mk_port')
-                ->label('Порт REST API')
-                ->default(env('MIKROTIK_PORT', '9080'))
+                ->label('REST API Port')
+                ->default(env('MIKROTIK_NAT_SYNC_PORT', '9080'))
                 ->required(),
             TextInput::make('mk_user')
-                ->label('Користувач')
-                ->default(env('MIKROTIK_USER'))
+                ->label('Username')
+                ->default(env('MIKROTIK_NAT_SYNC_USER'))
                 ->required(),
             TextInput::make('mk_pass')
-                ->label('Пароль')
+                ->label('Password')
                 ->password()
                 ->revealable()
-                ->default(env('MIKROTIK_PASS')),
+                ->default(env('MIKROTIK_NAT_SYNC_PASSWORD')),
             TextInput::make('mk_interface')
-                ->label('Вхідний інтерфейс (WAN)')
-                ->default(env('MIKROTIK_INTERFACE', 'ether1'))
+                ->label('WAN Interface')
+                ->default(env('MIKROTIK_NAT_SYNC_INTERFACE', 'ether1'))
                 ->required(),
             TextInput::make('mk_forbidden_ports')
-                ->label('Заборонені порти (через кому)')
+                ->label('Forbidden Ports (comma separated)')
                 ->placeholder('22, 80, 443, 3306')
-                ->default(env('MIKROTIK_FORBIDDEN_PORTS')),
+                ->default(env('MIKROTIK_NAT_SYNC_FORBIDDEN_PORTS')),
             Select::make('mk_interval')
-                ->label('Інтервал синхронізації')
+                ->label('Sync Interval')
                 ->options([
-                    'everyMinute' => 'Щохвилини',
-                    'everyFiveMinutes' => 'Кожні 5 хвилин',
-                    'everyTenMinutes' => 'Кожні 10 хвилин',
-                    'hourly' => 'Щогодини',
+                    'everyMinute' => 'Every Minute',
+                    'everyFiveMinutes' => 'Every 5 Minutes',
+                    'everyTenMinutes' => 'Every 10 Minutes',
+                    'hourly' => 'Hourly',
                 ])
-                ->default(env('MIKROTIK_SYNC_INTERVAL', 'everyFiveMinutes'))
+                ->default(env('MIKROTIK_NAT_SYNC_INTERVAL', 'everyFiveMinutes'))
                 ->required(),
         ];
     }
@@ -87,17 +87,17 @@ class MikroTikNATSyncPlugin implements FilamentPlugin, HasPluginSettings
     public function saveSettings(array $data): void
     {
         $this->writeToEnvironment([
-            'MIKROTIK_IP' => $data['mk_ip'],
-            'MIKROTIK_PORT' => $data['mk_port'],
-            'MIKROTIK_USER' => $data['mk_user'],
-            'MIKROTIK_PASS' => $data['mk_pass'],
-            'MIKROTIK_INTERFACE' => $data['mk_interface'],
-            'MIKROTIK_SYNC_INTERVAL' => $data['mk_interval'],
-            'MIKROTIK_FORBIDDEN_PORTS' => $data['mk_forbidden_ports'],
+            'MIKROTIK_NAT_SYNC_IP' => $data['mk_ip'],
+            'MIKROTIK_NAT_SYNC_PORT' => $data['mk_port'],
+            'MIKROTIK_NAT_SYNC_USER' => $data['mk_user'],
+            'MIKROTIK_NAT_SYNC_PASSWORD' => $data['mk_pass'],
+            'MIKROTIK_NAT_SYNC_INTERFACE' => $data['mk_interface'],
+            'MIKROTIK_NAT_SYNC_INTERVAL' => $data['mk_interval'],
+            'MIKROTIK_NAT_SYNC_FORBIDDEN_PORTS' => $data['mk_forbidden_ports'],
         ]);
 
         Notification::make()
-            ->title('Налаштування збережено')
+            ->title('Settings saved successfully')
             ->success()
             ->send();
     }

@@ -9,24 +9,24 @@ use Illuminate\Support\Facades\Http;
 class SyncMikrotikCommand extends Command
 {
     protected $signature = 'mikrotik:sync';
-    protected $description = 'Синхронізація правил NAT з MikroTik з перевіркою заборонених портів';
+    protected $description = 'Synchronize NAT rules with MikroTik checking for forbidden ports';
 
     public function handle()
     {
         $this->info('Starting MikroTik Sync...');
 
-        $mk_ip = str_replace(['http://', 'https://'], '', env('MIKROTIK_IP'));
-        $mk_port = env('MIKROTIK_PORT', '9080');
-        $mk_user = env('MIKROTIK_USER');
-        $mk_pass = env('MIKROTIK_PASS');
-        $mk_interface = env('MIKROTIK_INTERFACE', 'ether1');
-        
-        // Отримуємо список заборонених портів та перетворюємо в масив
-        $forbidden_string = env('MIKROTIK_FORBIDDEN_PORTS', '');
+        $mk_ip = str_replace(['http://', 'https://'], '', env('MIKROTIK_NAT_SYNC_IP'));
+        $mk_port = env('MIKROTIK_NAT_SYNC_PORT', '9080');
+        $mk_user = env('MIKROTIK_NAT_SYNC_USER');
+        $mk_pass = env('MIKROTIK_NAT_SYNC_PASSWORD');
+        $mk_interface = env('MIKROTIK_NAT_SYNC_INTERFACE', 'ether1');
+
+        // Get forbidden ports list and convert to array
+        $forbidden_string = env('MIKROTIK_NAT_SYNC_FORBIDDEN_PORTS', '');
         $forbidden_ports = array_map('trim', explode(',', $forbidden_string));
 
         if (!$mk_ip || !$mk_user || !$mk_pass) {
-            $this->error('Налаштування MikroTik не заповнені!');
+            $this->error('MikroTik settings are not configured!');
             return;
         }
 
@@ -43,9 +43,9 @@ class SyncMikrotikCommand extends Command
 
         $whitelist = [];
         foreach ($active_servers as $srv) {
-            // ПЕРЕВІРКА: чи порт не в списку заборонених
+            // CHECK: if port is in forbidden list
             if (in_array((string)$srv->port, $forbidden_ports)) {
-                $this->warn("Порт {$srv->port} для сервера {$srv->name} ЗАБОРОНЕНИЙ. Пропускаємо.");
+                $this->warn("Port {$srv->port} for server {$srv->name} is FORBIDDEN. Skipping.");
                 continue;
             }
 
@@ -57,18 +57,33 @@ class SyncMikrotikCommand extends Command
         try {
             $response = Http::withBasicAuth($mk_user, $mk_pass)->timeout(10)->get($url);
             if (!$response->successful()) {
-                $this->error('Помилка API: ' . $response->body());
+                $this->error('API Error: ' . $response->body());
                 return;
             }
 
             $existing_rules = [];
-            foreach ($response->json() as $rule) {
+            $rules_data = $response->json();
+            
+            // Safety check if response is array
+            if (!is_array($rules_data)) {
+                 $this->error('Invalid response format from MikroTik.');
+                 return;
+            }
+
+            foreach ($rules_data as $rule) {
                 if (isset($rule['comment']) && str_contains($rule['comment'], 'Pelican:')) {
-                    $key = ($rule['dst-port'] ?? '') . '-' . ($rule['protocol'] ?? 'tcp');
-                    $existing_rules[$key] = $rule['.id'];
+                    $dst_port = $rule['dst-port'] ?? '';
+                    $protocol = $rule['protocol'] ?? 'tcp';
+                    $key = $dst_port . '-' . $protocol;
+                    
+                    // We need rule ID to delete it later if needed
+                    if (isset($rule['.id'])) {
+                        $existing_rules[$key] = $rule['.id'];
+                    }
                 }
             }
 
+            // Remove old rules that are not in whitelist
             foreach ($existing_rules as $key => $id) {
                 if (!isset($whitelist[$key])) {
                     $this->warn("Deleting rule: $key");
@@ -76,11 +91,13 @@ class SyncMikrotikCommand extends Command
                 }
             }
 
+            // Add new rules
             foreach ($whitelist as $key => $info) {
                 if (!isset($existing_rules[$key])) {
                     [$port, $proto] = explode('-', $key);
                     $this->info("Adding rule: $key for {$info['name']}");
-                    Http::withBasicAuth($mk_user, $mk_pass)->put($url, [
+                    
+                    $payload = [
                         'chain' => 'dstnat',
                         'action' => 'dst-nat',
                         'to-addresses' => $info['ip'],
@@ -89,7 +106,9 @@ class SyncMikrotikCommand extends Command
                         'dst-port' => (string)$port,
                         'in-interface' => $mk_interface,
                         'comment' => "Pelican: {$info['name']} ({$info['uuid']})"
-                    ]);
+                    ];
+                    
+                    Http::withBasicAuth($mk_user, $mk_pass)->put($url, $payload);
                 }
             }
             $this->info('Sync Complete.');
