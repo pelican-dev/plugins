@@ -26,7 +26,7 @@ npm i -g yarn
 - [Legal Pages](/legal-pages) - Adds legal pages (Imprint, Privacy Policy, ToS) to the panel
 - [McLogCleaner](/mclogcleaner) - Delete old logs with ease
 - [MCLogs Uploader](/mclogs-uploader) - Upload console logs to mclo.gs
-- [MikroTik NAT Sync](https://github.com/avalon0077/mikrotik-nat-sync) - Automatically synchronize Pelican allocations with MikroTik NAT rules via REST API.
+- [MikroTik NAT Sync](/mikrotik-nat-sync) - Automatically synchronize Pelican allocations with MikroTik NAT rules via REST API.
 - [Minecraft Modrinth](/minecraft-modrinth) - Download Minecraft mods & plugins from Modrinth
 - [PasteFox Share](/pastefox-share) - Share console logs via pastefox.com
 - [Player Counter](/player-counter) - Show connected players count for game servers
