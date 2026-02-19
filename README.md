@@ -6,6 +6,10 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 
 [Download the repository archive](https://github.com/pelican-dev/plugins/archive/refs/heads/main.zip) and extract the folders of the plugins you want to install to your panels `plugins` folder (`/var/www/pelican/plugins` by default). Finally, open your panel and head to the plugins page and click on "Install".
 
+> [!IMPORTANT]
+> The plugin folder and the plugin id need to match!  
+> This means the plugin folder needs to be named the same as in this repo! (e.g. `player-counter` and _not_ `playercounter` or `plugins-player-counter`)
+
 ### Themes
 
 For themes you have to install NodeJs 22+ and Yarn beforehand. Example:
