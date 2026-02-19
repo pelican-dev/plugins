@@ -198,6 +198,7 @@ class PlayersPage extends Page implements HasTable
                     ->label(trans('player-counter::query.ban'))
                     ->icon('tabler-hammer')
                     ->color('danger')
+                    ->requiresConfirmation()
                     ->action(function (array $record) {
                         /** @var Server $server */
                         $server = Filament::getTenant();
