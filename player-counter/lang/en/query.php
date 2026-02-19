@@ -14,6 +14,7 @@ return [
     'unknown' => 'Unknown',
 
     'kick' => 'Kick',
+    'ban' => 'Ban',
 
     'whitelisted' => 'Whitelisted',
     'add_to_whitelist' => 'Add to whitelist',
@@ -37,6 +38,9 @@ return [
 
         'player_kicked' => 'Player kicked from server',
         'player_kick_failed' => 'Could not kick player',
+
+        'player_banned' => 'Player banned from server',
+        'player_ban_failed' => 'Could not ban player',
 
         'player_whitelist_add' => 'Player added to whitelist',
         'player_whitelist_remove' => 'Player removed from whitelist',
