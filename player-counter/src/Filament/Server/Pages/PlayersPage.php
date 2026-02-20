@@ -202,16 +202,20 @@ class PlayersPage extends Page implements HasTable
                     ->action(function (array $record) {
                         /** @var Server $server */
                         $server = Filament::getTenant();
+
                         try {
                             $server->send('ban ' . $record['name']);
+
                             Notification::make()
                                 ->title(trans('player-counter::query.notifications.player_banned'))
                                 ->body($record['name'])
                                 ->success()
                                 ->send();
+
                             $this->refreshPage();
                         } catch (Exception $exception) {
                             report($exception);
+
                             Notification::make()
                                 ->title(trans('player-counter::query.notifications.player_ban_failed'))
                                 ->body($exception->getMessage())
