@@ -12,7 +12,7 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel fre
 
 ### Themes
 
-For themes you have to install NodeJs 22+ and Yarn beforehand. Example:
+For themes you have to install Node.js 22+ and Yarn beforehand. Example:
 
 ```bash
 curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash - 
@@ -24,16 +24,16 @@ npm i -g yarn
 ## Plugins
 
 - [Announcements](/announcements) - Create panel wide announcements to inform your users
-- [Arma Reforger Workshop](/arma-reforger-workshop) - Manage Arma Reforger workshop mods in server config
+- *[Arma Reforger Workshop](/arma-reforger-workshop) - Manage Arma Reforger workshop mods in server config
 - [Billing](/billing) - Allows users to purchase servers via Stripe - **Proof of Concept - Do absolutely NOT use in production!**
 - [Generic OIDC Providers](/generic-oidc-providers) - Create generic OIDC providers for authentication
 - [Legal Pages](/legal-pages) - Adds legal pages (Imprint, Privacy Policy, ToS) to the panel
-- [McLogCleaner](/mclogcleaner) - Delete old logs with ease
+- *[McLogCleaner](/mclogcleaner) - Delete old logs with ease
 - [MCLogs Uploader](/mclogs-uploader) - Upload console logs to mclo.gs
 - [Minecraft Modrinth](/minecraft-modrinth) - Download Minecraft mods & plugins from Modrinth
-- [PasteFox Share](/pastefox-share) - Share console logs via pastefox.com
+- *[PasteFox Share](/pastefox-share) - Share console logs via pastefox.com
 - [Player Counter](/player-counter) - Show connected players count for game servers
-- [PocketID Provider](/pocketid-provider) - Allows you to use PocketID as an OAuth provider
+- *[PocketID Provider](/pocketid-provider) - Allows you to use PocketID as an OAuth provider
 - [Register](/register) - Enable user self-registration on all panels
 - [Robo Avatars](/robo-avatars) - Adds RoboHash as avatar provider
 - [Rust uMod](/rust-umod) - Download Rust plugins from uMod
@@ -43,6 +43,8 @@ npm i -g yarn
 - [Theme Customizer](/theme-customizer) - Customize panel font and colors
 - [Tickets](/tickets) - Simple ticket system for user support
 - [User Creatable Servers](/user-creatable-servers) - Allow users to create their own servers
+
+_* Third party plugins_
 
 ## Themes
 
