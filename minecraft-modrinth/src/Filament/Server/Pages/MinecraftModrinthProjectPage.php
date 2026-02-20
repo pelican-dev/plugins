@@ -86,6 +86,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         $this->loadDefaultActiveTab();
     }
 
+    /** @return array<string, Tab> */
     public function getTabs(): array
     {
         return [
