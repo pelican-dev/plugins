@@ -4,7 +4,7 @@ return [
     'nav_title' => 'Uzly',
     'model_label' => 'Uzel',
     'model_label_plural' => 'Uzly',
-    'create' => 'Vytvořit node',
+    'create' => 'Vytvořit uzel',
     'tabs' => [
         'overview' => 'Přehled',
         'basic_settings' => 'Základní nastavení',
