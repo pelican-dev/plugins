@@ -56,3 +56,4 @@ _* Third party plugins_
 ## Language Packs
 
 - [Pirate Language](/pirate-language) - Turns yer site's lingo into pirate talk, matey!
+- [Czech Language](/czech-language) - Adds Czech translation
