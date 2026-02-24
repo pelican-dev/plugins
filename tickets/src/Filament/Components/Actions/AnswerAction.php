@@ -23,7 +23,7 @@ class AnswerAction extends Action
 
         $this->hidden(fn (Ticket $ticket) => $ticket->status === TicketStatus::Closed || $ticket->assigned_user_id !== auth()->user()->id);
 
-        $this->label(trans('tickets::tickets.answer_verb'));
+        $this->tooltip(trans('tickets::tickets.answer_verb'));
 
         $this->icon('tabler-edit');
 
