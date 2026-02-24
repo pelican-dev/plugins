@@ -3,7 +3,7 @@
     "name": "Minecraft Modrinth",
     "author": "Boy132",
     "version": "1.0.0",
-    "description": "Easily download minecraft mods & plugins from modrinth",
+    "description": "Easily download, update, and manage minecraft mods & plugins from modrinth",
     "category": "plugin",
     "url": "https://github.com/pelican-dev/plugins/tree/main/minecraft-modrinth",
     "update_url": null,
