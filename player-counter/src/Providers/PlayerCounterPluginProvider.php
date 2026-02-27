@@ -7,6 +7,8 @@ use App\Filament\Server\Pages\Console;
 use App\Models\Egg;
 use App\Models\Role;
 use Boy132\PlayerCounter\Extensions\Query\QueryTypeService;
+use Boy132\PlayerCounter\Extensions\Query\Schemas\Arma3QueryTypeSchema;
+use Boy132\PlayerCounter\Extensions\Query\Schemas\ArmaReforgerQueryTypeSchema;
 use Boy132\PlayerCounter\Extensions\Query\Schemas\CitizenFXQueryTypeSchema;
 use Boy132\PlayerCounter\Extensions\Query\Schemas\GoldSourceQueryTypeSchema;
 use Boy132\PlayerCounter\Extensions\Query\Schemas\MinecraftBedrockQueryTypeSchema;
@@ -35,6 +37,8 @@ class PlayerCounterPluginProvider extends ServiceProvider
             $service->register(new MinecraftJavaQueryTypeSchema());
             $service->register(new MinecraftBedrockQueryTypeSchema());
             $service->register(new CitizenFXQueryTypeSchema());
+            $service->register(new Arma3QueryTypeSchema());
+            $service->register(new ArmaReforgerQueryTypeSchema());
 
             return $service;
         });
