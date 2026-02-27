@@ -34,7 +34,7 @@ class SourceQueryTypeSchema implements QueryTypeSchemaInterface
 
             $info = $query->GetInfo();
 
-            if ($info === false) {
+            if (!$info) {
                 return null;
             }
 
