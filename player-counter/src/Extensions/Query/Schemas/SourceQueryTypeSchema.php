@@ -33,14 +33,22 @@ class SourceQueryTypeSchema implements QueryTypeSchemaInterface
             $query->Connect($ip, $port, 5, $engine);
 
             $info = $query->GetInfo();
-            $players = $query->GetPlayers();
+
+            if ($info === false) {
+                return null;
+            }
+
+            $players = $query->GetPlayers() ?: [];
 
             return [
-                'hostname' => $info['HostName'],
-                'map' => $info['Map'],
-                'current_players' => $info['Players'],
-                'max_players' => $info['MaxPlayers'],
-                'players' => array_map(fn ($player) => ['id' => (string) $player['Id'], 'name' => (string) $player['Name']], $players),
+                'hostname' => (string) ($info['HostName'] ?? 'Unknown'),
+                'map' => (string) ($info['Map'] ?? 'Unknown'),
+                'current_players' => (int) ($info['Players'] ?? 0),
+                'max_players' => (int) ($info['MaxPlayers'] ?? 0),
+                'players' => array_map(fn ($player) => [
+                    'id' => (string) ($player['Id'] ?? ''),
+                    'name' => (string) ($player['Name'] ?? 'Unknown'),
+                ], $players),
             ];
         } catch (Exception $exception) {
             report($exception);
