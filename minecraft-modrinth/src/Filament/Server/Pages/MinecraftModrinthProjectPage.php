@@ -319,15 +319,19 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                             );
 
                                             if (!$saved) {
-                                                try {
-                                                    Http::daemon($server->node)
-                                                        ->post("/api/servers/{$server->uuid}/files/delete", [
-                                                            'root' => '/',
-                                                            'files' => [$folder . '/' . $safeFilename],
-                                                        ])
-                                                        ->throw();
-                                                } catch (Exception $rollbackException) {
-                                                    report($rollbackException);
+                                                $shouldRollbackDownloadedFile = $oldFilename === null || $oldFilename !== $safeFilename;
+
+                                                if ($shouldRollbackDownloadedFile) {
+                                                    try {
+                                                        Http::daemon($server->node)
+                                                            ->post("/api/servers/{$server->uuid}/files/delete", [
+                                                                'root' => '/',
+                                                                'files' => [$folder . '/' . $safeFilename],
+                                                            ])
+                                                            ->throw();
+                                                    } catch (Exception $rollbackException) {
+                                                        report($rollbackException);
+                                                    }
                                                 }
 
                                                 throw new Exception('Failed to save mod metadata');
@@ -595,15 +599,17 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             );
 
                             if (!$saved) {
-                                try {
-                                    Http::daemon($server->node)
-                                        ->post("/api/servers/{$server->uuid}/files/delete", [
-                                            'root' => '/',
-                                            'files' => [$folder . '/' . $safeNewFilename],
-                                        ])
-                                        ->throw();
-                                } catch (Exception $rollbackException) {
-                                    report($rollbackException);
+                                if ($safeFilename !== $safeNewFilename) {
+                                    try {
+                                        Http::daemon($server->node)
+                                            ->post("/api/servers/{$server->uuid}/files/delete", [
+                                                'root' => '/',
+                                                'files' => [$folder . '/' . $safeNewFilename],
+                                            ])
+                                            ->throw();
+                                    } catch (Exception $rollbackException) {
+                                        report($rollbackException);
+                                    }
                                 }
 
                                 throw new Exception('Failed to save mod metadata');
