@@ -7,6 +7,7 @@ use App\Repositories\Daemon\DaemonFileRepository;
 use Boy132\MinecraftModrinth\Enums\MinecraftLoader;
 use Boy132\MinecraftModrinth\Enums\ModrinthProjectType;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class MinecraftModrinthService
@@ -272,42 +273,40 @@ class MinecraftModrinthService
         ?string $author = null
     ): bool {
         try {
-            $metadata = [
-                'installed_mods' => $this->getInstalledModsMetadata($server, $fileRepository),
-            ];
+            return Cache::lock("modrinth_metadata:{$server->id}", 10)->block(5, function () use ($server, $fileRepository, $projectId, $projectSlug, $projectTitle, $versionId, $versionNumber, $filename, $author) {
+                $metadata = [
+                    'installed_mods' => $this->getInstalledModsMetadata($server, $fileRepository),
+                ];
 
-            $metadata['installed_mods'] = collect($metadata['installed_mods'])
-                ->filter(fn ($mod) => $mod['project_id'] !== $projectId)
-                ->values()
-                ->toArray();
+                $metadata['installed_mods'] = collect($metadata['installed_mods'])
+                    ->filter(fn ($mod) => $mod['project_id'] !== $projectId)
+                    ->values()
+                    ->toArray();
 
-            $modEntry = [
-                'project_id' => $projectId,
-                'project_slug' => $projectSlug,
-                'project_title' => $projectTitle,
-                'version_id' => $versionId,
-                'version_number' => $versionNumber,
-                'filename' => $filename,
-                'installed_at' => now()->toIso8601String(),
-            ];
+                $modEntry = [
+                    'project_id' => $projectId,
+                    'project_slug' => $projectSlug,
+                    'project_title' => $projectTitle,
+                    'version_id' => $versionId,
+                    'version_number' => $versionNumber,
+                    'filename' => $filename,
+                    'installed_at' => now()->toIso8601String(),
+                ];
 
-            if ($author !== null) {
-                $modEntry['author'] = $author;
-            }
+                if ($author !== null) {
+                    $modEntry['author'] = $author;
+                }
 
-            $metadata['installed_mods'][] = $modEntry;
+                $metadata['installed_mods'][] = $modEntry;
 
-            $metadataPath = $this->getMetadataFilePath($server);
-            $response = $fileRepository->setServer($server)->putContent(
-                $metadataPath,
-                json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-            );
+                $metadataPath = $this->getMetadataFilePath($server);
+                $response = $fileRepository->setServer($server)->putContent(
+                    $metadataPath,
+                    json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                );
 
-            if ($response->failed()) {
-                return false;
-            }
-
-            return true;
+                return !$response->failed();
+            }) === true;
         } catch (Exception $exception) {
             report($exception);
 
@@ -318,26 +317,24 @@ class MinecraftModrinthService
     public function removeModMetadata(Server $server, DaemonFileRepository $fileRepository, string $projectId): bool
     {
         try {
-            $metadata = [
-                'installed_mods' => $this->getInstalledModsMetadata($server, $fileRepository),
-            ];
+            return Cache::lock("modrinth_metadata:{$server->id}", 10)->block(5, function () use ($server, $fileRepository, $projectId) {
+                $metadata = [
+                    'installed_mods' => $this->getInstalledModsMetadata($server, $fileRepository),
+                ];
 
-            $metadata['installed_mods'] = collect($metadata['installed_mods'])
-                ->filter(fn ($mod) => $mod['project_id'] !== $projectId)
-                ->values()
-                ->toArray();
+                $metadata['installed_mods'] = collect($metadata['installed_mods'])
+                    ->filter(fn ($mod) => $mod['project_id'] !== $projectId)
+                    ->values()
+                    ->toArray();
 
-            $metadataPath = $this->getMetadataFilePath($server);
-            $response = $fileRepository->setServer($server)->putContent(
-                $metadataPath,
-                json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-            );
+                $metadataPath = $this->getMetadataFilePath($server);
+                $response = $fileRepository->setServer($server)->putContent(
+                    $metadataPath,
+                    json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                );
 
-            if ($response->failed()) {
-                return false;
-            }
-
-            return true;
+                return !$response->failed();
+            }) === true;
         } catch (Exception $exception) {
             report($exception);
 

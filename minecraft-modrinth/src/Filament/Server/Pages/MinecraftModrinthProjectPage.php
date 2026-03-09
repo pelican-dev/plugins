@@ -29,6 +29,7 @@ use Filament\Tables\Table;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class MinecraftModrinthProjectPage extends Page implements HasTable
 {
@@ -164,6 +165,100 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
     }
 
     /**
+     * @param array<string, mixed> $record
+     * @param array<string, mixed> $versionData
+     * @param array<string, mixed> $primaryFile
+     * @param array<string, mixed>|null $installedMod
+     *
+     * @throws Exception
+     */
+    private function performInstallOrUpdate(
+        Server $server,
+        DaemonFileRepository $fileRepository,
+        array $record,
+        array $versionData,
+        array $primaryFile,
+        ?array $installedMod = null
+    ): void {
+        $safeNewFilename = $this->validateFilename($primaryFile['filename']);
+        $oldFilename = $installedMod ? $this->validateFilename($installedMod['filename']) : null;
+
+        $type = ModrinthProjectType::fromServer($server);
+        if (!$type) {
+            throw new Exception('Server does not support Modrinth mods or plugins');
+        }
+
+        $folder = $type->getFolder();
+
+        $fileRepository->setServer($server)->pull($primaryFile['url'], $folder);
+
+        $saved = MinecraftModrinth::saveModMetadata(
+            $server,
+            $fileRepository,
+            $record['project_id'],
+            $record['slug'],
+            $record['title'],
+            $versionData['id'],
+            $versionData['version_number'],
+            $safeNewFilename,
+            $record['author'] ?? null
+        );
+
+        if (!$saved) {
+            try {
+                Http::daemon($server->node)
+                    ->post("/api/servers/{$server->uuid}/files/delete", [
+                        'root' => '/',
+                        'files' => [$folder . '/' . $safeNewFilename],
+                    ])
+                    ->throw();
+            } catch (Exception $rollbackException) {
+                report($rollbackException);
+            }
+
+            throw new Exception('Failed to save mod metadata');
+        }
+
+        if ($oldFilename && $oldFilename !== $safeNewFilename) {
+            try {
+                Http::daemon($server->node)
+                    ->post("/api/servers/{$server->uuid}/files/delete", [
+                        'root' => '/',
+                        'files' => [$folder . '/' . $oldFilename],
+                    ])
+                    ->throw();
+            } catch (Exception $deleteException) {
+                try {
+                    Http::daemon($server->node)
+                        ->post("/api/servers/{$server->uuid}/files/delete", [
+                            'root' => '/',
+                            'files' => [$folder . '/' . $safeNewFilename],
+                        ])
+                        ->throw();
+                } catch (Exception $rollbackException) {
+                    report($rollbackException);
+                }
+
+                if ($installedMod && !MinecraftModrinth::saveModMetadata(
+                    $server,
+                    $fileRepository,
+                    $record['project_id'],
+                    $installedMod['project_slug'],
+                    $installedMod['project_title'],
+                    $installedMod['version_id'],
+                    $installedMod['version_number'],
+                    $oldFilename,
+                    $installedMod['author'] ?? null
+                )) {
+                    report(new Exception('Failed to restore old mod metadata during rollback'));
+                }
+
+                throw $deleteException;
+            }
+        }
+    }
+
+    /**
      * @throws Exception
      */
     public function table(Table $table): Table
@@ -288,92 +383,13 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                                 throw new Exception('Invalid version data structure');
                                             }
 
-                                            $installedMod = $this->getInstalledMod($record['project_id']);
-                                            $oldFilename = $installedMod ? $this->validateFilename($installedMod['filename']) : null;
-
                                             if (!$primaryFile) {
                                                 throw new Exception('No downloadable file found');
                                             }
 
-                                            $safeFilename = $this->validateFilename($primaryFile['filename']);
+                                            $installedMod = $this->getInstalledMod($record['project_id']);
 
-                                            $type = ModrinthProjectType::fromServer($server);
-                                            if (!$type) {
-                                                throw new Exception('Server does not support Modrinth mods or plugins');
-                                            }
-
-                                            $folder = $type->getFolder();
-
-                                            $fileRepository->setServer($server)->pull($primaryFile['url'], $folder);
-
-                                            $saved = MinecraftModrinth::saveModMetadata(
-                                                $server,
-                                                $fileRepository,
-                                                $record['project_id'],
-                                                $record['slug'],
-                                                $record['title'],
-                                                $versionData['id'],
-                                                $versionData['version_number'],
-                                                $safeFilename,
-                                                $record['author'] ?? null
-                                            );
-
-                                            if (!$saved) {
-                                                $shouldRollbackDownloadedFile = $oldFilename === null || $oldFilename !== $safeFilename;
-
-                                                if ($shouldRollbackDownloadedFile) {
-                                                    try {
-                                                        Http::daemon($server->node)
-                                                            ->post("/api/servers/{$server->uuid}/files/delete", [
-                                                                'root' => '/',
-                                                                'files' => [$folder . '/' . $safeFilename],
-                                                            ])
-                                                            ->throw();
-                                                    } catch (Exception $rollbackException) {
-                                                        report($rollbackException);
-                                                    }
-                                                }
-
-                                                throw new Exception('Failed to save mod metadata');
-                                            }
-
-                                            if ($oldFilename && $oldFilename !== $safeFilename) {
-                                                try {
-                                                    Http::daemon($server->node)
-                                                        ->post("/api/servers/{$server->uuid}/files/delete", [
-                                                            'root' => '/',
-                                                            'files' => [$folder . '/' . $oldFilename],
-                                                        ])
-                                                        ->throw();
-                                                } catch (Exception $deleteException) {
-                                                    try {
-                                                        Http::daemon($server->node)
-                                                            ->post("/api/servers/{$server->uuid}/files/delete", [
-                                                                'root' => '/',
-                                                                'files' => [$folder . '/' . $safeFilename],
-                                                            ])
-                                                            ->throw();
-                                                    } catch (Exception $rollbackException) {
-                                                        report($rollbackException);
-                                                    }
-
-                                                    if (!MinecraftModrinth::saveModMetadata(
-                                                        $server,
-                                                        $fileRepository,
-                                                        $record['project_id'],
-                                                        $installedMod['project_slug'],
-                                                        $installedMod['project_title'],
-                                                        $installedMod['version_id'],
-                                                        $installedMod['version_number'],
-                                                        $oldFilename,
-                                                        $installedMod['author'] ?? null
-                                                    )) {
-                                                        report(new Exception('Failed to restore old mod metadata during rollback'));
-                                                    }
-
-                                                    throw $deleteException;
-                                                }
-                                            }
+                                            $this->performInstallOrUpdate($server, $fileRepository, $record, $versionData, $primaryFile, $installedMod);
 
                                             $this->installedModsMetadata = null;
                                             $this->versionsCache = [];
@@ -453,41 +469,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('No downloadable file found');
                             }
 
-                            $safeFilename = $this->validateFilename($primaryFile['filename']);
-
-                            $type = ModrinthProjectType::fromServer($server);
-                            if (!$type) {
-                                throw new Exception('Server does not support Modrinth mods or plugins');
-                            }
-
-                            $fileRepository->setServer($server)->pull($primaryFile['url'], $type->getFolder());
-
-                            $saved = MinecraftModrinth::saveModMetadata(
-                                $server,
-                                $fileRepository,
-                                $record['project_id'],
-                                $record['slug'],
-                                $record['title'],
-                                $latestVersion['id'],
-                                $latestVersion['version_number'],
-                                $safeFilename,
-                                $record['author'] ?? null
-                            );
-
-                            if (!$saved) {
-                                try {
-                                    Http::daemon($server->node)
-                                        ->post("/api/servers/{$server->uuid}/files/delete", [
-                                            'root' => '/',
-                                            'files' => [$type->getFolder() . '/' . $safeFilename],
-                                        ])
-                                        ->throw();
-                                } catch (Exception $rollbackException) {
-                                    report($rollbackException);
-                                }
-
-                                throw new Exception('Failed to save mod metadata');
-                            }
+                            $this->performInstallOrUpdate($server, $fileRepository, $record, $latestVersion, $primaryFile);
 
                             $this->installedModsMetadata = null;
                             $this->versionsCache = [];
@@ -555,8 +537,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('Mod not found in metadata');
                             }
 
-                            $safeFilename = $this->validateFilename($installedMod['filename']);
-
                             $versions = MinecraftModrinth::getModrinthVersions($record['project_id'], $server);
 
                             if (empty($versions)) {
@@ -575,83 +555,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('No downloadable file found');
                             }
 
-                            $safeNewFilename = $this->validateFilename($primaryFile['filename']);
-
-                            $type = ModrinthProjectType::fromServer($server);
-                            if (!$type) {
-                                throw new Exception('Server does not support Modrinth mods or plugins');
-                            }
-
-                            $folder = $type->getFolder();
-
-                            $fileRepository->setServer($server)->pull($primaryFile['url'], $folder);
-
-                            $saved = MinecraftModrinth::saveModMetadata(
-                                $server,
-                                $fileRepository,
-                                $record['project_id'],
-                                $record['slug'],
-                                $record['title'],
-                                $latestVersion['id'],
-                                $latestVersion['version_number'],
-                                $safeNewFilename,
-                                $record['author'] ?? null
-                            );
-
-                            if (!$saved) {
-                                if ($safeFilename !== $safeNewFilename) {
-                                    try {
-                                        Http::daemon($server->node)
-                                            ->post("/api/servers/{$server->uuid}/files/delete", [
-                                                'root' => '/',
-                                                'files' => [$folder . '/' . $safeNewFilename],
-                                            ])
-                                            ->throw();
-                                    } catch (Exception $rollbackException) {
-                                        report($rollbackException);
-                                    }
-                                }
-
-                                throw new Exception('Failed to save mod metadata');
-                            }
-
-                            if ($safeFilename !== $safeNewFilename) {
-                                try {
-                                    Http::daemon($server->node)
-                                        ->post("/api/servers/{$server->uuid}/files/delete", [
-                                            'root' => '/',
-                                            'files' => [$folder . '/' . $safeFilename],
-                                        ])
-                                        ->throw();
-                                } catch (Exception $deleteException) {
-                                    try {
-                                        Http::daemon($server->node)
-                                            ->post("/api/servers/{$server->uuid}/files/delete", [
-                                                'root' => '/',
-                                                'files' => [$folder . '/' . $safeNewFilename],
-                                            ])
-                                            ->throw();
-                                    } catch (Exception $rollbackException) {
-                                        report($rollbackException);
-                                    }
-
-                                    if (!MinecraftModrinth::saveModMetadata(
-                                        $server,
-                                        $fileRepository,
-                                        $record['project_id'],
-                                        $installedMod['project_slug'],
-                                        $installedMod['project_title'],
-                                        $installedMod['version_id'],
-                                        $installedMod['version_number'],
-                                        $safeFilename,
-                                        $installedMod['author'] ?? null
-                                    )) {
-                                        report(new Exception('Failed to restore old mod metadata during rollback'));
-                                    }
-
-                                    throw $deleteException;
-                                }
-                            }
+                            $this->performInstallOrUpdate($server, $fileRepository, $record, $latestVersion, $primaryFile, $installedMod);
 
                             $this->installedModsMetadata = null;
                             $this->versionsCache = [];
@@ -737,12 +641,23 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                             $metadataRemoved = MinecraftModrinth::removeModMetadata($server, $fileRepository, $record['project_id']);
 
-                            if ($metadataRemoved === false) {
-                                throw new Exception('Failed to remove mod metadata');
-                            }
+                            if (!$metadataRemoved) {
+                                Log::warning('Failed to remove mod metadata after successful file deletion', [
+                                    'project_id' => $record['project_id'],
+                                    'server_id' => $server->id,
+                                ]);
 
-                            $this->installedModsMetadata = null;
-                            $this->versionsCache = [];
+                                if (is_array($this->installedModsMetadata)) {
+                                    $this->installedModsMetadata = array_values(
+                                        array_filter($this->installedModsMetadata, fn ($mod) => $mod['project_id'] !== $record['project_id'])
+                                    );
+                                }
+
+                                unset($this->versionsCache[$record['project_id']]);
+                            } else {
+                                $this->installedModsMetadata = null;
+                                $this->versionsCache = [];
+                            }
 
                             if ($this->activeTab === 'installed') {
                                 $this->js('$wire.$refresh()');
