@@ -35,7 +35,9 @@ class McLogCleanAction extends Action
             return !in_array('mclogcleaner', $features, true);
         });
 
-        $this->label('Delete logs');
+        $this->label(function () {
+            return config('mclogcleaner.mclogcleaner_text_enabled') ? 'Delete logs' : '';
+        });
         $this->icon('tabler-trash');
         $this->color('danger');
         $this->size(Size::ExtraLarge);
@@ -104,7 +106,7 @@ class McLogCleanAction extends Action
                         return $logDate->lessThan($threshold);
                     })
                     ->pluck('name')
-                    ->map(fn ($name) => 'logs/' . $name)
+                    ->map(fn ($name) => 'logs/'.$name)
                     ->values()
                     ->all();
                 if (empty($logsToDelete)) {
@@ -124,7 +126,7 @@ class McLogCleanAction extends Action
                     ->throw();
                 Notification::make()
                     ->title('Logfolder cleaned')
-                    ->body(count($logsToDelete) . ' files were deleted.')
+                    ->body(count($logsToDelete).' files were deleted.')
                     ->success()
                     ->send();
             } catch (\Throwable $e) {

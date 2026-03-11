@@ -7,6 +7,8 @@ use Boy132\GenericOIDCProviders\Filament\Admin\Resources\GenericOIDCProviders\Pa
 use Boy132\GenericOIDCProviders\Filament\Admin\Resources\GenericOIDCProviders\Pages\EditGenericOIDCProvider;
 use Boy132\GenericOIDCProviders\Filament\Admin\Resources\GenericOIDCProviders\Pages\ListGenericOIDCProviders;
 use Boy132\GenericOIDCProviders\Models\GenericOIDCProvider;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -192,7 +194,10 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...
                 DeleteAction::make(),
             ])
             ->toolbarActions([
-                DeleteBulkAction::make(),
+                CreateAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make('exclude_bulk_delete'),
+                ]),
             ])
             ->emptyStateIcon('tabler-brand-oauth')
             ->emptyStateDescription('')

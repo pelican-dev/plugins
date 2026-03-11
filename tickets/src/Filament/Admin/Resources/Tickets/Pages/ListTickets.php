@@ -5,7 +5,6 @@ namespace Boy132\Tickets\Filament\Admin\Resources\Tickets\Pages;
 use Boy132\Tickets\Enums\TicketStatus;
 use Boy132\Tickets\Filament\Admin\Resources\Tickets\TicketResource;
 use Boy132\Tickets\Models\Ticket;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,16 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 class ListTickets extends ListRecords
 {
     protected static string $resource = TicketResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            CreateAction::make()
-                ->createAnother(false)
-                ->hiddenLabel()
-                ->icon('tabler-plus'),
-        ];
-    }
 
     public function getTabs(): array
     {

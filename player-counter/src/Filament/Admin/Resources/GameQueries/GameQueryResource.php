@@ -5,6 +5,7 @@ namespace Boy132\PlayerCounter\Filament\Admin\Resources\GameQueries;
 use Boy132\PlayerCounter\Extensions\Query\QueryTypeService;
 use Boy132\PlayerCounter\Filament\Admin\Resources\GameQueries\Pages\ManageGameQueries;
 use Boy132\PlayerCounter\Models\GameQuery;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -61,9 +62,13 @@ class GameQueryResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->hidden(fn ($record) => static::canEdit($record)),
+                    ->hidden(fn ($record) => static::getEditAuthorizationResponse($record)->allowed()),
                 EditAction::make(),
                 DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                CreateAction::make()
+                    ->createAnother(false),
             ])
             ->emptyStateIcon('tabler-device-desktop-search')
             ->emptyStateDescription('')

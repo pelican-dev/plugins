@@ -7,6 +7,8 @@ Allows users to create and manage custom subdomains (A/AAAA or SRV) for their ga
 [Create a Cloudflare API token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) and enter it via the plugin settings.  
 The token needs to have read permissions for `Zone.Zone` and write for `Zone.Dns`. For better security you can also set the `Zone Resources` to exclude certain domains and add the panel ip to the `Client IP Address Filtering`.
 
+By default every server has a subdomain limit of 0. You can change this limit by editing the server in the admin area.
+
 Note: You can't create subdomains for servers with `0.0.0.0` or `::` as allocation!
 
 ## SRV Records

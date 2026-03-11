@@ -193,6 +193,36 @@ class PlayersPage extends Page implements HasTable
                                 ->send();
                         }
                     }),
+                Action::make('exclude_ban')
+                    ->visible(fn () => $isMinecraft)
+                    ->label(trans('player-counter::query.ban'))
+                    ->icon('tabler-hammer')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (array $record) {
+                        /** @var Server $server */
+                        $server = Filament::getTenant();
+
+                        try {
+                            $server->send('ban ' . $record['name']);
+
+                            Notification::make()
+                                ->title(trans('player-counter::query.notifications.player_banned'))
+                                ->body($record['name'])
+                                ->success()
+                                ->send();
+
+                            $this->refreshPage();
+                        } catch (Exception $exception) {
+                            report($exception);
+
+                            Notification::make()
+                                ->title(trans('player-counter::query.notifications.player_ban_failed'))
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 Action::make('exclude_whitelist')
                     ->visible(fn () => $isMinecraft)
                     ->label(fn (array $record) => in_array($record['name'], $whitelist) ? trans('player-counter::query.remove_from_whitelist') : trans('player-counter::query.add_to_whitelist'))

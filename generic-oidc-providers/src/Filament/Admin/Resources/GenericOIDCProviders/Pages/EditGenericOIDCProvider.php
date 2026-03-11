@@ -19,12 +19,14 @@ class EditGenericOIDCProvider extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
-            Action::make('save')
+            $this->getCancelFormAction()->formId('form')
+                ->tooltip(fn (Action $action) => $action->getLabel())
                 ->hiddenLabel()
-                ->action('save')
-                ->keyBindings(['mod+s'])
-                ->tooltip(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+                ->icon('tabler-arrow-left'),
+            DeleteAction::make(),
+            $this->getSaveFormAction()->formId('form')
+                ->tooltip(fn (Action $action) => $action->getLabel())
+                ->hiddenLabel()
                 ->icon('tabler-device-floppy'),
         ];
     }

@@ -12,6 +12,7 @@ use Boy132\Tickets\Filament\Server\Resources\Tickets\Pages\ListTickets;
 use Boy132\Tickets\Filament\Server\Resources\Tickets\Pages\ViewTicket;
 use Boy132\Tickets\Filament\Server\Resources\Tickets\RelationManagers\MessagesRelationManager;
 use Boy132\Tickets\Models\Ticket;
+use Filament\Actions\CreateAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
@@ -103,6 +104,9 @@ class TicketResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make(),
+            ])
+            ->toolbarActions([
+                CreateAction::make(),
             ])
             ->groups([
                 Group::make('category')

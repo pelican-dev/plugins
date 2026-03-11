@@ -2,10 +2,12 @@
 
 namespace Boy132\UserCreatableServers\Filament\Admin\Resources\UserResourceLimits;
 
+use App\Enums\CustomizationKey;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Models\User;
 use Boy132\UserCreatableServers\Filament\Admin\Resources\UserResourceLimits\Pages\ManageUserResourceLimits;
 use Boy132\UserCreatableServers\Models\UserResourceLimits;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -40,7 +42,7 @@ class UserResourceLimitsResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return config('panel.filament.top-navigation', false) ? null : trans('admin/dashboard.user');
+        return user()?->getCustomization(CustomizationKey::TopNavigation) ? false : trans('admin/dashboard.user');
     }
 
     public static function getNavigationBadge(): ?string
@@ -73,9 +75,13 @@ class UserResourceLimitsResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->hidden(fn ($record) => static::canEdit($record)),
+                    ->hidden(fn ($record) => static::getEditAuthorizationResponse($record)->allowed()),
                 EditAction::make(),
                 DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                CreateAction::make()
+                    ->createAnother(false),
             ])
             ->emptyStateIcon('tabler-cube-plus')
             ->emptyStateDescription('');
