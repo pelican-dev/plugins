@@ -11,7 +11,9 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\ServiceProvider;
 
 class BackupTemplatesPluginProvider extends ServiceProvider
@@ -73,6 +75,22 @@ class BackupTemplatesPluginProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(BackupTemplate::class, BackupTemplatePolicy::class);
+
+        $pluginPath = dirname(__DIR__, 2);
+        foreach (['en', 'de'] as $locale) {
+            $langFile = "$pluginPath/lang/$locale/server/user.php";
+            if (file_exists($langFile)) {
+                $coreLangFile = base_path("lang/$locale/server/user.php");
+                $coreTranslations = file_exists($coreLangFile) ? require $coreLangFile : [];
+                $pluginTranslations = require $langFile;
+
+                $translations = collect(Arr::dot(array_replace_recursive($coreTranslations, $pluginTranslations)))
+                    ->mapWithKeys(fn ($value, $key) => ["server/user.$key" => $value])
+                    ->all();
+
+                Lang::addLines($translations, $locale);
+            }
+        }
 
         Server::resolveRelationUsing('backupTemplates', fn (Server $server) => $server->hasMany(BackupTemplate::class, 'server_id', 'id'));
     }
