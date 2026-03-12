@@ -2,7 +2,6 @@
 
 namespace Ebnater\BackupTemplates\Filament\Server\Resources\BackupTemplates\Pages;
 
-use App\Enums\SubuserPermission;
 use App\Models\Server;
 use Ebnater\BackupTemplates\Filament\Server\Resources\BackupTemplates\BackupTemplateResource;
 use Filament\Actions\CreateAction;
