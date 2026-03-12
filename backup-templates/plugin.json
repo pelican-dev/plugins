@@ -1,0 +1,21 @@
+{
+    "id": "backup-templates",
+    "name": "Backup Templates",
+    "author": "Ebnater",
+    "version": "1.0.0",
+    "description": "Provides backup templates for your Pelican site.",
+    "category": "plugin",
+    "url": "https://github.com/pelican-dev/plugins/tree/main/backup-templates",
+    "update_url": null,
+    "namespace": "Ebnater\\BackupTemplates",
+    "class": "BackupTemplatesPlugin",
+    "panels": [
+        "server"
+    ],
+    "panel_version": null,
+    "composer_packages": [],
+    "meta": {
+        "status": "enabled",
+        "status_message": null
+    }
+}
