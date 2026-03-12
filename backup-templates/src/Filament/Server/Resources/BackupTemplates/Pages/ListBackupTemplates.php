@@ -2,6 +2,7 @@
 
 namespace Ebnater\BackupTemplates\Filament\Server\Resources\BackupTemplates\Pages;
 
+use App\Enums\SubuserPermission;
 use App\Models\Server;
 use Ebnater\BackupTemplates\Filament\Server\Resources\BackupTemplates\BackupTemplateResource;
 use Filament\Actions\CreateAction;
@@ -21,6 +22,12 @@ class ListBackupTemplates extends ListRecords
     {
         return [
             CreateAction::make()
+                ->authorize(function (): bool {
+                    /** @var Server|null $server */
+                    $server = Filament::getTenant();
+
+                    return $server !== null && user()?->can('backupTemplates.create', $server);
+                })
                 ->createAnother(false)
                 ->mutateDataUsing(function (array $data): array {
                     /** @var Server|null $server */

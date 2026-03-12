@@ -3,6 +3,11 @@
 return [
     'template' => 'Backup Template|Backup Templates',
 
+    'permissions' => [
+        'group' => 'Permissions for managing backup templates for this server.',
+        'create' => 'Allows a user to create, edit, and delete backup templates for this server.',
+    ],
+
     'fields' => [
         'name' => 'Name',
         'ignored' => 'Ignored Files and Folders',

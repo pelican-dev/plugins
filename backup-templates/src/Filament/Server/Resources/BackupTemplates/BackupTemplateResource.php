@@ -2,6 +2,7 @@
 
 namespace Ebnater\BackupTemplates\Filament\Server\Resources\BackupTemplates;
 
+use App\Enums\SubuserPermission;
 use App\Models\Server;
 use Ebnater\BackupTemplates\Filament\Server\Resources\BackupTemplates\Pages\ListBackupTemplates;
 use Ebnater\BackupTemplates\Models\BackupTemplate;
@@ -23,6 +24,16 @@ class BackupTemplateResource extends Resource
     protected static ?int $navigationSort = 31;
 
     protected static string|\BackedEnum|null $navigationIcon = 'tabler-template';
+
+    public static function canAccess(): bool
+    {
+        /** @var Server|null $server */
+        $server = Filament::getTenant();
+
+        return $server !== null
+            && user()?->can(SubuserPermission::BackupRead, $server)
+            && parent::canAccess();
+    }
 
     public static function getNavigationLabel(): string
     {
