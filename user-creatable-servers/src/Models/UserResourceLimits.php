@@ -112,6 +112,7 @@ class UserResourceLimits extends Model
         return true;
     }
 
+    /** @param array<string, mixed> $variables */
     public function createServer(string $name, int|Egg $egg, int $cpu, int $memory, int $disk, array $variables = []): Server|bool
     {
         if ($this->canCreateServer($cpu, $memory, $disk)) {
