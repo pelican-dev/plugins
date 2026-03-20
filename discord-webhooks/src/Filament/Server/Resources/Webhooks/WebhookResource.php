@@ -2,15 +2,10 @@
 
 namespace Notjami\Webhooks\Filament\Server\Resources\Webhooks;
 
-use App\Models\Server;
-use Notjami\Webhooks\Filament\Server\Resources\Webhooks\Pages\ManageWebhooks;
-use Notjami\Webhooks\Models\Webhook;
-use Notjami\Webhooks\Enums\WebhookEvent;
-use Notjami\Webhooks\Services\DiscordWebhookService;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -20,7 +15,10 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-
+use Notjami\Webhooks\Enums\WebhookEvent;
+use Notjami\Webhooks\Filament\Server\Resources\Webhooks\Pages\ManageWebhooks;
+use Notjami\Webhooks\Models\Webhook;
+use Notjami\Webhooks\Services\DiscordWebhookService;
 class WebhookResource extends Resource
 {
     protected static ?string $model = Webhook::class;
@@ -58,12 +56,29 @@ class WebhookResource extends Resource
                 TextColumn::make('webhook_url')
                     ->label('Webhook URL')
                     ->limit(30)
-                    ->tooltip(fn ($state) => $state),
+                    ->formatStateUsing(function ($state) {
+                        // Mask the URL: show scheme://host/...****
+                        if (empty($state)) return '';
+                        $parsed = parse_url($state);
+                        if (!$parsed || !isset($parsed['scheme'], $parsed['host'])) return '••••••';
+                        $last4 = substr($parsed['path'] ?? '', -4);
+                        $masked = $parsed['scheme'] . '://' . $parsed['host'] . '/...';
+                        if ($last4) {
+                            $masked .= $last4;
+                        }
+                        return $masked;
+                    })
+                    ->tooltip('••••••'),
                 TextColumn::make('events')
                     ->label('Events')
                     ->badge()
                     ->formatStateUsing(function ($state) {
-                        return collect($state)->map(fn ($event) => WebhookEvent::from($event)->getLabel())->join(', ');
+                        $events = is_array($state) ? $state : (array) $state;
+                        return collect($events)
+                            ->map(fn ($event) => WebhookEvent::tryFrom($event))
+                            ->filter()
+                            ->map(fn ($event) => $event->getLabel())
+                            ->join(', ');
                     }),
                 IconColumn::make('enabled')
                     ->label('Enabled')
@@ -123,6 +138,7 @@ class WebhookResource extends Resource
                     ->placeholder('https://discord.com/api/webhooks/...')
                     ->required()
                     ->url()
+                    ->regex('/^https:\/\/discord\\.com\/api\/webhooks\/.+/')
                     ->maxLength(500)
                     ->columnSpanFull(),
                 Select::make('events')

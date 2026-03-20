@@ -41,16 +41,18 @@ class WebhooksPluginProvider extends ServiceProvider
 
         // Server Installation Events
         Event::listen('eloquent.updating: App\Models\Server', function (Server $server) {
-            $service = app(DiscordWebhookService::class);
-
             // Check if status changed to installing
             if ($server->isDirty('status') && $server->status === 'installing') {
-                $service->triggerEvent(WebhookEvent::ServerInstalling, $server);
+                DB::afterCommit(function () use ($server) {
+                    app(DiscordWebhookService::class)->triggerEvent(WebhookEvent::ServerInstalling, $server);
+                });
             }
 
             // Check if installation completed (status changed from installing to null/running)
             if ($server->isDirty('status') && $server->getOriginal('status') === 'installing' && $server->status === null) {
-                $service->triggerEvent(WebhookEvent::ServerInstalled, $server);
+                DB::afterCommit(function () use ($server) {
+                    app(DiscordWebhookService::class)->triggerEvent(WebhookEvent::ServerInstalled, $server);
+                });
             }
         });
 
@@ -58,8 +60,6 @@ class WebhooksPluginProvider extends ServiceProvider
         $statusEvents = [
             'App\Events\Server\Started' => WebhookEvent::ServerStarted,
             'App\Events\Server\Stopped' => WebhookEvent::ServerStopped,
-            'App\Events\Server\Starting' => WebhookEvent::ServerStarted,
-            'App\Events\Server\Stopping' => WebhookEvent::ServerStopped,
         ];
 
         foreach ($statusEvents as $eventClass => $webhookEvent) {
@@ -67,7 +67,10 @@ class WebhooksPluginProvider extends ServiceProvider
                 Event::listen($eventClass, function ($event) use ($webhookEvent) {
                     $server = $event->server ?? null;
                     if ($server instanceof Server) {
-                        app(DiscordWebhookService::class)->triggerEvent($webhookEvent, $server);
+                        // Only update the cache/state, do not send webhook here
+                        $cacheKey = "webhook_server_status_{$server->id}";
+                        $state = $webhookEvent === WebhookEvent::ServerStarted ? 'running' : 'offline';
+                        \Illuminate\Support\Facades\Cache::put($cacheKey, $state, now()->addHours(24));
                     }
                 });
             }

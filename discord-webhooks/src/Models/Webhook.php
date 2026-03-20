@@ -2,6 +2,8 @@
 
 namespace Notjami\Webhooks\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+
 use App\Models\Server;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -50,9 +52,16 @@ class Webhook extends Model
         return $this->belongsTo(Server::class);
     }
 
-    public function hasEvent(WebhookEvent $event): bool
+    /**
+     * Check if the webhook has the given event.
+     *
+     * @param WebhookEvent|string $event
+     * @return bool
+     */
+    public function hasEvent(WebhookEvent|string $event): bool
     {
-        return in_array($event->value, $this->events);
+        $value = $event instanceof WebhookEvent ? $event->value : $event;
+        return in_array($value, $this->events, true);
     }
 
     public function appliesToServer(Server $server): bool
@@ -60,21 +69,21 @@ class Webhook extends Model
         return $this->server_id === null || $this->server_id === $server->id;
     }
 
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
         return $query->where('enabled', true);
     }
 
-    public function scopeForEvent($query, WebhookEvent $event)
+    public function scopeForEvent(Builder $query, WebhookEvent $event): Builder
     {
         return $query->whereJsonContains('events', $event->value);
     }
 
-    public function scopeForServer($query, Server $server)
+    public function scopeForServer(Builder $query, Server $server): Builder
     {
         return $query->where(function ($q) use ($server) {
             $q->whereNull('server_id')
-              ->orWhere('server_id', $server->id);
+                ->orWhere('server_id', $server->id);
         });
     }
 }

@@ -42,10 +42,10 @@ class CheckServerStatus extends Command
 
                 $cacheKey = "webhook_server_status_{$server->id}";
                 $previousState = Cache::get($cacheKey, 'unknown');
+                // Always refresh the cache TTL, even if state hasn't changed
+                Cache::put($cacheKey, $currentState, now()->addHours(24));
 
                 if ($previousState !== $currentState) {
-                    Cache::put($cacheKey, $currentState, now()->addHours(24));
-
                     if ($previousState !== 'unknown') {
                         if ($currentState === 'running') {
                             $webhookService->triggerEvent(WebhookEvent::ServerStarted, $server);

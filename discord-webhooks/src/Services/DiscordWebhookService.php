@@ -91,9 +91,10 @@ class DiscordWebhookService
 
         foreach ($webhooks as $webhook) {
             try {
-                $this->sendServerEvent($webhook, $server, $event);
-                
-                $webhook->update(['last_triggered_at' => now()]);
+                $sent = $this->sendServerEvent($webhook, $server, $event);
+                if ($sent) {
+                    $webhook->update(['last_triggered_at' => now()]);
+                }
             } catch (\Exception $e) {
                 Log::error('Failed to send webhook', [
                     'webhook_id' => $webhook->id,
@@ -106,6 +107,14 @@ class DiscordWebhookService
 
     protected function send(Webhook $webhook, array $payload): bool
     {
+        // Enforce Discord webhook URL pattern as a second layer of validation
+        if (!preg_match('/^https:\/\/discord\.com\/api\/webhooks\/.+/', $webhook->webhook_url)) {
+            Log::warning('Rejected non-Discord webhook URL', [
+                'webhook_id' => $webhook->id,
+                'url' => $webhook->webhook_url,
+            ]);
+            return false;
+        }
         try {
             $response = Http::timeout(10)
                 ->post($webhook->webhook_url, $payload);
