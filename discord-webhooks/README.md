@@ -19,7 +19,7 @@ Send Discord webhook notifications for various server events in Pelican Panel.
 
 ## Installation
 
-1. Copy the `discord-webhooks` folder to your Pelican Panel plugins directory or import it with <URL-TO-RELEASE>
+1. Copy the `discord-webhooks` folder to your Pelican Panel plugins directory or import it with `https://github.com/jami100YT/pelican-plugins/archive/refs/tags/latest.zip`
 2. Install the plugin
 
 ## Server Status Detection
