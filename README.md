@@ -1,6 +1,6 @@
 # Pelican Plugins
 
-A curated list of plugins for the [Pelican Panel](https://pelican.dev). Feel free to add plugins that you created via a pull request!
+A curated list of plugins for the [Pelican Panel](https://pelican.dev).
 
 ## How to install plugins
 
@@ -44,7 +44,7 @@ npm i -g yarn
 - [Tickets](/tickets) - Simple ticket system for user support
 - [User Creatable Servers](/user-creatable-servers) - Allow users to create their own servers
 
-_* Third party plugins_
+_* Third party plugins, will be removed from this repo eventually_
 
 ## Themes
 
