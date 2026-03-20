@@ -1,0 +1,17 @@
+{
+    "id": "discord-webhooks",
+    "name": "Discord Webhooks",
+    "author": "notjami",
+    "version": "1.1.1",
+    "description": "Send Discord webhook notifications for server events",
+    "category": "plugin",
+    "url": "https://github.com/jami100YT/pelican-plugins/tree/discord-webhooks/discord-webhooks",
+    "update_url": null,
+    "namespace": "Notjami\\Webhooks",
+    "class": "WebhooksPlugin",
+    "panels": [
+        "server"
+    ],
+    "panel_version": null,
+    "composer_packages": null
+}
