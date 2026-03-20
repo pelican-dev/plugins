@@ -15,7 +15,7 @@ use Notjami\Webhooks\Enums\WebhookEvent;
  * @property string $name
  * @property string $webhook_url
  * @property int|null $server_id
- * @property array<WebhookEvent> $events
+ * @property array<string> $events
  * @property bool $enabled
  * @property Carbon|null $last_triggered_at
  * @property Carbon $created_at
@@ -60,7 +60,8 @@ class Webhook extends Model
      */
     public function hasEvent(WebhookEvent|string $event): bool
     {
-        $value = $event instanceof WebhookEvent ? $event->value : $event;
+        $value = $event instanceof WebhookEvent ? $event->value : (string)$event;
+        // $this->events ist array<string>
         return in_array($value, $this->events, true);
     }
 

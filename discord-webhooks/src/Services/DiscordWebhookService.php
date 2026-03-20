@@ -105,6 +105,9 @@ class DiscordWebhookService
         }
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     */
     protected function send(Webhook $webhook, array $payload): bool
     {
         // Enforce Discord webhook URL pattern as a second layer of validation

@@ -2,6 +2,7 @@
 
 namespace Notjami\Webhooks\Providers;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use App\Models\Server;
 use Illuminate\Console\Scheduling\Schedule;
@@ -42,14 +43,20 @@ class WebhooksPluginProvider extends ServiceProvider
         // Server Installation Events
         Event::listen('eloquent.updating: App\Models\Server', function (Server $server) {
             // Check if status changed to installing
-            if ($server->isDirty('status') && $server->status === 'installing') {
+            if (
+                $server->isDirty('status') &&
+                ((is_string($server->status) && $server->status === 'installing') ||
+                (method_exists($server->status, 'value') && $server->status->value === 'installing'))
+            ) {
                 DB::afterCommit(function () use ($server) {
                     app(DiscordWebhookService::class)->triggerEvent(WebhookEvent::ServerInstalling, $server);
                 });
             }
 
             // Check if installation completed (status changed from installing to null/running)
-            if ($server->isDirty('status') && $server->getOriginal('status') === 'installing' && $server->status === null) {
+            $original = $server->getOriginal('status');
+            $isOriginalInstalling = (is_string($original) && $original === 'installing') || (method_exists($original, 'value') && $original->value === 'installing');
+            if ($server->isDirty('status') && $isOriginalInstalling && $server->status === null) {
                 DB::afterCommit(function () use ($server) {
                     app(DiscordWebhookService::class)->triggerEvent(WebhookEvent::ServerInstalled, $server);
                 });
