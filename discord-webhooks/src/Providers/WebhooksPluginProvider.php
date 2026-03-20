@@ -3,6 +3,8 @@
 namespace Notjami\Webhooks\Providers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use BackedEnum;
 use App\Models\Role;
 use App\Models\Server;
 use Illuminate\Console\Scheduling\Schedule;
@@ -46,7 +48,7 @@ class WebhooksPluginProvider extends ServiceProvider
             $status = $server->status;
             $isInstalling = (
                 (is_string($status) && $status === 'installing') ||
-                ($status instanceof \BackedEnum && $status->value === 'installing')
+                ($status instanceof BackedEnum && $status->value === 'installing')
             );
             if ($server->isDirty('status') && $isInstalling) {
                 DB::afterCommit(function () use ($server) {
@@ -58,7 +60,7 @@ class WebhooksPluginProvider extends ServiceProvider
             $original = $server->getOriginal('status');
             $wasInstalling = (
                 (is_string($original) && $original === 'installing') ||
-                ($original instanceof \BackedEnum && $original->value === 'installing')
+                ($original instanceof BackedEnum && $original->value === 'installing')
             );
             if ($server->isDirty('status') && $wasInstalling && $server->status === null) {
                 DB::afterCommit(function () use ($server) {
@@ -77,12 +79,7 @@ class WebhooksPluginProvider extends ServiceProvider
             if (class_exists($eventClass)) {
                 Event::listen($eventClass, function ($event) use ($webhookEvent) {
                     $server = $event->server ?? null;
-                    if ($server instanceof Server) {
-                        // Only update the cache/state, do not send webhook here
-                        $cacheKey = "webhook_server_status_{$server->id}";
-                        $state = $webhookEvent === WebhookEvent::ServerStarted ? 'running' : 'offline';
-                        \Illuminate\Support\Facades\Cache::put($cacheKey, $state, now()->addHours(24));
-                    }
+                    // Do not update the cache here; let CheckServerStatus handle state and webhook dispatching.
                 });
             }
         }
