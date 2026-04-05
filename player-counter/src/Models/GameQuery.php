@@ -39,7 +39,7 @@ class GameQuery extends Model
             return null;
         }
 
-        $ip = config('player-counter.use_alias') && $allocation->alias ? gethostbyname($allocation->alias) : $allocation->ip;
+        $ip = config('player-counter.use_alias') && is_ip(gethostbyname($allocation->alias)) ? gethostbyname($allocation->alias) : $allocation->ip;
         $ip = is_ipv6($ip) ? '[' . $ip . ']' : $ip;
 
         /** @var QueryTypeService $service */
@@ -54,7 +54,7 @@ class GameQuery extends Model
             return false;
         }
 
-        $ip = config('player-counter.use_alias') && $allocation->alias ? gethostbyname($allocation->alias) : $allocation->ip;
+        $ip = config('player-counter.use_alias') && is_ip(gethostbyname($allocation->alias)) ? gethostbyname($allocation->alias) : $allocation->ip;
 
         return !in_array($ip, ['0.0.0.0', '::']);
     }
