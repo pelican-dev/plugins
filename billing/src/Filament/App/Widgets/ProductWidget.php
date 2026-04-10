@@ -6,6 +6,7 @@ use App\Filament\Server\Pages\Console;
 use Boy132\Billing\Models\Customer;
 use Boy132\Billing\Models\Order;
 use Boy132\Billing\Models\Product;
+use Boy132\Billing\Models\ProductPrice;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -16,6 +17,7 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Widgets\Widget;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
 
 class ProductWidget extends Widget implements HasActions, HasSchemas
@@ -31,7 +33,10 @@ class ProductWidget extends Widget implements HasActions, HasSchemas
     {
         $actions = [];
 
-        foreach ($this->product->prices as $price) {
+        /** @var Collection<int, ProductPrice> $prices */
+        $prices = $this->product->prices()->orderBy('cost')->get();
+
+        foreach ($prices as $price) {
             $actions[] = Action::make('exclude_' . str_slug($price->name))
                 ->label($price->getLabel())
                 ->action(function () use ($price) {
