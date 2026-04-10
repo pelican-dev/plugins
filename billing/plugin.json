@@ -12,6 +12,6 @@
     "panels": null,
     "panel_version": null,
     "composer_packages": {
-        "stripe/stripe-php": "^18.0"
+        "stripe/stripe-php": "^20.0"
     }
 }
