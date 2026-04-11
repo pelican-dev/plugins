@@ -72,7 +72,7 @@ class GameQuery extends Model
         return !in_array($ip, ['0.0.0.0', '::']);
     }
 
-    private static function resolveIp(Allocation $allocation): string
+    protected static function resolveIp(Allocation $allocation): string
     {
         if (config('player-counter.use_alias') && !empty($allocation->ip_alias)) {
             return $allocation->ip_alias;

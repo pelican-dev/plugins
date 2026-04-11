@@ -74,12 +74,12 @@ class TeamSpeakQueryTypeSchema implements QueryTypeSchemaInterface
             $clients = $this->parseClientList($clientLine);
 
             return [
-                'hostname'        => $this->unescape($info['virtualserver_name'] ?? 'Unknown'),
-                'map'             => 'TeamSpeak',
+                'hostname' => $this->unescape($info['virtualserver_name'] ?? 'Unknown'),
+                'map' => 'TeamSpeak',
                 'current_players' => count($clients),
-                'max_players'     => (int) ($info['virtualserver_maxclients'] ?? 0),
-                'players'         => array_map(fn ($c) => [
-                    'id'   => $c['clid'] ?? '0',
+                'max_players' => (int) ($info['virtualserver_maxclients'] ?? 0),
+                'players' => array_map(fn ($c) => [
+                    'id' => $c['clid'] ?? '0',
                     'name' => $this->unescape($c['client_nickname'] ?? 'Unknown'),
                 ], $clients),
             ];
@@ -94,6 +94,7 @@ class TeamSpeakQueryTypeSchema implements QueryTypeSchemaInterface
         return null;
     }
 
+    /** @param resource $socket */
     private function readUntilError($socket): string
     {
         $data = '';
@@ -110,6 +111,7 @@ class TeamSpeakQueryTypeSchema implements QueryTypeSchemaInterface
                 $data = $trimmed;
             }
         }
+
         return $data;
     }
 
@@ -123,6 +125,7 @@ class TeamSpeakQueryTypeSchema implements QueryTypeSchemaInterface
                 $result[$key] = $value;
             }
         }
+
         return $result;
     }
 
@@ -138,6 +141,7 @@ class TeamSpeakQueryTypeSchema implements QueryTypeSchemaInterface
             }
             $clients[] = $client;
         }
+
         return $clients;
     }
 
