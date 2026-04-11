@@ -12,6 +12,7 @@ use Boy132\PlayerCounter\Extensions\Query\Schemas\GoldSourceQueryTypeSchema;
 use Boy132\PlayerCounter\Extensions\Query\Schemas\MinecraftBedrockQueryTypeSchema;
 use Boy132\PlayerCounter\Extensions\Query\Schemas\MinecraftJavaQueryTypeSchema;
 use Boy132\PlayerCounter\Extensions\Query\Schemas\SourceQueryTypeSchema;
+use Boy132\PlayerCounter\Extensions\Query\Schemas\TeamSpeakQueryTypeSchema;
 use Boy132\PlayerCounter\Filament\Server\Widgets\ServerPlayerWidget;
 use Boy132\PlayerCounter\Models\EggGameQuery;
 use Boy132\PlayerCounter\Models\GameQuery;
@@ -35,6 +36,7 @@ class PlayerCounterPluginProvider extends ServiceProvider
             $service->register(new MinecraftJavaQueryTypeSchema());
             $service->register(new MinecraftBedrockQueryTypeSchema());
             $service->register(new CitizenFXQueryTypeSchema());
+            $service->register(new TeamSpeakQueryTypeSchema());
 
             return $service;
         });

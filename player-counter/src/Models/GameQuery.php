@@ -39,13 +39,26 @@ class GameQuery extends Model
             return null;
         }
 
-        $ip = config('player-counter.use_alias') && is_ip($allocation->alias) ? $allocation->alias : $allocation->ip;
+        $ip = static::resolveIp($allocation);
         $ip = is_ipv6($ip) ? '[' . $ip . ']' : $ip;
 
         /** @var QueryTypeService $service */
         $service = app(QueryTypeService::class);
 
-        return $service->get($this->query_type)?->process($ip, $allocation->port + ($this->query_port_offset ?? 0));
+        $schema = $service->get($this->query_type);
+        if (!$schema) {
+            return null;
+        }
+
+        // Allow schema to provide its own port resolution (e.g. from server variables)
+        if (method_exists($schema, 'resolvePort')) {
+            $resolvedPort = $schema->resolvePort($allocation);
+            if ($resolvedPort !== null) {
+                return $schema->process($ip, $resolvedPort);
+            }
+        }
+
+        return $schema->process($ip, $allocation->port + ($this->query_port_offset ?? 0));
     }
 
     public static function canRunQuery(?Allocation $allocation): bool
@@ -54,8 +67,17 @@ class GameQuery extends Model
             return false;
         }
 
-        $ip = config('player-counter.use_alias') && is_ip($allocation->alias) ? $allocation->alias : $allocation->ip;
+        $ip = static::resolveIp($allocation);
 
         return !in_array($ip, ['0.0.0.0', '::']);
+    }
+
+    private static function resolveIp(Allocation $allocation): string
+    {
+        if (config('player-counter.use_alias') && !empty($allocation->ip_alias)) {
+            return $allocation->ip_alias;
+        }
+
+        return $allocation->ip;
     }
 }
