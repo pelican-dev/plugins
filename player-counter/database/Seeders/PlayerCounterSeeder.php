@@ -42,6 +42,11 @@ class PlayerCounterSeeder extends Seeder
             'query_port_offset' => 1,
         ],
         [
+            'names' => ['Arma Reforger', 'ArmaReforger'],
+            'query_type' => 'source',
+            'query_port_offset' => 15776,
+        ],
+        [
             'names' => ['ARK: Survival Evolved', 'ARK: SurvivalEvolved', 'ARK Survival Evolved', 'ARK SurvivalEvolved', 'ARKSurvivalEvolved'],
             'query_type' => 'source',
             'query_port_offset' => 19238,
