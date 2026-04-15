@@ -27,28 +27,9 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
             return $query;
         }
 
-        try {
-            $ping = new MinecraftPing($ip, $port, 5, true);
-
-            $data = $ping->Query();
-
-            if (!$data) {
-                return null;
-            }
-
-            return [
-                'hostname' => is_string($data['description']) ? $data['description'] : $data['description']['text'],
-                'map' => 'world', // No map from MinecraftPing
-                'current_players' => $data['players']['online'],
-                'max_players' => $data['players']['max'],
-                'players' => $data['players']['sample'] ?? [],
-            ];
-        } catch (Exception $exception) {
-            report($exception);
-        } finally {
-            if (isset($ping)) {
-                $ping->Close();
-            }
+        $ping = $this->tryPing($ip, $port);
+        if ($ping) {
+            return $ping;
         }
 
         return null;
@@ -78,6 +59,36 @@ class MinecraftJavaQueryTypeSchema implements QueryTypeSchemaInterface
             ];
         } catch (Exception $exception) {
             report($exception);
+        }
+
+        return false;
+    }
+
+    /** @return false|array{hostname: string, map: string, current_players: int, max_players: int, players: array<array{id: string, name: string}>} */
+    protected function tryPing(string $ip, int $port): false|array
+    {
+        try {
+            $ping = new MinecraftPing($ip, $port, 5, true);
+
+            $data = $ping->Query();
+
+            if (!$data) {
+                return false;
+            }
+
+            return [
+                'hostname' => is_string($data['description']) ? $data['description'] : $data['description']['text'],
+                'map' => 'world', // No map from MinecraftPing
+                'current_players' => $data['players']['online'],
+                'max_players' => $data['players']['max'],
+                'players' => $data['players']['sample'] ?? [],
+            ];
+        } catch (Exception $exception) {
+            report($exception);
+        } finally {
+            if (isset($ping)) {
+                $ping->Close();
+            }
         }
 
         return false;
