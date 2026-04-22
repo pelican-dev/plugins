@@ -12,13 +12,13 @@ A curated list of plugins for the [Pelican Panel](https://pelican.dev).
 
 ### Additional setup for themes
 
-For themes you have to install Node.js 22+ and Yarn beforehand. Example:
+For themes you have to install Node.js 22+ and enable Corepack (which ships with Node.js and provides Yarn). Example:
 
 ```bash
 curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash - 
 sudo apt install -y nodejs
 
-npm i -g yarn
+sudo corepack enable
 ```
 
 ## Plugins
