@@ -56,10 +56,10 @@ class PalworldQueryTypeSchema implements ServerAwareQueryTypeSchemaInterface
                 ->json();
 
             return [
-                'hostname'        => $metrics['servername'] ?? $server->name,
+                'hostname'        => $server->name,
                 'map'             => 'Palpagos Islands',
                 'current_players' => count($players),
-                'max_players'     => $metrics['maxplayers'] ?? 32,
+                'max_players'     => $metrics['maxplayernum'] ?? 32,
                 'players'         => $players,
             ];
         } catch (\Throwable $e) {
