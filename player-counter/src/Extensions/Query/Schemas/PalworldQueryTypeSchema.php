@@ -45,22 +45,22 @@ class PalworldQueryTypeSchema implements ServerAwareQueryTypeSchemaInterface
 
             $data = $response->json();
             $players = array_map(fn ($p) => [
-                'id'   => $p['playeruid'] ?? $p['steamid'] ?? '',
+                'id' => $p['playeruid'] ?? $p['steamid'] ?? '',
                 'name' => $p['name'] ?? '',
             ], $data['players'] ?? []);
 
-            // Fetch metrics for servername and max_players
+            // Fetch metrics for max_players
             $metrics = Http::timeout(5)
                 ->withBasicAuth('admin', $adminPassword)
                 ->get("http://{$ip}:{$port}/v1/api/metrics")
                 ->json();
 
             return [
-                'hostname'        => $server->name,
-                'map'             => 'Palpagos Islands',
+                'hostname' => $server->name,
+                'map' => 'Palpagos Islands',
                 'current_players' => count($players),
-                'max_players'     => $metrics['maxplayernum'] ?? 32,
-                'players'         => $players,
+                'max_players' => $metrics['maxplayernum'] ?? 32,
+                'players' => $players,
             ];
         } catch (\Throwable $e) {
             report($e);
