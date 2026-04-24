@@ -1,0 +1,15 @@
+{
+    "id": "chatwoot",
+    "name": "Chatwoot",
+    "author": "Boy132 (edited by Philip E)",
+    "version": "1.0.0",
+    "description": "Adds a Chatwoot widget to all panels",
+    "category": "plugin",
+    "url": "https://github.com/pelican-dev/plugins/tree/main/chatwoot",
+    "update_url": null,
+    "namespace": "Boy132\\Chatwoot",
+    "class": "ChatwootPlugin",
+    "panels": null,
+    "panel_version": null,
+    "composer_packages": null
+}
