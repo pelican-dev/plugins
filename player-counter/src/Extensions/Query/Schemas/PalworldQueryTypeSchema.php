@@ -65,8 +65,8 @@ class PalworldQueryTypeSchema implements ServerAwareQueryTypeSchemaInterface
             ];
         } catch (\Throwable $e) {
             report($e);
+
             return null;
         }
     }
 }
-
