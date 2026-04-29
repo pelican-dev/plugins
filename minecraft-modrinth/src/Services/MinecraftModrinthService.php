@@ -20,7 +20,7 @@ class MinecraftModrinthService
         return $version;
     }
 
-    /** @return ?array<int, array{icon: string, name: string, supported_project_types: string[], display_name: string}> */
+    /** @return array{icon: string, name: string, supported_project_types: string[], display_name: string}|null */
     public function getLoaderFromServer(Server $server): ?array
     {
         $server->loadMissing('egg');
@@ -43,7 +43,7 @@ class MinecraftModrinthService
             }
 
             if (in_array($loader['name'], $tags)) {
-                return array_merge($loader, ['display_name' => str($loader['name'])->title()]);
+                return array_merge($loader, ['display_name' => str($loader['name'])->title()->toString()]);
             }
         }
 

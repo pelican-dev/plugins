@@ -211,7 +211,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             ->badge(),
                         TextEntry::make('Loader')
                             ->state(fn () => MinecraftModrinth::getLoaderFromServer($server)['display_name'] ?? trans('minecraft-modrinth::strings.page.unknown'))
-                            ->icon(fn () => new HtmlString(MinecraftModrinth::getLoaderFromServer($server)['icon'] ?? null))
+                            ->icon(fn () => new HtmlString(MinecraftModrinth::getLoaderFromServer($server)['icon'] ?? ''))
                             ->badge(),
                         TextEntry::make('installed')
                             ->label(fn () => trans('minecraft-modrinth::strings.page.installed', ['type' => ModrinthProjectType::fromServer($server)->getLabel()]))
