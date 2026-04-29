@@ -117,7 +117,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                         $versions = array_slice(MinecraftModrinth::getProjectVersions($record['project_id'], $server), 0, 10);
                         foreach ($versions as $versionData) {
-                            $files = $versionData['files'] ?? [];
+                            $files = $versionData['files'];
                             $primaryFile = null;
 
                             foreach ($files as $fileData) {
