@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'latest_minecraft_version' => env('LATEST_MINECRAFT_VERSION', '1.21.11'),
+    'latest_minecraft_version' => env('LATEST_MINECRAFT_VERSION', '26.1.2'),
 ];
