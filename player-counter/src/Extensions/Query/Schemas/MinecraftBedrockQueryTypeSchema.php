@@ -2,6 +2,7 @@
 
 namespace Boy132\PlayerCounter\Extensions\Query\Schemas;
 
+use App\Models\Server;
 use Boy132\PlayerCounter\Extensions\Query\QueryTypeSchemaInterface;
 use Exception;
 use xPaw\MinecraftQuery;
@@ -19,7 +20,7 @@ class MinecraftBedrockQueryTypeSchema implements QueryTypeSchemaInterface
     }
 
     /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: ?array<array{id: string, name: string}>} */
-    public function process(string $ip, int $port): ?array
+    public function process(Server $server, string $ip, int $port): ?array
     {
         $query = new MinecraftQuery();
 

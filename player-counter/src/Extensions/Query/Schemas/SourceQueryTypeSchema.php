@@ -2,6 +2,7 @@
 
 namespace Boy132\PlayerCounter\Extensions\Query\Schemas;
 
+use App\Models\Server;
 use Boy132\PlayerCounter\Extensions\Query\QueryTypeSchemaInterface;
 use Exception;
 use xPaw\SourceQuery\SourceQuery;
@@ -19,7 +20,7 @@ class SourceQueryTypeSchema implements QueryTypeSchemaInterface
     }
 
     /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: array<array{id: string, name: string}>} */
-    public function process(string $ip, int $port): ?array
+    public function process(Server $server, string $ip, int $port): ?array
     {
         return $this->run($ip, $port, SourceQuery::SOURCE);
     }
