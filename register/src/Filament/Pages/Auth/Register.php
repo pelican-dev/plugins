@@ -47,7 +47,7 @@ class Register extends BaseRegister
         return $parent
             ->name('username')
             ->statePath('username')
-            ->label(__('profile.username'))
+            ->label(trans('profile.username'))
             ->unique($this->getUserModel(), 'username');
     }
 }
