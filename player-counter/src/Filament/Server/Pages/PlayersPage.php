@@ -87,6 +87,7 @@ class PlayersPage extends Page implements HasTable
 
         $whitelist = [];
         $ops = [];
+        $players = [];
 
         if ($isMinecraft) {
             $fileRepository = (new DaemonFileRepository())->setServer($server);
@@ -104,14 +105,19 @@ class PlayersPage extends Page implements HasTable
             } catch (Exception $exception) {
                 report($exception);
             }
+
+            try {
+                $players = json_decode($fileRepository->getContent('usercache.json'), true, 512, JSON_THROW_ON_ERROR);
+                $players = array_map(fn ($data) => ['id' => $data['uuid'],'name' => $data['name']], $players);
+            } catch (Exception $exception) {
+                report($exception);
+            }
         }
 
         return $table
-            ->records(function (?string $search, int $page, int $recordsPerPage) {
+            ->records(function (?string $search, int $page, int $recordsPerPage) use ($players) {
                 /** @var Server $server */
                 $server = Filament::getTenant();
-
-                $players = [];
 
                 /** @var ?GameQuery $gameQuery */
                 $gameQuery = $server->egg->gameQuery; // @phpstan-ignore property.notFound
@@ -120,7 +126,7 @@ class PlayersPage extends Page implements HasTable
                     $data = $gameQuery->runQuery($server);
 
                     if ($data) {
-                        $players = $data['players'] ?? [];
+                        $players = array_unique(array_merge($players, $data['players'] ?? []), SORT_REGULAR);
                     }
                 }
 
