@@ -93,7 +93,7 @@ class PlayersPage extends Page implements HasTable
 
             try {
                 $whitelist = json_decode($fileRepository->getContent('whitelist.json'), true, 512, JSON_THROW_ON_ERROR);
-                $whitelist = array_unique(array_map(fn ($data) => $data['name'], $whitelist));
+                $whitelist = array_unique(array_map(fn ($data) => $data['id'], $whitelist));
             } catch (Exception $exception) {
                 report($exception);
             }
