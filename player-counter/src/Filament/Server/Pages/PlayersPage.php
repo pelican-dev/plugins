@@ -93,7 +93,7 @@ class PlayersPage extends Page implements HasTable
 
             try {
                 $whitelist = json_decode($fileRepository->getContent('whitelist.json'), true, 512, JSON_THROW_ON_ERROR);
-                $whitelist = array_unique(array_map(fn ($data) => $data['id'], $whitelist));
+                $whitelist = array_unique(array_map(fn ($data) => $data['name'], $whitelist));
             } catch (Exception $exception) {
                 report($exception);
             }
@@ -140,7 +140,7 @@ class PlayersPage extends Page implements HasTable
                 Split::make([
                     ImageColumn::make('avatar')
                         ->visible(fn () => $isMinecraft)
-                        ->state(fn (array $record) => 'https://cravatar.eu/helmhead/' . $record['name'] . '/256.png')
+                        ->state(fn (array $record) => 'https://cravatar.eu/helmhead/' . $record['id'] . '/256.png')
                         ->grow(false),
                     TextColumn::make('name')
                         ->label('Name')
