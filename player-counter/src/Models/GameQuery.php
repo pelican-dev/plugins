@@ -59,9 +59,7 @@ class GameQuery extends Model
         /** @var QueryTypeService $service */
         $service = app(QueryTypeService::class);
 
-        $schema = $service->get($this->query_type);
-
-        return $schema?->process($server, $ip, $port);
+        return $service->get($this->query_type)?->process($ip, $port);
     }
 
     public static function canRunQuery(?Allocation $allocation): bool

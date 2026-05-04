@@ -4,6 +4,7 @@ namespace Boy132\PlayerCounter\Extensions\Query\Schemas;
 
 use App\Models\Server;
 use Boy132\PlayerCounter\Extensions\Query\QueryTypeSchemaInterface;
+use Exception;
 use Illuminate\Support\Facades\Http;
 
 class PalworldQueryTypeSchema implements QueryTypeSchemaInterface
@@ -55,8 +56,8 @@ class PalworldQueryTypeSchema implements QueryTypeSchemaInterface
                 'players' => $players,
             ];
 
-        } catch (\Throwable $e) {
-            report($e);
+        } catch (Exception $exception) {
+            report($exception);
 
             return null;
         }
