@@ -165,9 +165,9 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
     }
 
     /**
-     * @param  array<string, mixed>       $record
-     * @param  array<string, mixed>       $versionData
-     * @param  array<string, mixed>       $primaryFile
+     * @param  array<string, mixed>  $record
+     * @param  array<string, mixed>  $versionData
+     * @param  array<string, mixed>  $primaryFile
      * @param  array<string, mixed>|null  $installedMod
      *
      * @throws Exception
@@ -190,7 +190,10 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
         $folder = $type->getFolder();
 
-        $fileRepository->setServer($server)->pull($primaryFile['url'], $folder);
+        $fileRepository
+            ->setServer($server)
+            ->pull($primaryFile['url'], $folder)
+            ->throw();
 
         $saved = MinecraftModrinth::saveModMetadata(
             $server,
@@ -376,14 +379,11 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 $headerAction = Action::make('install_version_' . $versionIndex)
                                     ->label(trans('minecraft-modrinth::strings.actions.install'))
                                     ->icon('tabler-download')
+                                    ->visible($primaryFile !== null)
                                     ->action(function (DaemonFileRepository $fileRepository) use ($record, $versionData, $primaryFile) {
                                         try {
                                             /** @var Server $server */
                                             $server = Filament::getTenant();
-
-                                            if (!isset($versionData['id'], $versionData['version_number'], $versionData['files'])) {
-                                                throw new Exception('Invalid version data structure');
-                                            }
 
                                             if (!$primaryFile) {
                                                 throw new Exception('No downloadable file found');
@@ -460,10 +460,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             }
 
                             $latestVersion = $versions[0];
-
-                            if (!isset($latestVersion['id'], $latestVersion['version_number'], $latestVersion['files'])) {
-                                throw new Exception('Invalid version data structure');
-                            }
 
                             $primaryFile = $this->getPrimaryFile($latestVersion['files']);
 
@@ -546,10 +542,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             }
 
                             $latestVersion = $versions[0];
-
-                            if (!isset($latestVersion['id'], $latestVersion['version_number'], $latestVersion['files'])) {
-                                throw new Exception('Invalid version data structure');
-                            }
 
                             $primaryFile = $this->getPrimaryFile($latestVersion['files']);
 
