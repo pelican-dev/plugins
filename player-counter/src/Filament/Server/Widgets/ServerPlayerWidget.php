@@ -45,7 +45,7 @@ class ServerPlayerWidget extends StatsOverviewWidget
             return [];
         }
 
-        $data = $gameQuery->runQuery($server->allocation) ?? [];
+        $data = $gameQuery->runQuery($server) ?? [];
 
         return [
             SmallStatBlock::make(trans('player-counter::query.hostname'), $data['hostname'] ?? trans('player-counter::query.unknown')),

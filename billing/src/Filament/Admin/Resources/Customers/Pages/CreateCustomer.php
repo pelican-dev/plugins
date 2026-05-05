@@ -3,6 +3,7 @@
 namespace Boy132\Billing\Filament\Admin\Resources\Customers\Pages;
 
 use Boy132\Billing\Filament\Admin\Resources\Customers\CustomerResource;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCustomer extends CreateRecord
@@ -19,7 +20,10 @@ class CreateCustomer extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getCreateFormAction()->formId('form'),
+            $this->getCreateFormAction()->formId('form')
+                ->tooltip(fn (Action $action) => $action->getLabel())
+                ->hiddenLabel()
+                ->icon('tabler-plus'),
         ];
     }
 }

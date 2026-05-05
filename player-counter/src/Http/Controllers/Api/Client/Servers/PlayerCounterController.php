@@ -66,6 +66,6 @@ class PlayerCounterController extends ClientApiController
             abort(Response::HTTP_NOT_ACCEPTABLE, 'Server has no query');
         }
 
-        return $gameQuery->runQuery($server->allocation);
+        return $gameQuery->runQuery($server);
     }
 }

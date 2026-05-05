@@ -69,7 +69,6 @@ class PriceRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->label('Create Price')
                     ->createAnother(false),
             ])
             ->recordActions([

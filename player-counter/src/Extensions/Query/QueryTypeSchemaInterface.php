@@ -2,6 +2,8 @@
 
 namespace Boy132\PlayerCounter\Extensions\Query;
 
+use App\Models\Server;
+
 interface QueryTypeSchemaInterface
 {
     public function getId(): string;
@@ -9,5 +11,5 @@ interface QueryTypeSchemaInterface
     public function getName(): string;
 
     /** @return ?array{hostname: string, map: string, current_players: int, max_players: int, players: ?array<array{id: string, name: string}>} */
-    public function process(string $ip, int $port): ?array;
+    public function process(Server $server, string $ip, int $port): ?array;
 }

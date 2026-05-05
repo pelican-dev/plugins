@@ -15,11 +15,9 @@ class CreateTicket extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('create')
+            $this->getCreateFormAction()->formId('form')
+                ->tooltip(fn (Action $action) => $action->getLabel())
                 ->hiddenLabel()
-                ->action('create')
-                ->keyBindings(['mod+s'])
-                ->tooltip(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->icon('tabler-plus'),
         ];
     }

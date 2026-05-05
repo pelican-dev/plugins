@@ -8,6 +8,8 @@ use Boy132\Billing\Filament\Admin\Resources\Coupons\Pages\CreateCoupon;
 use Boy132\Billing\Filament\Admin\Resources\Coupons\Pages\EditCoupon;
 use Boy132\Billing\Filament\Admin\Resources\Coupons\Pages\ListCoupons;
 use Boy132\Billing\Models\Coupon;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -105,7 +107,11 @@ class CouponResource extends Resource
                 DeleteAction::make(),
             ])
             ->toolbarActions([
-                DeleteBulkAction::make(),
+                CreateAction::make()
+                    ->createAnother(false),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make('exclude_bulk_delete'),
+                ]),
             ])
             ->emptyStateHeading('No Coupons')
             ->emptyStateDescription('')

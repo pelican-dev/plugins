@@ -6,6 +6,7 @@ use Boy132\Billing\Filament\Admin\Resources\Products\Pages\CreateProduct;
 use Boy132\Billing\Filament\Admin\Resources\Products\Pages\EditProduct;
 use Boy132\Billing\Filament\Admin\Resources\Products\Pages\ListProducts;
 use Boy132\Billing\Models\Product;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -86,8 +87,10 @@ class ProductResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        TagsInput::make('ports'),
+                        TagsInput::make('ports')
+                            ->placeholder('New port or port range'),
                         TagsInput::make('tags')
+                            ->placeholder('New tag for deployment')
                             ->default(array_filter(explode(',', config('billing.deployment_tags', '')))),
                     ]),
                 Fieldset::make('Limits')
@@ -98,17 +101,20 @@ class ProductResource extends Resource
                             ->prefixIcon('tabler-network')
                             ->required()
                             ->numeric()
-                            ->minValue(0),
+                            ->minValue(0)
+                            ->default(0),
                         TextInput::make('database_limit')
                             ->prefixIcon('tabler-database')
                             ->required()
                             ->numeric()
-                            ->minValue(0),
+                            ->minValue(0)
+                            ->default(0),
                         TextInput::make('backup_limit')
                             ->prefixIcon('tabler-copy-check')
                             ->required()
                             ->numeric()
-                            ->minValue(0),
+                            ->minValue(0)
+                            ->default(0),
                     ]),
             ]);
     }
@@ -143,6 +149,10 @@ class ProductResource extends Resource
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                CreateAction::make()
+                    ->createAnother(false),
             ])
             ->emptyStateHeading('No Products')
             ->emptyStateDescription('')

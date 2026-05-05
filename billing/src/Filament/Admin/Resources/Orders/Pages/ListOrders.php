@@ -5,7 +5,6 @@ namespace Boy132\Billing\Filament\Admin\Resources\Orders\Pages;
 use Boy132\Billing\Enums\OrderStatus;
 use Boy132\Billing\Filament\Admin\Resources\Orders\OrderResource;
 use Boy132\Billing\Models\Order;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,15 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 class ListOrders extends ListRecords
 {
     protected static string $resource = OrderResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            CreateAction::make()
-                ->label('Create Order')
-                ->createAnother(false),
-        ];
-    }
 
     public function getDefaultActiveTab(): string
     {

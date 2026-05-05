@@ -79,17 +79,23 @@ class OrdersResource extends Resource
                     ->url(fn (Order $order) => Console::getUrl(panel: 'server', tenant: $order->server)),
                 Action::make('activate')
                     ->visible(fn (Order $order) => $order->status === OrderStatus::Pending)
+                    ->tooltip('Activate')
                     ->color('success')
+                    ->icon('tabler-check')
                     ->requiresConfirmation()
                     ->action(fn (Order $order) => redirect($order->getCheckoutSession()->url)),
                 Action::make('cancel')
                     ->visible(fn (Order $order) => $order->status === OrderStatus::Pending || $order->status === OrderStatus::Active)
+                    ->tooltip('Cancel')
                     ->color('danger')
+                    ->icon('tabler-x')
                     ->requiresConfirmation()
                     ->action(fn (Order $order) => $order->close()),
                 Action::make('renew')
                     ->visible(fn (Order $order) => $order->status === OrderStatus::Expired && $order->productPrice->renewable)
+                    ->tooltip('Renew')
                     ->color('warning')
+                    ->icon('tabler-refresh')
                     ->requiresConfirmation()
                     ->action(fn (Order $order) => redirect($order->getCheckoutSession()->url)),
             ])

@@ -112,7 +112,8 @@ class UserResourceLimits extends Model
         return true;
     }
 
-    public function createServer(string $name, int|Egg $egg, int $cpu, int $memory, int $disk): Server|bool
+    /** @param array<string, mixed> $variables */
+    public function createServer(string $name, int|Egg $egg, int $cpu, int $memory, int $disk, array $variables = []): Server|bool
     {
         if ($this->canCreateServer($cpu, $memory, $disk)) {
             if (!$egg instanceof Egg) {
@@ -121,7 +122,7 @@ class UserResourceLimits extends Model
 
             $environment = [];
             foreach ($egg->variables as $variable) {
-                $environment[$variable->env_variable] = $variable->default_value;
+                $environment[$variable->env_variable] = $variables[$variable->env_variable] ?? $variable->default_value;
             }
 
             $data = [

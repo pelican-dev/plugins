@@ -6,6 +6,7 @@ use Boy132\Subdomains\Filament\Admin\Resources\CloudflareDomains\Pages\ManageClo
 use Boy132\Subdomains\Models\CloudflareDomain;
 use Exception;
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -68,7 +69,7 @@ class CloudflareDomainResource extends Resource
             ])
             ->recordActions([
                 Action::make('sync')
-                    ->label(trans('subdomains::strings.sync'))
+                    ->tooltip(trans('subdomains::strings.sync'))
                     ->icon('tabler-refresh')
                     ->visible(fn (CloudflareDomain $domain) => is_null($domain->cloudflare_id))
                     ->action(function (CloudflareDomain $domain) {
@@ -89,6 +90,23 @@ class CloudflareDomainResource extends Resource
                         }
                     }),
                 DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                CreateAction::make()
+                    ->createAnother(false)
+                    //->hidden(fn () => is_null(config('subdomains.token')))
+                    ->using(function (array $data) {
+                        try {
+                            return CloudflareDomain::create($data);
+                        } catch (Exception $exception) {
+                            Notification::make()
+                                ->title(trans('subdomains::strings.notifications.not_synced'))
+                                ->body($exception->getMessage())
+                                ->warning()
+                                ->persistent()
+                                ->send();
+                        }
+                    }),
             ])
             ->emptyStateIcon('tabler-world-www')
             ->emptyStateDescription('')

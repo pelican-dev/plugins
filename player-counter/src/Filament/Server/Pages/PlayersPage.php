@@ -117,7 +117,7 @@ class PlayersPage extends Page implements HasTable
                 $gameQuery = $server->egg->gameQuery; // @phpstan-ignore property.notFound
 
                 if ($gameQuery) {
-                    $data = $gameQuery->runQuery($server->allocation);
+                    $data = $gameQuery->runQuery($server);
 
                     if ($data) {
                         $players = $data['players'] ?? [];
@@ -140,7 +140,7 @@ class PlayersPage extends Page implements HasTable
                 Split::make([
                     ImageColumn::make('avatar')
                         ->visible(fn () => $isMinecraft)
-                        ->state(fn (array $record) => 'https://cravatar.eu/helmhead/' . $record['name'] . '/256.png')
+                        ->state(fn (array $record) => 'https://cravatar.eu/helmhead/' . $record['id'] . '/256.png')
                         ->grow(false),
                     TextColumn::make('name')
                         ->label('Name')

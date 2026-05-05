@@ -15,18 +15,16 @@ class EditTicket extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            AnswerAction::make(),
-            AssignToMeAction::make(),
-            Action::make('save')
-                ->hiddenLabel()
-                ->action('save')
-                ->keyBindings(['mod+s'])
-                ->tooltip(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
-                ->icon('tabler-device-floppy'),
             $this->getCancelFormAction()->formId('form')
-                ->tooltip(trans('filament-panels::auth/pages/edit-profile.actions.cancel.label'))
+                ->tooltip(fn (Action $action) => $action->getLabel())
                 ->hiddenLabel()
                 ->icon('tabler-arrow-left'),
+            AnswerAction::make(),
+            AssignToMeAction::make(),
+            $this->getSaveFormAction()->formId('form')
+                ->tooltip(fn (Action $action) => $action->getLabel())
+                ->hiddenLabel()
+                ->icon('tabler-device-floppy'),
         ];
     }
 

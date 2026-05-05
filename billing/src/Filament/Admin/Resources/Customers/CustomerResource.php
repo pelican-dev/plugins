@@ -7,7 +7,10 @@ use Boy132\Billing\Filament\Admin\Resources\Customers\Pages\CreateCustomer;
 use Boy132\Billing\Filament\Admin\Resources\Customers\Pages\EditCustomer;
 use Boy132\Billing\Filament\Admin\Resources\Customers\Pages\ListCustomers;
 use Boy132\Billing\Models\Customer;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -47,7 +50,8 @@ class CustomerResource extends Resource
                     ->required()
                     ->suffix(config('billing.currency'))
                     ->numeric()
-                    ->minValue(0),
+                    ->minValue(0)
+                    ->default(0),
                 TextInput::make('first_name')
                     ->required(),
                 TextInput::make('last_name')
@@ -82,6 +86,13 @@ class CustomerResource extends Resource
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                CreateAction::make()
+                    ->createAnother(false),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make('exclude_bulk_delete'),
+                ]),
             ])
             ->emptyStateHeading('No Customers')
             ->emptyStateDescription('')

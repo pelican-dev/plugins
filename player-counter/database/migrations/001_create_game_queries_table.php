@@ -12,6 +12,7 @@ return new class extends Migration
             $table->increments('id');
             $table->string('query_type');
             $table->integer('query_port_offset')->nullable();
+            $table->string('query_port_variable')->nullable();
             $table->timestamps();
         });
     }

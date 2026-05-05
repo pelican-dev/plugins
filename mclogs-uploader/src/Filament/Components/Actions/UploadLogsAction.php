@@ -25,6 +25,12 @@ class UploadLogsAction extends Action
             /** @var Server $server */
             $server = Filament::getTenant();
 
+            if (config('mclogs-uploader.only_minecraft_eggs')) {
+                if (!in_array('minecraft', $server->egg->tags ?? [])) {
+                    return true;
+                }
+            }
+
             return $server->retrieveStatus()->isOffline();
         });
 

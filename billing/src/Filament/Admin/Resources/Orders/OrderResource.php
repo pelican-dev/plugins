@@ -13,6 +13,7 @@ use Boy132\Billing\Models\Order;
 use Boy132\Billing\Models\ProductPrice;
 use Exception;
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -102,7 +103,9 @@ class OrderResource extends Resource
             ->recordActions([
                 Action::make('activate')
                     ->visible(fn (Order $order) => $order->status !== OrderStatus::Active)
+                    ->tooltip('Activate')
                     ->color('success')
+                    ->icon('tabler-check')
                     ->requiresConfirmation()
                     ->action(function (Order $order) {
                         $order->activate(null);
@@ -115,7 +118,9 @@ class OrderResource extends Resource
                     }),
                 Action::make('create_server')
                     ->visible(fn (Order $order) => $order->status === OrderStatus::Active && !$order->server)
+                    ->tooltip('Create server')
                     ->color('primary')
+                    ->icon('tabler-brand-docker')
                     ->requiresConfirmation()
                     ->action(function (Order $order) {
                         try {
@@ -131,7 +136,9 @@ class OrderResource extends Resource
                     }),
                 Action::make('close')
                     ->visible(fn (Order $order) => $order->status === OrderStatus::Active)
+                    ->tooltip('Close')
                     ->color('danger')
+                    ->icon('tabler-x')
                     ->requiresConfirmation()
                     ->action(function (Order $order) {
                         $order->close();
@@ -142,6 +149,10 @@ class OrderResource extends Resource
                             ->success()
                             ->send();
                     }),
+            ])
+            ->toolbarActions([
+                CreateAction::make()
+                    ->createAnother(false),
             ])
             ->emptyStateHeading('No Orders')
             ->emptyStateDescription('')

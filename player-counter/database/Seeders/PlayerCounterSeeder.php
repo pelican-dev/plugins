@@ -15,61 +15,79 @@ class PlayerCounterSeeder extends Seeder
             'names' => 'Squad',
             'query_type' => 'source',
             'query_port_offset' => 19378,
+            'query_port_variable' => null,
         ],
         [
             'names' => 'Barotrauma',
             'query_type' => 'source',
             'query_port_offset' => 1,
+            'query_port_variable' => null,
         ],
         [
             'names' => 'Valheim',
             'query_type' => 'source',
             'query_port_offset' => 1,
+            'query_port_variable' => null,
         ],
         [
             'names' => ['V Rising', 'V-Rising', 'VRising'],
             'query_type' => 'source',
             'query_port_offset' => 1,
+            'query_port_variable' => null,
         ],
         [
             'names' => ['The Forrest', 'TheForrest'],
             'query_type' => 'source',
             'query_port_offset' => 1,
+            'query_port_variable' => null,
         ],
         [
             'names' => ['Arma 3', 'Arma3'],
             'query_type' => 'source',
             'query_port_offset' => 1,
+            'query_port_variable' => null,
+        ],
+        [
+            'names' => ['Arma Reforger', 'ArmaReforger'],
+            'query_type' => 'source',
+            'query_port_offset' => 15776,
+            'query_port_variable' => null,
         ],
         [
             'names' => ['ARK: Survival Evolved', 'ARK: SurvivalEvolved', 'ARK Survival Evolved', 'ARK SurvivalEvolved', 'ARKSurvivalEvolved'],
             'query_type' => 'source',
             'query_port_offset' => 19238,
+            'query_port_variable' => null,
         ],
         [
             'names' => 'Unturned',
             'query_type' => 'source',
             'query_port_offset' => 1,
+            'query_port_variable' => null,
         ],
         [
             'names' => ['Insurgency: Sandstorm', 'Insurgency Sandstorm', 'InsurgencySandstorm'],
             'query_type' => 'source',
             'query_port_offset' => 29,
+            'query_port_variable' => null,
         ],
         [
             'tag' => 'bedrock',
             'query_type' => 'minecraft_bedrock',
             'query_port_offset' => null,
+            'query_port_variable' => null,
         ],
         [
             'tag' => 'minecraft',
             'query_type' => 'minecraft_java',
             'query_port_offset' => null,
+            'query_port_variable' => null,
         ],
         [
             'tag' => 'source',
             'query_type' => 'source',
             'query_port_offset' => null,
+            'query_port_variable' => null,
         ],
     ];
 
@@ -84,6 +102,7 @@ class PlayerCounterSeeder extends Seeder
                         $query = GameQuery::firstOrCreate([
                             'query_type' => $mapping['query_type'],
                             'query_port_offset' => $mapping['query_port_offset'],
+                            'query_port_variable' => $mapping['query_port_variable'],
                         ]);
 
                         EggGameQuery::firstOrCreate([
