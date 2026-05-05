@@ -4,7 +4,6 @@ namespace Boy132\MinecraftModrinth\Services;
 
 use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
-use Boy132\MinecraftModrinth\Enums\MinecraftLoader;
 use Boy132\MinecraftModrinth\Enums\ModrinthProjectType;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -23,11 +22,60 @@ class MinecraftModrinthService
         return $version;
     }
 
+    /** @return array{icon: string, name: string, supported_project_types: string[], display_name: string}|null */
+    public function getLoaderFromServer(Server $server): ?array
+    {
+        $server->loadMissing('egg');
+
+        $tags = $server->egg->tags ?? [];
+
+        if (!in_array('minecraft', $tags)) {
+            return null;
+        }
+
+        $projectType = ModrinthProjectType::fromServer($server)?->value;
+        if (!$projectType) {
+            return null;
+        }
+
+        $loaders = $this->getLoaders();
+        foreach ($loaders as $loader) {
+            if (!in_array($projectType, $loader['supported_project_types'])) {
+                continue;
+            }
+
+            if (in_array($loader['name'], $tags)) {
+                return array_merge($loader, ['display_name' => str($loader['name'])->title()->toString()]);
+            }
+        }
+
+        return null;
+    }
+
+    /** @return array<int, array{icon: string, name: string, supported_project_types: string[]}> */
+    public function getLoaders(): array
+    {
+        return cache()->remember('modrinth_loaders', now()->addHour(), function () {
+            try {
+                return Http::asJson()
+                    ->timeout(5)
+                    ->connectTimeout(5)
+                    ->throw()
+                    ->get('https://api.modrinth.com/v2/tag/loader')
+                    ->json();
+            } catch (Exception $exception) {
+                report($exception);
+
+                return [];
+            }
+        });
+    }
+
     /** @return array{hits: array<int, array<string, mixed>>, total_hits: int} */
-    public function getModrinthProjects(Server $server, int $page = 1, ?string $search = null): array
+    public function getProjects(Server $server, int $page = 1, ?string $search = null): array
     {
         $projectType = ModrinthProjectType::fromServer($server)?->value;
-        $minecraftLoader = MinecraftLoader::fromServer($server)?->value;
+        $minecraftLoader = $this->getLoaderFromServer($server);
 
         if (!$projectType || !$minecraftLoader) {
             return [
@@ -37,6 +85,7 @@ class MinecraftModrinthService
         }
 
         $minecraftVersion = $this->getMinecraftVersion($server);
+        $minecraftLoader = $minecraftLoader['name'];
 
         $data = [
             'offset' => ($page - 1) * 20,
@@ -122,15 +171,16 @@ class MinecraftModrinthService
             }
         }
 
+        $installedModsById = [];
+        foreach ($installedMods as $mod) {
+            if (!isset($installedModsById[$mod['project_id']])) {
+                $installedModsById[$mod['project_id']] = $mod;
+            }
+        }
+
         $results = [];
         foreach ($pageIds as $projectId) {
-            $installedMod = null;
-            foreach ($installedMods as $mod) {
-                if ($mod['project_id'] === $projectId) {
-                    $installedMod = $mod;
-                    break;
-                }
-            }
+            $installedMod = $installedModsById[$projectId] ?? null;
 
             if (!$installedMod) {
                 continue;
@@ -165,16 +215,17 @@ class MinecraftModrinthService
         return $results;
     }
 
-    /** @return array<int, mixed> */
-    public function getModrinthVersions(string $projectId, Server $server): array
+    /** @return array<array{name: string, version_number: string, changelog: ?string, dependencies: array<mixed>, game_version: string[], version_type: string, loaders: string[], featured: bool, status: string, requested_status: ?string, id: string, project_id: string, author_id: string, date_published: string, downloads: int, changelog_url: ?string, files: array<mixed>}> */
+    public function getProjectVersions(string $projectId, Server $server): array
     {
-        $minecraftLoader = MinecraftLoader::fromServer($server)?->value;
+        $minecraftLoader = $this->getLoaderFromServer($server);
 
         if (!$minecraftLoader) {
             return [];
         }
 
         $minecraftVersion = $this->getMinecraftVersion($server);
+        $minecraftLoader = $minecraftLoader['name'];
 
         $data = [
             'game_versions' => "[\"$minecraftVersion\"]",

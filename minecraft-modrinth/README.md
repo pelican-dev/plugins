@@ -5,7 +5,7 @@ Easily download, update, and manage Minecraft mods and plugins directly from Mod
 ## Setup
 
 Add `modrinth_mods` or `modrinth_plugins` to the _features_ of your egg to enable the mod/plugins page.
-Also make sure your egg has the `minecraft` _tag_ and a _tag_ for the [mod loader](https://github.com/pelican-dev/plugins/blob/main/minecraft-modrinth/src/Enums/MinecraftLoader.php#L10-L16). (e.g. `paper` or `neoforge`)
+Also make sure your egg has the `minecraft` _tag_ and a tag matching a Modrinth loader name. (e.g. `paper` or `neoforge`)
 
 ## Features
 

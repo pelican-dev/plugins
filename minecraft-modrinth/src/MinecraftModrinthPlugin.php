@@ -33,7 +33,7 @@ class MinecraftModrinthPlugin implements HasPluginSettings, Plugin
             TextInput::make('latest_minecraft_version')
                 ->label(trans('minecraft-modrinth::strings.settings.latest_minecraft_version'))
                 ->required()
-                ->default(fn () => config('minecraft-modrinth.latest_minecraft_version', '1.21.11')),
+                ->default(fn () => config('minecraft-modrinth.latest_minecraft_version', '26.1.2')),
         ];
     }
 

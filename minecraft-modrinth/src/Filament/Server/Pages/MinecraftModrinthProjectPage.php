@@ -6,7 +6,6 @@ use App\Filament\Server\Resources\Files\Pages\ListFiles;
 use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
 use App\Traits\Filament\BlockAccessInConflict;
-use Boy132\MinecraftModrinth\Enums\MinecraftLoader;
 use Boy132\MinecraftModrinth\Enums\ModrinthProjectType;
 use Boy132\MinecraftModrinth\Facades\MinecraftModrinth;
 use Exception;
@@ -30,6 +29,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\HtmlString;
 
 class MinecraftModrinthProjectPage extends Page implements HasTable
 {
@@ -96,7 +96,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         ];
     }
 
-    /** @return array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string}> */
+    /** @return array<int, array{project_id: string, project_slug: string, project_title: string, version_id: string, version_number: string, filename: string, installed_at: string, author?: string}> */
     protected function getInstalledModsMetadata(): array
     {
         if ($this->installedModsMetadata === null) {
@@ -131,7 +131,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         if (!isset($this->versionsCache[$projectId])) {
             /** @var Server $server */
             $server = Filament::getTenant();
-            $this->versionsCache[$projectId] = MinecraftModrinth::getModrinthVersions($projectId, $server);
+            $this->versionsCache[$projectId] = MinecraftModrinth::getProjectVersions($projectId, $server);
         }
 
         return $this->versionsCache[$projectId];
@@ -165,10 +165,10 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
     }
 
     /**
-     * @param array<string, mixed> $record
-     * @param array<string, mixed> $versionData
-     * @param array<string, mixed> $primaryFile
-     * @param array<string, mixed>|null $installedMod
+     * @param  array<string, mixed>       $record
+     * @param  array<string, mixed>       $versionData
+     * @param  array<string, mixed>       $primaryFile
+     * @param  array<string, mixed>|null  $installedMod
      *
      * @throws Exception
      */
@@ -205,15 +205,17 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         );
 
         if (!$saved) {
-            try {
-                Http::daemon($server->node)
-                    ->post("/api/servers/{$server->uuid}/files/delete", [
-                        'root' => '/',
-                        'files' => [$folder . '/' . $safeNewFilename],
-                    ])
-                    ->throw();
-            } catch (Exception $rollbackException) {
-                report($rollbackException);
+            if (!$oldFilename || $oldFilename !== $safeNewFilename) {
+                try {
+                    Http::daemon($server->node)
+                        ->post("/api/servers/{$server->uuid}/files/delete", [
+                            'root' => '/',
+                            'files' => [$folder . '/' . $safeNewFilename],
+                        ])
+                        ->throw();
+                } catch (Exception $rollbackException) {
+                    report($rollbackException);
+                }
             }
 
             throw new Exception('Failed to save mod metadata');
@@ -285,7 +287,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                     return new LengthAwarePaginator($projects, $totalCount, 20, $page);
                 } else {
-                    $response = MinecraftModrinth::getModrinthProjects($server, $page, $search);
+                    $response = MinecraftModrinth::getProjects($server, $page, $search);
 
                     return new LengthAwarePaginator($response['hits'], $response['total_hits'], 20, $page);
                 }
@@ -451,7 +453,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             /** @var Server $server */
                             $server = Filament::getTenant();
 
-                            $versions = MinecraftModrinth::getModrinthVersions($record['project_id'], $server);
+                            $versions = MinecraftModrinth::getProjectVersions($record['project_id'], $server);
 
                             if (empty($versions)) {
                                 throw new Exception('No compatible versions found');
@@ -537,7 +539,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('Mod not found in metadata');
                             }
 
-                            $versions = MinecraftModrinth::getModrinthVersions($record['project_id'], $server);
+                            $versions = MinecraftModrinth::getProjectVersions($record['project_id'], $server);
 
                             if (empty($versions)) {
                                 throw new Exception('No compatible versions found');
@@ -725,7 +727,8 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             ->state(fn () => MinecraftModrinth::getMinecraftVersion($server) ?? trans('minecraft-modrinth::strings.page.unknown'))
                             ->badge(),
                         TextEntry::make('Loader')
-                            ->state(fn () => MinecraftLoader::fromServer($server)?->getLabel() ?? trans('minecraft-modrinth::strings.page.unknown'))
+                            ->state(fn () => MinecraftModrinth::getLoaderFromServer($server)['display_name'] ?? trans('minecraft-modrinth::strings.page.unknown'))
+                            ->icon(fn () => new HtmlString(MinecraftModrinth::getLoaderFromServer($server)['icon'] ?? ''))
                             ->badge(),
                         TextEntry::make('installed')
                             ->label(fn () => trans('minecraft-modrinth::strings.page.installed', ['type' => $type?->getLabel() ?? 'Modrinth']))
