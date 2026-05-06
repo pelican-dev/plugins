@@ -3,7 +3,6 @@
 namespace Boy132\MinecraftModrinth\Facades;
 
 use App\Models\Server;
-use App\Repositories\Daemon\DaemonFileRepository;
 use Boy132\MinecraftModrinth\Services\MinecraftModrinthService;
 use Illuminate\Support\Facades\Facade;
 
@@ -17,12 +16,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static array{hits: array<int, array<string, mixed>>, total_hits: int} getProjects(Server $server, int $page = 1, ?string $search = null)
  * @method static array<int, array<string, mixed>> getInstalledModsFromModrinth(array<int, InstalledModMetadata> $installedMods, int $page = 1)
  * @method static array<int, ModrinthVersion> getProjectVersions(string $projectId, Server $server)
- * @method static array<int, InstalledModMetadata> getInstalledModsMetadata(Server $server, DaemonFileRepository $fileRepository)
- * @method static bool saveModMetadata(Server $server, DaemonFileRepository $fileRepository, string $projectId, string $projectSlug, string $projectTitle, string $versionId, string $versionNumber, string $filename, ?string $author = null)
- * @method static bool removeModMetadata(Server $server, DaemonFileRepository $fileRepository, string $projectId)
- * @method static InstalledModMetadata|null getInstalledMod(Server $server, DaemonFileRepository $fileRepository, string $projectId)
+ * @method static array<int, InstalledModMetadata> getInstalledModsMetadata(Server $server)
+ * @method static bool saveModMetadata(Server $server, string $projectId, string $projectSlug, string $projectTitle, string $versionId, string $versionNumber, string $filename, ?string $author = null)
+ * @method static bool removeModMetadata(Server $server, string $projectId)
+ * @method static InstalledModMetadata|null getInstalledMod(Server $server, string $projectId)
  * @method static bool isUpdateAvailable(array{version_id: string, version_number: string} $installedMod, array<int, array{id: string, version_number: string}> $availableVersions)
- * @method static array<string> getInstalledMods(Server $server, DaemonFileRepository $fileRepository)
+ * @method static array<string> getInstalledMods(Server $server)
  *
  * @see MinecraftModrinthService
  */

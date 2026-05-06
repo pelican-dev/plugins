@@ -1,7 +1,7 @@
 {
     "id": "minecraft-modrinth",
     "name": "Minecraft Modrinth",
-    "author": "Boy132",
+    "author": "Boy132 & H1ghSyst3m",
     "version": "1.0.0",
     "description": "Easily download, update, and manage minecraft mods & plugins from modrinth",
     "category": "plugin",

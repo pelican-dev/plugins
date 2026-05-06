@@ -102,10 +102,8 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         if ($this->installedModsMetadata === null) {
             /** @var Server $server */
             $server = Filament::getTenant();
-            /** @var DaemonFileRepository $fileRepository */
-            $fileRepository = app(DaemonFileRepository::class);
 
-            $this->installedModsMetadata = MinecraftModrinth::getInstalledModsMetadata($server, $fileRepository);
+            $this->installedModsMetadata = MinecraftModrinth::getInstalledModsMetadata($server);
         }
 
         return $this->installedModsMetadata;
@@ -174,12 +172,13 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
      */
     private function performInstallOrUpdate(
         Server $server,
-        DaemonFileRepository $fileRepository,
         array $record,
         array $versionData,
         array $primaryFile,
         ?array $installedMod = null
     ): void {
+        $fileRepository = app(DaemonFileRepository::class);
+
         $safeNewFilename = $this->validateFilename($primaryFile['filename']);
         $oldFilename = $installedMod ? $this->validateFilename($installedMod['filename']) : null;
 
@@ -197,7 +196,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
         $saved = MinecraftModrinth::saveModMetadata(
             $server,
-            $fileRepository,
             $record['project_id'],
             $record['slug'],
             $record['title'],
@@ -246,7 +244,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                 if ($installedMod && !MinecraftModrinth::saveModMetadata(
                     $server,
-                    $fileRepository,
                     $record['project_id'],
                     $installedMod['project_slug'],
                     $installedMod['project_title'],
@@ -286,9 +283,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                     $projects = MinecraftModrinth::getInstalledModsFromModrinth($installedMods, $page);
 
-                    $totalCount = count($installedMods);
-
-                    return new LengthAwarePaginator($projects, $totalCount, 20, $page);
+                    return new LengthAwarePaginator($projects, count($installedMods), 20, $page);
                 } else {
                     $response = MinecraftModrinth::getProjects($server, $page, $search);
 
@@ -328,6 +323,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                     ->icon('tabler-list')
                     ->color('info')
                     ->tooltip(trans('minecraft-modrinth::strings.actions.versions'))
+                    ->visible(fn (array $record) => empty($record['unavailable']))
                     ->modalSubmitAction(false)
                     ->schema(function (array $record) {
                         $versions = $this->getCachedVersions($record['project_id']);
@@ -380,7 +376,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                     ->label(trans('minecraft-modrinth::strings.actions.install'))
                                     ->icon('tabler-download')
                                     ->visible($primaryFile !== null)
-                                    ->action(function (DaemonFileRepository $fileRepository) use ($record, $versionData, $primaryFile) {
+                                    ->action(function () use ($record, $versionData, $primaryFile) {
                                         try {
                                             /** @var Server $server */
                                             $server = Filament::getTenant();
@@ -391,7 +387,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                                             $installedMod = $this->getInstalledMod($record['project_id']);
 
-                                            $this->performInstallOrUpdate($server, $fileRepository, $record, $versionData, $primaryFile, $installedMod);
+                                            $this->performInstallOrUpdate($server, $record, $versionData, $primaryFile, $installedMod);
 
                                             $this->installedModsMetadata = null;
                                             $this->versionsCache = [];
@@ -448,7 +444,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                         return is_null($installedMod);
                     })
-                    ->action(function (array $record, DaemonFileRepository $fileRepository) {
+                    ->action(function (array $record) {
                         try {
                             /** @var Server $server */
                             $server = Filament::getTenant();
@@ -467,7 +463,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('No downloadable file found');
                             }
 
-                            $this->performInstallOrUpdate($server, $fileRepository, $record, $latestVersion, $primaryFile);
+                            $this->performInstallOrUpdate($server, $record, $latestVersion, $primaryFile);
 
                             $this->installedModsMetadata = null;
                             $this->versionsCache = [];
@@ -524,7 +520,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             'new_version' => $versions[0]['version_number'] ?? 'unknown',
                         ]);
                     })
-                    ->action(function (array $record, DaemonFileRepository $fileRepository) {
+                    ->action(function (array $record) {
                         try {
                             /** @var Server $server */
                             $server = Filament::getTenant();
@@ -549,7 +545,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 throw new Exception('No downloadable file found');
                             }
 
-                            $this->performInstallOrUpdate($server, $fileRepository, $record, $latestVersion, $primaryFile, $installedMod);
+                            $this->performInstallOrUpdate($server, $record, $latestVersion, $primaryFile, $installedMod);
 
                             $this->installedModsMetadata = null;
                             $this->versionsCache = [];
@@ -606,7 +602,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                     ->requiresConfirmation()
                     ->modalHeading(fn (array $record) => trans('minecraft-modrinth::strings.modals.uninstall_heading'))
                     ->modalDescription(fn (array $record) => trans('minecraft-modrinth::strings.modals.uninstall_description', ['name' => $record['title']]))
-                    ->action(function (array $record, DaemonFileRepository $fileRepository) {
+                    ->action(function (array $record) {
                         try {
                             /** @var Server $server */
                             $server = Filament::getTenant();
@@ -633,7 +629,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 ])
                                 ->throw();
 
-                            $metadataRemoved = MinecraftModrinth::removeModMetadata($server, $fileRepository, $record['project_id']);
+                            $metadataRemoved = MinecraftModrinth::removeModMetadata($server, $record['project_id']);
 
                             if (!$metadataRemoved) {
                                 Log::warning('Failed to remove mod metadata after successful file deletion', [
