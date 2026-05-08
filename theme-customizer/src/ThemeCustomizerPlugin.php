@@ -5,9 +5,11 @@ namespace Boy132\ThemeCustomizer;
 use App\Contracts\Plugins\HasPluginSettings;
 use App\Traits\EnvironmentWriterTrait;
 use Filament\Contracts\Plugin;
+use Filament\Enums\ThemeMode;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Panel;
@@ -62,6 +64,11 @@ class ThemeCustomizerPlugin implements HasPluginSettings, Plugin
         }
 
         $panel->colors($colors);
+
+        $defaultThemeMode = config('theme-customizer.default_theme_mode');
+        if ($defaultThemeMode) {
+            $panel->defaultThemeMode(ThemeMode::from($defaultThemeMode) ?? ThemeMode::System);
+        }
     }
 
     public function boot(Panel $panel): void {}
@@ -135,6 +142,13 @@ class ThemeCustomizerPlugin implements HasPluginSettings, Plugin
                 ->color(fn (Get $get) => $get($color) ? Color::rgb($get($color)) : $defaultColor);
         }
 
+        $schema[] = ToggleButtons::make('default_theme_mode')
+            ->label('Default Theme Mode')
+            ->inline()
+            ->options(ThemeMode::class)
+            ->default(fn () => config('theme-customizer.default_theme_mode') ?? ThemeMode::System)
+            ->columnSpanFull();
+
         return [
             Group::make($schema)
                 ->columns(),
@@ -143,7 +157,17 @@ class ThemeCustomizerPlugin implements HasPluginSettings, Plugin
 
     public function saveSettings(array $data): void
     {
-        $data = array_filter(Arr::mapWithKeys($data, fn ($value, $key) => $key === 'font' ? [$key => $value] : ['THEME_CUSTOMIZER_COLORS_' . strtoupper($key) => $value]));
+        $data = Arr::mapWithKeys($data, function ($value, $key) {
+            if ($key === 'font') {
+                return ['THEME_CUSTOMIZER_FONT' => $value];
+            }
+
+            if ($key === 'default_theme_mode') {
+                return ['THEME_CUSTOMIZER_DEFAULT_THEME_MODE' => $value->value];
+            }
+
+            return ['THEME_CUSTOMIZER_COLORS_' . strtoupper($key) => $value];
+        });
         $this->writeToEnvironment($data);
 
         Notification::make()
