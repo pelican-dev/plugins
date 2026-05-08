@@ -1,15 +1,20 @@
-# Minecraft Modrinth (by Boy132)
+# Minecraft Modrinth (by Boy132  & H1ghSyst3m)
 
-Easily download and install Minecraft mods and plugins directly from Modrinth within the server panel.
+Easily download, update, and manage Minecraft mods and plugins directly from Modrinth within the server panel.
 
 ## Setup
 
-Add `modrinth_mods` or `modrinth_plugins` to the _features_ of your egg to enable the mod/plugins page.  
-Also make sure your egg has the `minecraft` _tag_ and a _tag_ for the [mod loader](https://github.com/pelican-dev/plugins/blob/main/minecraft-modrinth/src/Enums/MinecraftLoader.php#L10-L16). (e.g. `paper` or `neoforge`)
+Add `modrinth_mods` or `modrinth_plugins` to the _features_ of your egg to enable the mod/plugins page.
+Also make sure your egg has the `minecraft` _tag_ and a tag matching a Modrinth loader name. (e.g. `paper` or `neoforge`)
 
 ## Features
 
-- Browse and search Modrinth's extensive mod library
-- Download mods and plugins directly to your server
-- Automatic version compatibility checking
-- Seamless installation to the correct server directory
+- **Browse and Search**: Access Modrinth's extensive mod library with search and pagination
+- **Smart Installation**: One-click install with automatic latest version selection
+- **Status Tracking**: See which mods are installed directly in the Modrinth list
+- **Update Detection**: Automatic detection of available updates with one-click upgrade
+- **Easy Uninstall**: Remove mods/plugins with confirmation and automatic file cleanup
+- **Metadata Management**: Tracks installed versions, filenames, and installation dates
+- **Version Compatibility**: Automatic filtering by Minecraft version and mod loader
+- **Seamless Installation**: Downloads to the correct server directory (mods/ or plugins/)
+- **Multilingual**: Supports English and German translations
