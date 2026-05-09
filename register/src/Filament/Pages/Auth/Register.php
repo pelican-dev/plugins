@@ -9,6 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as SchemaFacade;
 use Illuminate\Validation\ValidationException;
 
@@ -67,13 +68,15 @@ class Register extends BaseRegister
      */
     protected function handleRegistration(array $data): Model
     {
-        $this->throwIfRegistrationLimitReached();
+        return DB::transaction(function () use ($data): Model {
+            $this->throwIfRegistrationLimitReached(true);
 
-        $user = parent::handleRegistration($data);
+            $user = parent::handleRegistration($data);
 
-        $this->createDefaultUserResourceLimits($user);
+            $this->createDefaultUserResourceLimits($user);
 
-        return $user;
+            return $user;
+        });
     }
 
     private function abortIfRegistrationLimitReached(): void
@@ -85,11 +88,17 @@ class Register extends BaseRegister
         }
     }
 
-    private function throwIfRegistrationLimitReached(): void
+    private function throwIfRegistrationLimitReached(bool $lockForUpdate = false): void
     {
         $maxUsers = (int) config('register.max_users', 0);
 
-        if ($maxUsers > 0 && $this->getUserModel()::query()->count() >= $maxUsers) {
+        $query = $this->getUserModel()::query();
+
+        if ($lockForUpdate) {
+            $query->lockForUpdate();
+        }
+
+        if ($maxUsers > 0 && $query->count() >= $maxUsers) {
             throw ValidationException::withMessages([
                 'email' => trans('register::messages.registration_closed'),
             ]);

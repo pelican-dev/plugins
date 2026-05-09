@@ -9,6 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Panel;
 use Filament\Schemas\Components\Section;
+use Illuminate\Support\Facades\Artisan;
 use Throwable;
 
 class RegisterPlugin implements HasPluginSettings, Plugin
@@ -99,11 +100,11 @@ class RegisterPlugin implements HasPluginSettings, Plugin
         $configPath = plugin_path($this->getId(), 'config/register.php');
 
         $config = [
-            'max_users' => (int) ($data['max_users'] ?? 0),
-            'default_cpu' => (int) ($data['default_cpu'] ?? 0),
-            'default_memory' => (int) ($data['default_memory'] ?? 0),
-            'default_disk' => (int) ($data['default_disk'] ?? 0),
-            'default_server_limit' => (int) ($data['default_server_limit'] ?? 0),
+            'max_users' => max(0, (int) ($data['max_users'] ?? 0)),
+            'default_cpu' => max(0, (int) ($data['default_cpu'] ?? 0)),
+            'default_memory' => max(0, (int) ($data['default_memory'] ?? 0)),
+            'default_disk' => max(0, (int) ($data['default_disk'] ?? 0)),
+            'default_server_limit' => max(0, (int) ($data['default_server_limit'] ?? 0)),
         ];
 
         $content = <<<'PHP'
@@ -117,6 +118,14 @@ PHP;
 
         if (file_put_contents($configPath, $content, LOCK_EX) === false) {
             throw new \RuntimeException('Failed writing register config file.');
+        }
+
+        foreach ($config as $key => $value) {
+            config()->set("register.{$key}", $value);
+        }
+
+        if (app()->configurationIsCached()) {
+            Artisan::call('config:clear');
         }
     }
 }
