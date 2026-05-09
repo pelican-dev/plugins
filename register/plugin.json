@@ -1,8 +1,8 @@
 {
     "id": "register",
     "name": "Register",
-    "author": "Boy132",
-    "version": "1.0.0",
+    "author": "Boy132 (& TheOriginalCER06)",
+    "version": "1.0.1",
     "description": "A simple way for users to register themselves",
     "category": "plugin",
     "url": "https://github.com/pelican-dev/plugins/tree/main/register",
