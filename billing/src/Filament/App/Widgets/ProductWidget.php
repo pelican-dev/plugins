@@ -16,6 +16,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\IconSize;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
@@ -70,6 +71,8 @@ class ProductWidget extends Widget implements HasActions, HasSchemas
                 Section::make()
                     ->heading($this->product->getLabel())
                     ->description($this->product->description)
+                    ->icon(fn (Product $product) => $product->egg->icon)
+                    ->iconSize(IconSize::TwoExtraLarge)
                     ->columns(6)
                     ->schema([
                         TextEntry::make('cpu')
