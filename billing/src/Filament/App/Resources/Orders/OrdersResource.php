@@ -75,6 +75,7 @@ class OrdersResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
+                    ->tooltip('View server')
                     ->hidden(fn (Order $order) => !$order->server)
                     ->url(fn (Order $order) => Console::getUrl(panel: 'server', tenant: $order->server)),
                 Action::make('activate')
