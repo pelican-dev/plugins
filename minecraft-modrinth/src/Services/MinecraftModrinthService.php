@@ -38,7 +38,7 @@ class MinecraftModrinthService
             } catch (Exception $exception) {
                 report($exception);
 
-                return [];
+                return null;
             }
         });
     }
