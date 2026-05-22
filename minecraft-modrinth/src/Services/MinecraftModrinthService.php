@@ -16,10 +16,30 @@ class MinecraftModrinthService
         $version = $server->variables()->where(fn ($builder) => $builder->where('env_variable', 'MINECRAFT_VERSION')->orWhere('env_variable', 'MC_VERSION'))->first()?->server_value;
 
         if (!$version || $version === 'latest') {
-            return config('minecraft-modrinth.latest_minecraft_version');
+            return $this->getLatestMinecraftVersion();
         }
 
         return $version;
+    }
+
+    public function getLatestMinecraftVersion(): ?string
+    {
+        return cache()->remember('modrinth:latest_minecraft_version', now()->addHour(), function () {
+            try {
+                $versions = Http::asJson()
+                    ->timeout(5)
+                    ->connectTimeout(5)
+                    ->throw()
+                    ->get('https://api.modrinth.com/v2/tag/game_version')
+                    ->json();
+
+                return collect($versions)->filter(fn ($version) => $version['version_type'] === 'release')->first()['version'] ?? null;
+            } catch (Exception $exception) {
+                report($exception);
+
+                return [];
+            }
+        });
     }
 
     /** @return array{icon: string, name: string, supported_project_types: string[], display_name: string}|null */
@@ -55,7 +75,7 @@ class MinecraftModrinthService
     /** @return array<int, array{icon: string, name: string, supported_project_types: string[]}> */
     public function getLoaders(): array
     {
-        return cache()->remember('modrinth_loaders', now()->addHour(), function () {
+        return cache()->remember('modrinth:loaders', now()->addHour(), function () {
             try {
                 return Http::asJson()
                     ->timeout(5)
