@@ -26,6 +26,7 @@ class MinecraftModrinthService
     {
         return cache()->remember('modrinth:latest_minecraft_version', now()->addHour(), function () {
             try {
+                /** @var array<int, mixed> $versions */
                 $versions = Http::asJson()
                     ->timeout(5)
                     ->connectTimeout(5)
