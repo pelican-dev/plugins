@@ -43,8 +43,8 @@ class GameQuery extends Model
             return null;
         }
 
-        $ip = config('player-counter.use_alias') && is_ip($server->allocation->alias) ? $server->allocation->alias : $server->allocation->ip;
-        $ip = is_ipv6($ip) ? '[' . $ip . ']' : $ip;
+        $host = static::getQueryHost($server->allocation);
+        $host = is_ipv6($host) ? '[' . $host . ']' : $host;
 
         $port = $server->allocation->port + ($this->query_port_offset ?? 0);
 
@@ -59,7 +59,7 @@ class GameQuery extends Model
         /** @var QueryTypeService $service */
         $service = app(QueryTypeService::class);
 
-        return $service->get($this->query_type)?->process($server, $ip, $port);
+        return $service->get($this->query_type)?->process($server, $host, $port);
     }
 
     public static function canRunQuery(?Allocation $allocation): bool
@@ -68,8 +68,19 @@ class GameQuery extends Model
             return false;
         }
 
-        $ip = config('player-counter.use_alias') && is_ip($allocation->alias) ? $allocation->alias : $allocation->ip;
+        $host = static::getQueryHost($allocation);
 
-        return !in_array($ip, ['0.0.0.0', '::']);
+        return !blank($host) && !in_array($host, ['0.0.0.0', '::'], true);
+    }
+
+    protected static function getQueryHost(Allocation $allocation): string
+    {
+        $alias = trim((string) $allocation->alias);
+
+        if (config('player-counter.use_alias') && $alias !== '') {
+            return $alias;
+        }
+
+        return $allocation->ip;
     }
 }
