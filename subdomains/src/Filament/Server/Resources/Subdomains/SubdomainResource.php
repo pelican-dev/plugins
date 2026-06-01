@@ -143,7 +143,7 @@ class SubdomainResource extends Resource
                     ->label(trans('subdomains::strings.name'))
                     ->required()
                     ->unique()
-                    ->alphaNum()
+                    ->alphaDash()
                     ->columnSpanFull()
                     ->suffix(fn (Get $get) => '.' . CloudflareDomain::find($get('domain_id'))?->name),
                 Select::make('domain_id')
