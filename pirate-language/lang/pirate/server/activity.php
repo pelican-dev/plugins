@@ -1,11 +1,11 @@
 <?php
 
 return [
-    'title' => 'Cap\'n\'s Log',
-    'event' => 'Happenin\'',
-    'user' => 'Scallywag',
-    'deleted_user' => 'Vanished Scallywag',
-    'system' => 'The Ship',
-    'timestamp' => 'Hourglass Sand',
-    'metadata' => 'Hidden Booty',
+    'title' => 'Ship\'s Log',
+    'event' => 'Event',
+    'user' => 'Sailor',
+    'deleted_user' => 'Cast-Off Sailor',
+    'system' => 'The Ship Itself',
+    'timestamp' => 'Time Mark',
+    'metadata' => 'Captain\'s Notes',
 ];

@@ -1,60 +1,72 @@
 <?php
 
 return [
-    'title' => 'Health',
-    'results_refreshed' => 'Health check results be updated, aye!',
-    'checked' => 'Checked results from :time, matey',
-    'refresh' => 'Refresh the lookout',
+    'title' => 'Ship Health',
+    'results_refreshed' => 'Health check results refreshed in the crow\'s nest',
+    'checked' => 'Scanned at :time',
+    'refresh' => 'Re-scan the Ship',
+
     'results' => [
         'cache' => [
-            'label' => 'Cache',
-            'ok' => 'Arr, all be shipshape',
-            'failed_retrieve' => "Couldn't set or fetch a cache value in the hold.",
-            'failed' => 'A cursed error struck the cache: :error',
+            'label' => 'Memory Cache',
+            'ok' => 'All Good',
+            'failed_retrieve' => 'Could not set or retrieve a cache value in the ship\'s memory.',
+            'failed' => 'A curse struck the cache system: :error',
         ],
+
         'database' => [
-            'label' => 'Database',
-            'ok' => 'Arr, database be connected',
-            'failed' => "Couldn't connect to the database port: :error",
+            'label' => 'Treasure Vault (Database)',
+            'ok' => 'All Good',
+            'failed' => 'Could not connect to the vault: :error',
         ],
+
         'debugmode' => [
-            'label' => 'Debug Mode',
-            'ok' => 'Debug mode be disabled, smooth sailin’',
-            'failed' => 'Debug mode was expected to be :expected, but it be :actual instead!',
+            'label' => 'Spy Mode (Debug)',
+            'ok' => 'Spy mode be OFF',
+            'failed' => 'Spy mode expected to be :expected, but instead be :actual',
         ],
+
         'environment' => [
-            'label' => 'Environment',
-            'ok' => 'Aye, environment set to :actual',
-            'failed' => 'Environment be set to :actual, but we expected :expected',
+            'label' => 'Ship Environment',
+            'ok' => 'All Good, set to :actual',
+            'failed' => 'Environment be :actual, but expected :expected',
         ],
+
         'nodeversions' => [
-            'label' => 'Node Versions',
-            'ok' => 'All Nodes be up-to-date and seaworthy',
-            'failed' => ':outdated out o’ :all Nodes be outdated, arr!',
-            'no_nodes_created' => 'No Nodes created yet, matey',
-            'no_nodes' => 'No Nodes in sight',
-            'all_up_to_date' => 'All be shipshape and up-to-date',
-            'outdated' => ':outdated out o’ :all be outdated',
+            'label' => 'Node Fleet Versions',
+            'ok' => 'All ships in the fleet be up to date',
+            'failed' => ':outdated/:all ships be running outdated gear',
+
+            'no_nodes_created' => 'No ships built yet',
+            'no_nodes' => 'No ships in the fleet',
+
+            'all_up_to_date' => 'All ships current',
+            'outdated' => ':outdated/:all outdated vessels',
         ],
+
         'panelversion' => [
-            'label' => 'Panel Version',
-            'ok' => 'Panel be shipshape and up-to-date',
-            'failed' => 'Installed version be :currentVersion but latest be :latestVersion, matey!',
-            'up_to_date' => 'All caught up',
-            'outdated' => 'Old as a barnacle',
+            'label' => 'Captain\'s Panel Version',
+            'ok' => 'Panel be up to date',
+            'failed' => 'Ye run :currentVersion, but the latest be :latestVersion',
+
+            'up_to_date' => 'Current',
+            'outdated' => 'Outdated',
         ],
+
         'schedule' => [
-            'label' => 'Schedule',
-            'ok' => 'Aye, all good',
-            'failed_last_ran' => 'The last time the schedule ran was over :time minutes ago, arr!',
-            'failed_not_ran' => "The schedule hasn't set sail yet.",
+            'label' => 'Ship Schedule',
+            'ok' => 'All Good',
+            'failed_last_ran' => 'Last voyage was more than :time minutes ago',
+            'failed_not_ran' => 'No voyage has been set sail yet.',
         ],
+
         'useddiskspace' => [
-            'label' => 'Disk Space',
+            'label' => 'Cargo Hold Space',
         ],
     ],
+
     'checks' => [
-        'successful' => 'Fair winds',
-        'failed' => 'Davy Jones’ locker',
+        'successful' => 'Ship Be Healthy',
+        'failed' => 'Trouble in :checks Systems',
     ],
 ];

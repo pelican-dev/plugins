@@ -1,44 +1,51 @@
 <?php
 
 return [
-    'heading' => 'Welcome aboard the Pelican!',
-    'version' => 'Version: :version',
-    'advanced' => 'High Seas',
+    'heading' => 'Welcome aboard :app, ye scallywags!',
+    'version' => 'Version o\' the ship: :version',
+    'advanced' => 'Advanced Loot',
     'server' => 'Ship',
     'user' => 'Crewmate',
+
     'sections' => [
         'intro-developers' => [
-            'heading' => 'Message in a Bottle fer Developers',
-            'content' => 'Thanks fer testin\' the development ship, matey!',
-            'extra_note' => 'If ye run aground, report it on the GitHub seas.',
-            'button_issues' => 'Raise a Complaint',
-            'button_features' => 'Parley Features',
+            'heading' => 'Words fer the Code-Slingin\' Crew',
+            'content' => 'Thanks fer testin\' out the development waters!',
+            'extra_note' => 'If ye hit rough seas, report it on GitHub, aye.',
+            'button_issues' => 'Report Trouble',
+            'button_features' => 'Talk About New Tricks',
         ],
+
         'intro-update-available' => [
-            'heading' => 'New booty be available!',
-            'content' => ':latestVersion be ready fer ye! Read the scrolls to upgrade yer Panel.',
+            'heading' => 'Fresh Loot Available (Update Ready)',
+            'content' => ':latestVersion be ready to plunder! Check the charts (docs) to update yer panel.',
+            'button_changelog' => 'What\'s New in the Booty?',
         ],
+
         'intro-no-update' => [
-            'heading' => 'Yer Panel be shipshape',
-            'content' => 'Ye be sailin\' with :version. Yer panel be all up-to-date, savvy!',
+            'heading' => 'Yer Ship Be Up to Date',
+            'content' => 'Ye be sailin\' on :version. No need to patch the sails—yer current, matey!',
         ],
+
         'intro-first-node' => [
-            'heading' => 'No Nodes Spotted on the Horizon',
-            'content' => "Looks like ye ain't got any Nodes charted yet, but fret not — just click the action button to craft yer first one, matey!",
-            'extra_note' => 'If ye be runnin\' into troubles, send word to GitHub.',
-            'button_label' => 'Forge yer First Node in Pelican',
+            'heading' => 'No Ports (Nodes) Spotted',
+            'content' => 'Looks like ye haven\'t set up any Nodes yet—but fear not, ye can click the action button to forge yer first!',
+            'extra_note' => 'If things go sideways, send word on GitHub.',
+            'button_label' => 'Create Yer First Node',
         ],
+
         'intro-support' => [
-            'heading' => 'Lend a Hand to Pelican',
-            'content' => 'We be grateful fer yer help, mates! This ship sails thanks to ye, our crew, and all hands who support us!',
-            'extra_note' => 'Any aid from landlubbers or seadogs is welcome!',
-            'button_translate' => 'Help Translate the Tongue',
-            'button_donate' => 'Send Some Booty',
+            'heading' => 'Support the Crew (Pelican)',
+            'content' => 'Thanks fer sailin\' with Pelican! This voyage only be possible through ye, our crew, and all supporters across the seas!',
+            'extra_note' => 'We be grateful fer any support, big or small treasure.',
+            'button_translate' => 'Help Translate the Charts',
+            'button_donate' => 'Send Gold (Donate)',
         ],
+
         'intro-help' => [
             'heading' => 'Need a Hand, Matey?',
-            'content' => 'Start with the scrolls! Still lost? Head over to our Discord port for aid!',
-            'button_docs' => 'Read the Scrolls',
+            'content' => 'Check the maps (documentation) first! If ye still be lost at sea, head to our Discord tavern!',
+            'button_docs' => 'Read the Ship Logs (Docs)',
         ],
     ],
 ];

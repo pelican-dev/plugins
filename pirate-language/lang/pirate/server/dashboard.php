@@ -1,25 +1,28 @@
 <?php
 
 return [
-    'title' => 'Fleet o\' Ships',
-    'list' => 'Manifest o\' Ships',
-    'my_servers' => 'Me Own Vessels',
-    'other_servers' => 'Ships of Other Scallywags',
-    'all_servers' => 'The Whole Armada',
-    'empty_own' => 'Ye own no ships, landlubber!',
-    'empty_other' => 'Ye\'ve no rights to any other vessels!',
+    'title' => 'Fleet',
+    'list' => 'Fleet Manifest',
+    'tabs' => [
+        'my' => 'My Vessels',
+        'other' => 'Crew Vessels',
+        'all' => 'All Vessels',
+    ],
+    'empty_own' => 'Ye don\'t command any vessels, matey!',
+    'empty_other' => 'Ye have no access ter any vessels!',
 
-    'status' => 'Where She Be Standin\'',
-    'server' => 'The Ship',
-    'resource' => 'Supplies',
-    'usage_limit' => 'Limit o\' Usage: :resource',
+    'status' => 'Status',
+    'server' => 'Vessel',
+    'resources' => 'Resources',
+    'usage_limit' => 'Resource Limit: :resource',
 
-    'cpu' => 'Captain\'s Cogitator (CPU)',
-    'memory' => 'Memory Chest',
-    'disk' => 'Cargo Bay',
-    'network' => 'Signal Ropes',
-    'none' => 'Nay',
-    'loading' => 'Hoistin\' the sails...',
+    'cpu' => 'CPU',
+    'memory' => 'Memory',
+    'disk' => 'Cargo Hold',
+    'network' => 'Sea Lanes',
+    'none' => 'None',
+    'loading' => 'Loadin\' the charts...',
 
     'power_actions' => 'Ship Commands',
+    'power_action_sent' => ':action has been dispatched ter :name, matey',
 ];

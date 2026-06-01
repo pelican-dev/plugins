@@ -1,64 +1,64 @@
 <?php
 
 return [
-    'daemon_connection_failed' => 'There be a storm brewin\' while tryin\' to parley with the daemon, resultin\' in a HTTP/:code response. This scallywag error has been logged in the captain\'s log.',
+    'daemon_connection_failed' => 'There be an exception while tryin\' ter parley with the daemon, resultin\' in a HTTP/:code response. This mishap has been logged in the captain\'s records.',
     'node' => [
-        'servers_attached' => 'A node can only be sent to Davy Jones\' Locker if no servers be chained to it.',
-        'error_connecting' => 'Trouble makin\' contact with :node, arrr!',
-        'daemon_off_config_updated' => 'The daemon\'s config <strong>has been updated</strong>, but there was a squall tryin\' to update the config file on the daemon itself. Ye\'ll need to update the config.yml file by hand to make the changes take hold.',
+        'servers_attached' => 'A node must have no servers moored to it before it can be sent to Davy Jones\' Locker.',
+        'error_connecting' => 'Failed ter establish a connection with :node',
+        'daemon_off_config_updated' => 'The daemon configuration <strong>has been updated</strong>, but an error was encountered while attemptin\' ter automatically update the daemon\'s configuration file. Ye must manually update the daemon configuration file (config.yml) fer these changes ter take effect.',
     ],
     'allocations' => [
-        'server_using' => 'This allocation be already claimed by a server. Ye can only delete it if no server be assigned.',
-        'too_many_ports' => 'Tryin\' to add over 1000 ports in one go ain\'t supported, matey.',
-        'invalid_mapping' => 'The map given for port :port be as wrong as a drunk sailor\'s compass and can\'t be processed.',
-        'cidr_out_of_range' => 'CIDR notation only allows masks from /25 to /32 — no more, no less!',
-        'port_out_of_range' => 'Ports must be between 1024 and 65535 to sail these waters.',
+        'server_using' => 'A server be currently assigned ter this allocation. An allocation may only be scuttled if no server be claimin\' it.',
+        'too_many_ports' => 'Chartin\' more than 1000 ports in a single range at once be not supported.',
+        'invalid_mapping' => 'The mapping provided fer :port be invalid and could not be processed.',
+        'cidr_out_of_range' => 'CIDR notation only permits masks between /25 and /32, matey.',
+        'port_out_of_range' => 'Ports in an allocation must be at least 1024 and no greater than 65535.',
     ],
     'egg' => [
-        'delete_has_servers' => 'Ye can\'t toss an Egg overboard if there be active servers hatchin\' from it.',
-        'invalid_copy_id' => 'The Egg ye picked to copy a script from either don\'t exist or be copyin\' from another script itself.',
-        'has_children' => 'This Egg be a parent to other Eggs. Ye must send them to the deep before ye delete this one.',
+        'delete_has_servers' => 'An Egg with active servers hatchin\' from it cannot be deleted from the Panel.',
+        'invalid_copy_id' => 'The Egg selected fer copyin\' a script either does not exist or be attemptin\' ter copy from itself.',
+        'has_children' => 'This Egg be the parent of one or more other Eggs. Ye must remove those Eggs before deletin\' this one.',
     ],
     'variables' => [
-        'env_not_unique' => 'The environment variable :name must be unique for this Egg\'s domain.',
-        'reserved_name' => 'The environment variable :name be protected — no assignin\' allowed!',
-        'bad_validation_rule' => 'The validation rule ":rule" be no good for this ship\'s application.',
+        'env_not_unique' => 'The environment variable :name must be unique ter this Egg.',
+        'reserved_name' => 'The environment variable :name be protected and cannot be assigned ter another variable.',
+        'bad_validation_rule' => 'The validation rule ":rule" be not recognized by this application.',
     ],
     'importer' => [
-        'json_error' => 'There was trouble parsing the JSON treasure map: :error.',
-        'file_error' => 'The JSON file provided be nothin\' but bilge water.',
-        'invalid_json_provided' => 'The JSON file be not in a form the ship can recognize.',
+        'json_error' => 'An error occurred while readin\' the JSON file: :error.',
+        'file_error' => 'The provided JSON file be invalid.',
+        'invalid_json_provided' => 'The provided JSON file be not in a format this vessel can recognize.',
     ],
     'subusers' => [
-        'editing_self' => 'Ye can\'t be editin\' yer own subuser account, savvy?',
-        'user_is_owner' => 'Ye can\'t add the server\'s captain as a subuser, no matter how much grog ye offer.',
-        'subuser_exists' => 'A matey with that email be already listed as a subuser for this server.',
+        'editing_self' => 'Ye be not permitted ter edit yer own deckhand account.',
+        'user_is_owner' => 'Ye cannot add the ship\'s owner as a deckhand fer this server.',
+        'subuser_exists' => 'A sailor with that email address already serves as a deckhand on this server.',
     ],
     'databases' => [
-        'delete_has_databases' => 'Ye can\'t scuttle a database host server while it still has active databases tied to it.',
+        'delete_has_databases' => 'Cannot remove a database host server that still has active databases anchored ter it.',
     ],
     'tasks' => [
-        'chain_interval_too_long' => 'The longest waitin\' time fer a chained task be 15 minutes, no more!',
+        'chain_interval_too_long' => 'The maximum interval fer a chained task be 15 minutes.',
     ],
     'locations' => [
-        'has_nodes' => 'Ye can\'t delete a location if it\'s got active nodes anchored there.',
+        'has_nodes' => 'Cannot delete a location that still has active nodes stationed there.',
     ],
     'users' => [
-        'is_self' => 'Ye can\'t send yerself to the briny deep by deletin\' yer own user account.',
-        'has_servers' => 'Ye can\'t delete a user while they\'ve got servers sailin\' under their flag. Sink their servers first, then come back.',
-        'node_revocation_failed' => 'Failed to revoke keys on <a href=":link">Node #:node</a>. :error',
+        'is_self' => 'Ye cannot cast yer own account overboard.',
+        'has_servers' => 'Cannot delete a sailor with active servers attached ter their account. Scuttle their servers first before proceedin\'.',
+        'node_revocation_failed' => 'Failed ter revoke keys on <a href=":link">Node #:node</a>. :error',
     ],
     'deployment' => [
-        'no_viable_nodes' => 'No nodes meetin\' the demands for automatic deployment could be found in these waters.',
-        'no_viable_allocations' => 'No allocations fit fer automatic deployment were found, arr!',
+        'no_viable_nodes' => 'No nodes meetin\' the specified requirements fer automatic deployment could be found.',
+        'no_viable_allocations' => 'No allocations suitable fer automatic deployment could be found.',
     ],
     'api' => [
-        'resource_not_found' => 'The treasure ye seek does not exist on this server.',
+        'resource_not_found' => 'The requested resource be nowhere on this server.',
     ],
     'mount' => [
-        'servers_attached' => 'A mount must be free of servers before it can be sent to the depths.',
+        'servers_attached' => 'A mount must have no servers attached ter it before it can be deleted.',
     ],
     'server' => [
-        'marked_as_failed' => 'This server\'s installation voyage ain\'t finished yet, try again later, matey.',
+        'marked_as_failed' => 'This server has not yet finished its installation voyage. Please try again later, matey.',
     ],
 ];

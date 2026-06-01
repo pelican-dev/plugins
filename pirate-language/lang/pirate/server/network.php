@@ -1,15 +1,17 @@
 <?php
 
 return [
-    'title' => 'Signal Ropes',
-    'add' => 'Claim a New Channel',
-    'limit' => 'Ye\'ve Reached the End o\' the Ropes!',
-    'address' => 'Dockin\' Coordinates',
-    'port' => 'Port o\' Call',
-    'notes' => 'Captain\'s Scribbles',
-    'no_notes' => 'No Scribbles Left Behind',
-    'make_primary' => 'Fly as Main Flag',
-    'primary' => 'Main Line',
-    'make' => 'Hoist It!',
-    'delete' => 'Cut the Line',
+    'title' => 'Sea Routes',
+    'add' => 'Add Berth',
+    'limit' => 'Berth limit reached',
+    'address' => 'Address',
+    'port' => 'Port',
+    'notes' => 'Captain\'s Notes',
+    'no_notes' => 'No Notes Logged',
+    'make_primary' => 'Make Flagship Berth',
+    'primary' => 'Flagship',
+    'make' => 'Make',
+    'delete' => 'Scuttle',
+    'locked' => 'Locked Away?',
+    'locked_helper' => 'Locked berths may only be removed by Admirals',
 ];
