@@ -43,8 +43,10 @@ class GameQuery extends Model
             return null;
         }
 
-        $ip = config('player-counter.use_alias') && is_ip($server->allocation->alias) ? $server->allocation->alias : $server->allocation->ip;
-        $ip = is_ipv6($ip) ? '[' . $ip . ']' : $ip;
+        $host = self::getHost($server->allocation);
+        if ($host === false) {
+            return null;
+        }
 
         $port = $server->allocation->port + ($this->query_port_offset ?? 0);
 
@@ -59,17 +61,69 @@ class GameQuery extends Model
         /** @var QueryTypeService $service */
         $service = app(QueryTypeService::class);
 
-        return $service->get($this->query_type)?->process($server, $ip, $port);
+        return $service->get($this->query_type)?->process($server, $host, $port);
     }
 
     public static function canRunQuery(?Allocation $allocation): bool
+    {
+        return self::getHost($allocation) !== false;
+    }
+
+    private static function isValidHost(string $address): bool
+    {
+        return self::normaliseIpAddress($address) !== false ||
+            filter_var($address, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+    }
+
+    private static function normaliseIpAddress(string $address): bool|string
+    {
+        $address = inet_pton($address);
+        if ($address === false) {
+            return false;
+        }
+
+        $address = inet_ntop($address);
+        if ($address === false) {
+            return false;
+        }
+
+        if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            if ($address === '::') {
+                return false;
+            }
+
+            return '[' . $address . ']';
+        } elseif (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            if ($address === '0.0.0.0') {
+                return false;
+            }
+
+            return $address;
+        }
+
+        return false;
+    }
+
+    protected static function getHost(?Allocation $allocation): bool|string
     {
         if (!$allocation) {
             return false;
         }
 
-        $ip = config('player-counter.use_alias') && is_ip($allocation->alias) ? $allocation->alias : $allocation->ip;
+        $address = false;
 
-        return !in_array($ip, ['0.0.0.0', '::']);
+        if (config('player-counter.use_alias') && $allocation->alias && self::isValidHost($allocation->alias)) {
+            $address = $allocation->alias;
+        } elseif (self::isValidHost($allocation->ip)) {
+            $address = $allocation->ip;
+        } else {
+            return false;
+        }
+
+        if (($ip = self::normaliseIpAddress($address)) !== false) {
+            $address = $ip;
+        }
+
+        return $address;
     }
 }
