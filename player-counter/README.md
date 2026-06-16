@@ -4,7 +4,7 @@ Show the amount of connected players to game servers with real-time querying cap
 
 ## Setup
 
-Make sure your server has an allocation with a public ip. Alternatively, if you use local ips you can put the public ip in the allocation alias and enable "Use allocation alias?" in the plugin settings.
+Make sure your server has an allocation with a public ip. Alternatively, if you use local ips you can put the public ip in the allocation alias and enable "Use allocation alias?" in the plugin settings. (Using a domain as allocation alias or `0.0.0.0`/`::` as allocation ip will not work!)
 
 Minecraft servers will first try the query (which requires you to set `enable-query` to true and `query-port` to your server port in `server.properties`) and will fallback to ping. It is recommended to enable query.
 
