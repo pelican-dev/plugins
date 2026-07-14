@@ -5,6 +5,7 @@ namespace Boy132\Subdomains\Filament\Admin\Resources\Servers\RelationManagers;
 use App\Models\Server;
 use Boy132\Subdomains\Models\CloudflareDomain;
 use Boy132\Subdomains\Models\Subdomain;
+use Boy132\Subdomains\Rules\NotOnBlacklist;
 use Boy132\Subdomains\Services\SubdomainService;
 use Exception;
 use Filament\Actions\Action;
@@ -113,6 +114,7 @@ class SubdomainRelationManager extends RelationManager
                     ->required()
                     ->unique()
                     ->alphaDash()
+                    ->rule(new NotOnBlacklist())
                     ->columnSpanFull()
                     ->suffix(fn (Get $get) => '.' . CloudflareDomain::find($get('domain_id'))?->name),
                 Select::make('domain_id')

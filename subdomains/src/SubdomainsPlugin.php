@@ -5,6 +5,7 @@ namespace Boy132\Subdomains;
 use App\Contracts\Plugins\HasPluginSettings;
 use App\Traits\EnvironmentWriterTrait;
 use Filament\Contracts\Plugin;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Panel;
@@ -37,13 +38,19 @@ class SubdomainsPlugin implements HasPluginSettings, Plugin
                 ->hintIcon('tabler-question-mark')
                 ->hintIconTooltip(trans('subdomains::strings.api_token_help'))
                 ->default(fn () => config('subdomains.token')),
+            TagsInput::make('blacklist')
+                ->label(trans('subdomains::strings.subdomain_blacklist'))
+                ->hintIcon('tabler-question-mark')
+                ->hintIconTooltip(trans('subdomains::strings.subdomain_blacklist_help'))
+                ->default(fn () => array_filter(explode(',', config('subdomains.subdomain_blacklist')))),
         ];
     }
 
     public function saveSettings(array $data): void
     {
         $this->writeToEnvironment([
-            'CLOUDFLARE_TOKEN' => $data['token'],
+            'SUBDOMAINS_CLOUDFLARE_TOKEN' => $data['token'],
+            'SUBDOMAINS_BLACKLIST' => implode(',', $data['blacklist']),
         ]);
 
         Notification::make()

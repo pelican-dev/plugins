@@ -8,6 +8,7 @@ use App\Traits\Filament\HasLimitBadge;
 use Boy132\Subdomains\Filament\Server\Resources\Subdomains\Pages\ListSubdomains;
 use Boy132\Subdomains\Models\CloudflareDomain;
 use Boy132\Subdomains\Models\Subdomain;
+use Boy132\Subdomains\Rules\NotOnBlacklist;
 use Boy132\Subdomains\Services\SubdomainService;
 use Exception;
 use Filament\Actions\CreateAction;
@@ -144,6 +145,7 @@ class SubdomainResource extends Resource
                     ->required()
                     ->unique()
                     ->alphaDash()
+                    ->rule(new NotOnBlacklist())
                     ->columnSpanFull()
                     ->suffix(fn (Get $get) => '.' . CloudflareDomain::find($get('domain_id'))?->name),
                 Select::make('domain_id')
