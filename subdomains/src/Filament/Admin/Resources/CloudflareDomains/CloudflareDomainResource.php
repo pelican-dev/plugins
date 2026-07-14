@@ -94,7 +94,7 @@ class CloudflareDomainResource extends Resource
             ->toolbarActions([
                 CreateAction::make()
                     ->createAnother(false)
-                    //->hidden(fn () => is_null(config('subdomains.token')))
+                    ->hidden(fn () => is_null(config('subdomains.token')))
                     ->using(function (array $data) {
                         try {
                             return CloudflareDomain::create($data);
