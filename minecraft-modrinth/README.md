@@ -1,4 +1,4 @@
-# Minecraft Modrinth (by Boy132  & H1ghSyst3m)
+# Minecraft Modrinth (by Boy132 & H1ghSyst3m)
 
 Easily download, update, and manage Minecraft mods and plugins directly from Modrinth within the server panel.
 
