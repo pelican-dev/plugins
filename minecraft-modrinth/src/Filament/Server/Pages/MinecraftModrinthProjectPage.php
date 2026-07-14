@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 
-class MinecraftModrinthProjectPage extends Page implements HasTable
+abstract class MinecraftModrinthProjectPage extends Page implements HasTable
 {
     use BlockAccessInConflict;
     use HasTabs;
@@ -49,22 +49,19 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
     protected static ?int $navigationSort = 30;
 
+    protected static ?ModrinthProjectType $modrinthProjectType = null;
+
     public static function canAccess(): bool
     {
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        return parent::canAccess() && ModrinthProjectType::fromServer($server);
+        return parent::canAccess() && static::$modrinthProjectType && in_array(static::$modrinthProjectType, ModrinthProjectType::fromServer($server));
     }
 
     public static function getNavigationLabel(): string
     {
-        /** @var Server $server */
-        $server = Filament::getTenant();
-
-        $type = ModrinthProjectType::fromServer($server);
-
-        return $type?->getLabel() ?? 'Modrinth';
+        return static::$modrinthProjectType?->getLabel() ?? 'Modrinth';
     }
 
     public static function getModelLabel(): string
@@ -103,7 +100,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
             /** @var Server $server */
             $server = Filament::getTenant();
 
-            $this->installedModsMetadata = MinecraftModrinth::getInstalledModsMetadata($server);
+            $this->installedModsMetadata = MinecraftModrinth::getInstalledModsMetadata($server, static::$modrinthProjectType);
         }
 
         return $this->installedModsMetadata;
@@ -182,12 +179,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         $safeNewFilename = $this->validateFilename($primaryFile['filename']);
         $oldFilename = $installedMod ? $this->validateFilename($installedMod['filename']) : null;
 
-        $type = ModrinthProjectType::fromServer($server);
-        if (!$type) {
-            throw new Exception('Server does not support Modrinth mods or plugins');
-        }
-
-        $folder = $type->getFolder();
+        $folder = static::$modrinthProjectType->getFolder();
 
         $fileRepository
             ->setServer($server)
@@ -285,7 +277,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                     return new LengthAwarePaginator($projects, count($installedMods), 20, $page);
                 } else {
-                    $response = MinecraftModrinth::getProjects($server, $page, $search);
+                    $response = MinecraftModrinth::getProjects($server, static::$modrinthProjectType, $page, $search);
 
                     return new LengthAwarePaginator($response['hits'], $response['total_hits'], 20, $page);
                 }
@@ -615,12 +607,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
                             $safeFilename = $this->validateFilename($installedMod['filename']);
 
-                            $type = ModrinthProjectType::fromServer($server);
-                            if (!$type) {
-                                throw new Exception('Server does not support Modrinth mods or plugins');
-                            }
-
-                            $folder = $type->getFolder();
+                            $folder = static::$modrinthProjectType->getFolder();
 
                             Http::daemon($server->node)
                                 ->post("/api/servers/{$server->uuid}/files/delete", [
@@ -629,7 +616,7 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                                 ])
                                 ->throw();
 
-                            $metadataRemoved = MinecraftModrinth::removeModMetadata($server, $record['project_id']);
+                            $metadataRemoved = MinecraftModrinth::removeModMetadata($server, static::$modrinthProjectType, $record['project_id']);
 
                             if (!$metadataRemoved) {
                                 Log::warning('Failed to remove mod metadata after successful file deletion', [
@@ -682,15 +669,11 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
 
     protected function getHeaderActions(): array
     {
-        /** @var Server $server */
-        $server = Filament::getTenant();
-
-        $type = ModrinthProjectType::fromServer($server);
-        if (!$type) {
+        if (!static::$modrinthProjectType) {
             return [];
         }
 
-        $folder = $type->getFolder();
+        $folder = static::$modrinthProjectType->getFolder();
 
         return [
             Action::make('open_folder')
@@ -705,8 +688,6 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
         /** @var Server $server */
         $server = Filament::getTenant();
 
-        $type = ModrinthProjectType::fromServer($server);
-
         return $schema
             ->components([
                 Grid::make(3)
@@ -719,14 +700,10 @@ class MinecraftModrinthProjectPage extends Page implements HasTable
                             ->icon(fn () => new HtmlString(MinecraftModrinth::getLoaderFromServer($server)['icon'] ?? ''))
                             ->badge(),
                         TextEntry::make('installed')
-                            ->label(fn () => trans('minecraft-modrinth::strings.page.installed', ['type' => $type?->getLabel() ?? 'Modrinth']))
-                            ->state(function (DaemonFileRepository $fileRepository) use ($server, $type) {
+                            ->label(fn () => trans('minecraft-modrinth::strings.page.installed', ['type' => static::$modrinthProjectType?->getLabel() ?? 'Modrinth']))
+                            ->state(function (DaemonFileRepository $fileRepository) use ($server) {
                                 try {
-                                    if (!$type) {
-                                        return trans('minecraft-modrinth::strings.page.unknown');
-                                    }
-
-                                    $files = $fileRepository->setServer($server)->getDirectory($type->getFolder());
+                                    $files = $fileRepository->setServer($server)->getDirectory(static::$modrinthProjectType->getFolder());
 
                                     if (isset($files['error'])) {
                                         throw new Exception($files['error']);

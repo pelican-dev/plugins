@@ -26,21 +26,24 @@ enum ModrinthProjectType: string implements HasLabel
         };
     }
 
-    public static function fromServer(Server $server): ?ModrinthProjectType
+    /** @return ModrinthProjectType[] */
+    public static function fromServer(Server $server): array
     {
         $server->loadMissing('egg');
 
         $features = $server->egg->features ?? [];
         $tags = $server->egg->tags ?? [];
 
+        $projectTypes = [];
+
         if (in_array('modrinth_plugins', $features) || (in_array('minecraft', $tags) && in_array('plugins', $features))) {
-            return self::Plugin;
+            $projectTypes[] = self::Plugin;
         }
 
         if (in_array('modrinth_mods', $features) || (in_array('minecraft', $tags) && in_array('mods', $features))) {
-            return self::Mod;
+            $projectTypes[] = self::Mod;
         }
 
-        return null;
+        return $projectTypes;
     }
 }
