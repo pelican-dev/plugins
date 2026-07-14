@@ -10,4 +10,5 @@ return [
 
     'deployment_tags' => env('UCS_DEPLOYMENT_TAGS', 'user_creatable_servers'),
     'deployment_ports' => env('UCS_DEPLOYMENT_PORTS', ''),
+    'allowed_eggs' => env('UCS_ALLOWED_EGGS', ''),
 ];

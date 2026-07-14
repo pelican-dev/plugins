@@ -3,8 +3,10 @@
 namespace Boy132\UserCreatableServers;
 
 use App\Contracts\Plugins\HasPluginSettings;
+use App\Models\Egg;
 use App\Traits\EnvironmentWriterTrait;
 use Filament\Contracts\Plugin;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -87,6 +89,15 @@ class UserCreatableServersPlugin implements HasPluginSettings, Plugin
                         ->hintIcon('tabler-question-mark')
                         ->hintIconTooltip('These ports will be used for deployment. You can enter individual ports or port ranges. (e.g. 8000-8100) Leave empty to create servers with any allocations.')
                         ->default(fn () => array_filter(explode(',', config('user-creatable-servers.deployment_ports')))),
+                    Select::make('allowed_eggs')
+                        ->label('Allowed eggs')
+                        ->options(fn () => Egg::all()->mapWithKeys(fn (Egg $egg) => [$egg->id => $egg->name]))
+                        ->searchable()
+                        ->preload()
+                        ->multiple()
+                        ->columnSpanFull()
+                        ->placeholder('All eggs')
+                        ->default(fn () => array_filter(explode(',', config('user-creatable-servers.allowed_eggs')))),
                 ]),
         ];
     }
@@ -101,6 +112,7 @@ class UserCreatableServersPlugin implements HasPluginSettings, Plugin
             'UCS_CAN_USERS_DELETE_SERVERS' => $data['can_users_delete_servers'] ? 'true' : 'false',
             'UCS_DEPLOYMENT_TAGS' => implode(',', $data['deployment_tags']),
             'UCS_DEPLOYMENT_PORTS' => implode(',', $data['deployment_ports']),
+            'UCS_ALLOWED_EGGS' => implode(',', $data['allowed_eggs']),
         ]);
 
         Notification::make()

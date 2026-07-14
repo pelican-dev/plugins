@@ -80,7 +80,15 @@ class CreateServerPage extends Page
                 Select::make('egg_id')
                     ->label(trans('user-creatable-servers::strings.egg'))
                     ->prefixIcon('tabler-egg')
-                    ->options(fn () => Egg::all()->mapWithKeys(fn (Egg $egg) => [$egg->id => $egg->name]))
+                    ->options(function () {
+                        $allowedEggs = array_filter(explode(',', config('user-creatable-servers.allowed_eggs')));
+
+                        if (!empty($allowedEggs)) {
+                            return Egg::whereIn('id', $allowedEggs)->get()->mapWithKeys(fn (Egg $egg) => [$egg->id => $egg->name]);
+                        }
+
+                        return Egg::all()->mapWithKeys(fn (Egg $egg) => [$egg->id => $egg->name]);
+                    })
                     ->required()
                     ->searchable()
                     ->preload()
