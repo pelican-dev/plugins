@@ -2,7 +2,7 @@
     "id": "pirate-language",
     "name": "Pirate Language",
     "author": "Boy132",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Turns yer site's lingo into pirate talk, matey!",
     "category": "language",
     "url": "https://hub.pelican.dev/plugins/pirate-language",

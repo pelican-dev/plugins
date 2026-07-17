@@ -2,7 +2,7 @@
     "id": "announcements",
     "name": "Announcements",
     "author": "Boy132",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Create panel wide announcements to inform your users about stuff",
     "category": "plugin",
     "url": "https://hub.pelican.dev/plugins/announcements",

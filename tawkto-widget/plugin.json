@@ -2,7 +2,7 @@
     "id": "tawkto-widget",
     "name": "Tawk.to Widget",
     "author": "Boy132",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Adds a Tawk.to widget to all panels",
     "category": "plugin",
     "url": "https://hub.pelican.dev/plugins/tawkto-widget",

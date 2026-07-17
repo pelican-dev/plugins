@@ -2,7 +2,7 @@
     "id": "user-creatable-servers",
     "name": "User Creatable Servers",
     "author": "Boy132",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Allow users to create their own servers",
     "category": "plugin",
     "url": "https://hub.pelican.dev/plugins/user-creatable-servers",

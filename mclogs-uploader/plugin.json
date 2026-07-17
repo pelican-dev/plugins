@@ -2,7 +2,7 @@
     "id": "mclogs-uploader",
     "name": "Mclogs Uploader",
     "author": "Boy132",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Upload console logs to mclo.gs",
     "category": "plugin",
     "url": "https://hub.pelican.dev/plugins/mclogs-uploader",
