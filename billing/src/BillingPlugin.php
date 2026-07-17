@@ -56,21 +56,27 @@ class BillingPlugin implements HasPluginSettings, Plugin
 
     public function boot(Panel $panel): void {}
 
+    public function getSettingsFormData(): array
+    {
+        $data = config('billing');
+
+        $data['deployment_tags'] = array_filter(explode(',', $data['deployment_tags']));
+
+        return $data;
+    }
+
     public function getSettingsForm(): array
     {
         return [
             TextInput::make('key')
                 ->label('Stripe Key')
-                ->required()
-                ->default(fn () => config('billing.key')),
+                ->required(),
             TextInput::make('secret')
                 ->label('Stripe Secret')
-                ->required()
-                ->default(fn () => config('billing.secret')),
+                ->required(),
             Select::make('currency')
                 ->label('Currency')
                 ->required()
-                ->default(fn () => config('billing.currency'))
                 ->options([
                     'USD' => 'US Dollar',
                     'EUR' => 'Euro',
