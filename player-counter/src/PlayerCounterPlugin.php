@@ -29,6 +29,11 @@ class PlayerCounterPlugin implements HasPluginSettings, Plugin
 
     public function boot(Panel $panel): void {}
 
+    public function getSettingsFormData(): array
+    {
+        return config('player-counter');
+    }
+
     public function getSettingsForm(): array
     {
         return [

@@ -34,6 +34,17 @@ class UserCreatableServersPlugin implements HasPluginSettings, Plugin
 
     public function boot(Panel $panel): void {}
 
+    public function getSettingsFormData(): array
+    {
+        $data = config('user-creatable-servers');
+
+        $data['deployment_tags'] = array_filter(explode(',', $data['deployment_tags']));
+        $data['deployment_ports'] = array_filter(explode(',', $data['deployment_ports']));
+        $data['allowed_eggs'] = array_filter(explode(',', $data['allowed_eggs']));
+
+        return $data;
+    }
+
     public function getSettingsForm(): array
     {
         return [

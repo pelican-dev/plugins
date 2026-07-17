@@ -29,6 +29,15 @@ class SubdomainsPlugin implements HasPluginSettings, Plugin
 
     public function boot(Panel $panel): void {}
 
+    public function getSettingsFormData(): array
+    {
+        $data = config('subdomains');
+
+        $data['blacklist'] = array_filter(explode(',', $data['blacklist']));
+
+        return $data;
+    }
+
     public function getSettingsForm(): array
     {
         return [

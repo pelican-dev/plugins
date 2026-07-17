@@ -9,6 +9,8 @@ use Filament\Forms\Components\Slider;
 use Filament\Notifications\Notification;
 use Filament\Panel;
 use Filament\Schemas\Components\Group;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class SnowflakesPlugin implements HasPluginSettings, Plugin
 {
@@ -23,10 +25,15 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
 
     public function boot(Panel $panel): void {}
 
+    public function getSettingsFormData(): array
+    {
+        return config('snowflakes');
+    }
+
     public function getSettingsForm(): array
     {
         $schema = [
-            Slider::make('SNOWFLAKES_SIZE')
+            Slider::make('size')
                 ->label(trans('snowflakes::strings.size'))
                 ->range(minValue: 0.5, maxValue: 4)
                 ->decimalPlaces(1)
@@ -35,7 +42,7 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
                 ->hintIcon('tabler-question-mark')
                 ->hintIconTooltip(trans('snowflakes::strings.size_help'))
                 ->default(fn () => config('snowflakes.size')),
-            Slider::make('SNOWFLAKES_SPEED')
+            Slider::make('speed')
                 ->label(trans('snowflakes::strings.speed'))
                 ->range(minValue: 0.5, maxValue: 3)
                 ->decimalPlaces(1)
@@ -44,7 +51,7 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
                 ->hintIcon('tabler-question-mark')
                 ->hintIconTooltip(trans('snowflakes::strings.speed_help'))
                 ->default(fn () => config('snowflakes.speed')),
-            Slider::make('SNOWFLAKES_OPACITY')
+            Slider::make('opacity')
                 ->label(trans('snowflakes::strings.opacity'))
                 ->range(minValue: 0.1, maxValue: 1)
                 ->decimalPlaces(1)
@@ -53,7 +60,7 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
                 ->hintIcon('tabler-question-mark')
                 ->hintIconTooltip(trans('snowflakes::strings.opacity_help'))
                 ->default(fn () => config('snowflakes.opacity')),
-            Slider::make('SNOWFLAKES_DENSITY')
+            Slider::make('density')
                 ->label(trans('snowflakes::strings.density'))
                 ->range(minValue: 0.5, maxValue: 10)
                 ->decimalPlaces(1)
@@ -62,7 +69,7 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
                 ->hintIcon('tabler-question-mark')
                 ->hintIconTooltip(trans('snowflakes::strings.density_help'))
                 ->default(fn () => config('snowflakes.density')),
-            Slider::make('SNOWFLAKES_QUALITY')
+            Slider::make('quality')
                 ->label(trans('snowflakes::strings.quality'))
                 ->range(minValue: 0.1, maxValue: 1)
                 ->decimalPlaces(1)
@@ -82,7 +89,7 @@ class SnowflakesPlugin implements HasPluginSettings, Plugin
 
     public function saveSettings(array $data): void
     {
-        $this->writeToEnvironment($data);
+        $this->writeToEnvironment(Arr::mapWithKeys($data, fn ($value, $key) => [Str::upper("SNOWFLAKES_$key") => $value]));
 
         Notification::make()
             ->title(trans('admin/setting.save_success'))

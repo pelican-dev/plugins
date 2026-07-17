@@ -22,6 +22,11 @@ class TawktoWidgetPlugin implements HasPluginSettings, Plugin
 
     public function boot(Panel $panel): void {}
 
+    public function getSettingsFormData(): array
+    {
+        return config('tawkto-widget');
+    }
+
     public function getSettingsForm(): array
     {
         return [

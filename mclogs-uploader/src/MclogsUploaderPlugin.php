@@ -22,6 +22,11 @@ class MclogsUploaderPlugin implements HasPluginSettings, Plugin
 
     public function boot(Panel $panel): void {}
 
+    public function getSettingsFormData(): array
+    {
+        return config('mclogs-uploader');
+    }
+
     public function getSettingsForm(): array
     {
         return [
