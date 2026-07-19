@@ -188,6 +188,7 @@ abstract class MinecraftModrinthProjectPage extends Page implements HasTable
 
         $saved = MinecraftModrinth::saveModMetadata(
             $server,
+            static::$modrinthProjectType,
             $record['project_id'],
             $record['slug'],
             $record['title'],
@@ -236,6 +237,7 @@ abstract class MinecraftModrinthProjectPage extends Page implements HasTable
 
                 if ($installedMod && !MinecraftModrinth::saveModMetadata(
                     $server,
+                    static::$modrinthProjectType,
                     $record['project_id'],
                     $installedMod['project_slug'],
                     $installedMod['project_title'],
