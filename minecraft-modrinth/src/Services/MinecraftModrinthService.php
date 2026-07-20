@@ -161,7 +161,7 @@ class MinecraftModrinthService
             return [];
         }
 
-        $idsParam = json_encode($pageIds);
+        $idsParam = json_encode($pageIds, JSON_THROW_ON_ERROR);
         $modrinthProjects = cache()->remember('modrinth_bulk:' . md5($idsParam), now()->addMinutes(30), function () use ($idsParam) {
             try {
                 return Http::asJson()
@@ -372,7 +372,7 @@ class MinecraftModrinthService
                 $metadataPath = $this->getMetadataFilePath($modrinthProjectType);
                 $response = $fileRepository->setServer($server)->putContent(
                     $metadataPath,
-                    json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                    json_encode($metadata, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
                 );
 
                 return !$response->failed();
@@ -402,7 +402,7 @@ class MinecraftModrinthService
                 $metadataPath = $this->getMetadataFilePath($modrinthProjectType);
                 $response = $fileRepository->setServer($server)->putContent(
                     $metadataPath,
-                    json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                    json_encode($metadata, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
                 );
 
                 return !$response->failed();

@@ -86,7 +86,7 @@ class Coupon extends Model
             }
 
             if ($this->redeem_by) {
-                $data['redeem_by'] = $this->redeem_by->timestamp;
+                $data['redeem_by'] = (int) $this->redeem_by->timestamp;
             }
 
             $stripeCoupon = $stripeClient->coupons->create($data);

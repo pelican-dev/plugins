@@ -42,7 +42,7 @@ class UserResourceLimits extends Model
         if ($this->cpu > 0) {
             $sum_cpu = $this->user->servers->sum('cpu');
 
-            return max(0, $this->cpu - $sum_cpu);
+            return (int) max(0, $this->cpu - $sum_cpu);
         }
 
         return null;
@@ -53,7 +53,7 @@ class UserResourceLimits extends Model
         if ($this->memory > 0) {
             $sum_memory = $this->user->servers->sum('memory');
 
-            return max(0, $this->memory - $sum_memory);
+            return (int) max(0, $this->memory - $sum_memory);
         }
 
         return null;
@@ -64,7 +64,7 @@ class UserResourceLimits extends Model
         if ($this->disk > 0) {
             $sum_disk = $this->user->servers->sum('disk');
 
-            return max(0, $this->disk - $sum_disk);
+            return (int) max(0, $this->disk - $sum_disk);
         }
 
         return null;
@@ -113,7 +113,7 @@ class UserResourceLimits extends Model
     }
 
     /** @param array<string, mixed> $variables */
-    public function createServer(string $name, int|Egg $egg, int $cpu, int $memory, int $disk, array $variables = []): Server|bool
+    public function createServer(string $name, int|Egg $egg, int $cpu, int $memory, int $disk, array $variables = []): Server|false
     {
         if ($this->canCreateServer($cpu, $memory, $disk)) {
             if (!$egg instanceof Egg) {

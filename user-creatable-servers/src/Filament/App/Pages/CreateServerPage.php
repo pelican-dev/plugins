@@ -175,7 +175,8 @@ class CreateServerPage extends Page
             /** @var UserResourceLimits $userResourceLimits */
             $userResourceLimits = UserResourceLimits::where('user_id', auth()->user()->id)->firstOrFail();
 
-            if ($server = $userResourceLimits->createServer($data['name'], $data['egg_id'], $data['cpu'], $data['memory'], $data['disk'], Arr::mapWithKeys($data['variables'], fn ($value) => [$value['env_variable'] => $value['variable_value']]))) {
+            $server = $userResourceLimits->createServer($data['name'], $data['egg_id'], $data['cpu'], $data['memory'], $data['disk'], Arr::mapWithKeys($data['variables'], fn ($value) => [$value['env_variable'] => $value['variable_value']]));
+            if ($server) {
                 $redirectUrl = Console::getUrl(panel: 'server', tenant: $server);
                 $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode($redirectUrl));
             }

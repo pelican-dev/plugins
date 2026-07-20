@@ -9,6 +9,7 @@ use Boy132\Billing\Models\Order;
 use Filament\Facades\Filament;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Stripe\Checkout\Session;
 use Stripe\StripeClient;
 
@@ -18,7 +19,7 @@ class CheckoutController extends Controller
         private StripeClient $stripeClient
     ) {}
 
-    public function success(Request $request): RedirectResponse
+    public function success(Request $request): Redirector|RedirectResponse
     {
         $sessionId = $request->get('session_id');
 

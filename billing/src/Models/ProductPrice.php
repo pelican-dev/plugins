@@ -105,6 +105,6 @@ class ProductPrice extends Model implements HasLabel
 
         $formatter = new NumberFormatter(user()->language ?? 'en', NumberFormatter::CURRENCY);
 
-        return $formatter->formatCurrency($this->cost, config('billing.currency'));
+        return $formatter->formatCurrency($this->cost, config('billing.currency')) ?: (string) $this->cost;
     }
 }

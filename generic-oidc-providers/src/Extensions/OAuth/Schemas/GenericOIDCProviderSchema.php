@@ -79,7 +79,7 @@ final class GenericOIDCProviderSchema extends OAuthSchema
     {
         $id = Str::upper($this->getId());
 
-        return env("OAUTH_{$id}_ENABLED", true);
+        return (bool) env("OAUTH_{$id}_ENABLED", true);
     }
 
     public function shouldCreateMissingUser(OAuthUser $user): bool
