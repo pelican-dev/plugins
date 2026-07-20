@@ -30,30 +30,24 @@ class PalworldQueryTypeSchema implements QueryTypeSchemaInterface
         }
 
         try {
-            $base = "http://{$ip}:{$port}";
-            [$playersResp, $metricsResp] = Http::pool(fn ($pool) => [
-                $pool->timeout(5)->withBasicAuth('admin', $adminPassword)->get("{$base}/v1/api/players"),
-                $pool->timeout(5)->withBasicAuth('admin', $adminPassword)->get("{$base}/v1/api/metrics"),
-            ]);
+            $http = Http::acceptJson()
+                ->timeout(5)
+                ->withBasicAuth('admin', $adminPassword)
+                ->throw()
+                ->baseUrl("http://{$ip}:{$port}");
 
-            if (!$playersResp->ok()) {
-                return null;
-            }
+            $info = $http->get('v1/api/info')->json();
+            $metrics = $http->get('v1/api/metrics')->json();
+            $players = $http->get('v1/api/players')->json();
 
-            $data = $playersResp->json();
-            $players = array_map(fn ($p) => [
-                'id' => $p['playeruid'] ?? $p['steamid'] ?? '',
-                'name' => $p['name'] ?? '',
-            ], $data['players'] ?? []);
-
-            $maxPlayers = $metricsResp->ok() ? ($metricsResp->json()['maxplayernum'] ?? 32) : 32;
+            $players = $players['players'] ?? [];
 
             return [
-                'hostname' => $server->name,
+                'hostname' => $info['servername'],
                 'map' => 'Palpagos Islands',
-                'current_players' => count($players),
-                'max_players' => $maxPlayers,
-                'players' => $players,
+                'current_players' => $metrics['currentplayernum'],
+                'max_players' => $metrics['maxplayernum'],
+                'players' => array_map(fn ($player) => ['id' => (string) ($player['playerId'] ?? $player['userId']), 'name' => (string) $player['name']], $players),
             ];
 
         } catch (Exception $exception) {
