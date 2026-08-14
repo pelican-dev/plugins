@@ -44,7 +44,9 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Clone Pelican Panel
-        run: git clone --depth=1 https://github.com/pelican/panel pelican
+        run: |
+          git clone --depth=1 https://github.com/pelican/panel pelican \
+            || git clone --depth=1 https://github.com/pelican-dev/panel pelican
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
