@@ -8,7 +8,7 @@ To start contributing you need to have a basic understanding of the following:
 
 You can find detailed information on how plugins work in [our documentation](https://pelican.dev/docs/panel/advanced/plugins#create-a-plugin).
 
-For information on setting up a panel dev environment, see the [contributing guide in the panel repo](https://github.com/pelican-dev/panel/blob/main/contributing.md#dev-environment-setup).
+For information on setting up a panel dev environment, see the [contributing guide in the panel repo](https://github.com/pelican/panel/blob/main/contributing.md#dev-environment-setup).
 
 ## Coding Standards
 
@@ -31,4 +31,4 @@ Also, please make sure that your pull requests are as targeted and simple as pos
 ## Community and Support
 
 * Help: [Discord](https://discord.gg/pelican-panel)
-* Bugs & Features: [GitHub Issues](https://github.com/pelican-dev/plugins/issues)
+* Bugs & Features: [GitHub Issues](https://github.com/pelican/plugins/issues)

@@ -16,4 +16,4 @@ Note: You can't create subdomains for servers with `0.0.0.0` or `::` as allocati
 In order to create SRV records instead of A/AAAA you need to do the following:
 
 1. Set a `SRV target` for the node
-2. Add a [SRV service type](https://github.com/pelican-dev/plugins/blob/main/subdomains/src/Enums/SRVServiceType.php#L10-L15) to the features of the egg. The format is `srv-` and then the service name, e.g. `srv-minecraft` or `srv-rust`.
+2. Add a [SRV service type](https://github.com/pelican/plugins/blob/main/subdomains/src/Enums/SRVServiceType.php#L10-L15) to the features of the egg. The format is `srv-` and then the service name, e.g. `srv-minecraft` or `srv-rust`.
