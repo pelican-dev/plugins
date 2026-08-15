@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'user_resource_limits' => 'Bruker Ressursgrense|Bruker Ressursgrenser',
+    'user_resource_limits' => 'Brukerreessursgrense|Brukerressursgrenser',
     'user' => 'Bruker|Brukere',
     'cpu' => 'CPU',
     'memory' => 'Minne',
@@ -15,7 +15,7 @@ return [
     'left' => 'igjen',
     'variables' => 'Oppstartsvariabler',
 
-    'create_server' => 'Oprett server',
+    'create_server' => 'Opprett server',
 
     'modals' => [
         'delete_server_confirm' => 'Er du sikker på at du vil slette denne serveren?',
