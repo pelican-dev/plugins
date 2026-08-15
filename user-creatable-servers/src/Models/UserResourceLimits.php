@@ -10,6 +10,7 @@ use App\Services\Servers\ServerCreationService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property int $id
@@ -81,43 +82,30 @@ class UserResourceLimits extends Model
         return $this->canAllocateResources($cpu, $memory, $disk, $server);
     }
 
+    public function updateServerResources(Server $server, int $cpu, int $memory, int $disk): Server|false
+    {
+        return DB::transaction(function () use ($server, $cpu, $memory, $disk) {
+            $userResourceLimits = $this->lockQuotaRecord();
+            $server = Server::query()->lockForUpdate()->findOrFail($server->getKey());
+
+            if (!$userResourceLimits->canUpdateServerResources($server, $cpu, $memory, $disk)) {
+                return false;
+            }
+
+            $server->update([
+                'cpu' => $cpu,
+                'memory' => $memory,
+                'disk' => $disk,
+            ]);
+
+            return $server;
+        }, 5);
+    }
+
     public function canCreateServer(int $cpu, int $memory, int $disk): bool
     {
         if ($this->server_limit && $this->user->servers->count() >= $this->server_limit) {
             return false;
-        }
-
-        if ($this->cpu > 0) {
-            if ($cpu <= 0) {
-                return false;
-            }
-
-            $sum_cpu = $this->user->servers->sum('cpu');
-            if ($sum_cpu + $cpu > $this->cpu) {
-                return false;
-            }
-        }
-
-        if ($this->memory > 0) {
-            if ($memory <= 0) {
-                return false;
-            }
-
-            $sum_memory = $this->user->servers->sum('memory');
-            if ($sum_memory + $memory > $this->memory) {
-                return false;
-            }
-        }
-
-        if ($this->disk > 0) {
-            if ($disk <= 0) {
-                return false;
-            }
-
-            $sum_disk = $this->user->servers->sum('disk');
-            if ($sum_disk + $disk > $this->disk) {
-                return false;
-            }
         }
 
         return $this->canAllocateResources($cpu, $memory, $disk);
@@ -126,6 +114,12 @@ class UserResourceLimits extends Model
     private function canAllocateResources(int $cpu, int $memory, int $disk, ?Server $excludedServer = null): bool
     {
         foreach (['cpu' => $cpu, 'memory' => $memory, 'disk' => $disk] as $resource => $requested) {
+            $userLimit = $this->{$resource};
+
+            if ($userLimit > 0 && ($requested <= 0 || $this->getUserAllocatedResource($resource, $excludedServer) + $requested > $userLimit)) {
+                return false;
+            }
+
             $limit = (int) config("user-creatable-servers.max_{$resource}");
 
             if ($limit > 0 && $this->getUcsAllocatedResource($resource, $excludedServer) + $requested > $limit) {
@@ -158,6 +152,24 @@ class UserResourceLimits extends Model
         return (int) $servers->sum($resource);
     }
 
+    private function getUserAllocatedResource(string $resource, ?Server $excludedServer = null): int
+    {
+        $servers = Server::query()->where('owner_id', $this->user_id);
+
+        if ($excludedServer) {
+            $servers->whereKeyNot($excludedServer->getKey());
+        }
+
+        return (int) $servers->sum($resource);
+    }
+
+    private function lockQuotaRecord(): self
+    {
+        self::query()->orderBy('id')->lockForUpdate()->firstOrFail();
+
+        return self::query()->findOrFail($this->getKey());
+    }
+
     private function getLowestLimit(?int ...$limits): ?int
     {
         $limits = array_filter($limits, fn (?int $limit) => $limit !== null);
@@ -168,7 +180,13 @@ class UserResourceLimits extends Model
     /** @param array<string, mixed> $variables */
     public function createServer(string $name, int|Egg $egg, int $cpu, int $memory, int $disk, array $variables = []): Server|false
     {
-        if ($this->canCreateServer($cpu, $memory, $disk)) {
+        return DB::transaction(function () use ($name, $egg, $cpu, $memory, $disk, $variables) {
+            $userResourceLimits = $this->lockQuotaRecord();
+
+            if (!$userResourceLimits->canCreateServer($cpu, $memory, $disk)) {
+                return false;
+            }
+
             if (!$egg instanceof Egg) {
                 $egg = Egg::findOrFail($egg);
             }
@@ -205,8 +223,6 @@ class UserResourceLimits extends Model
             $service = app(ServerCreationService::class);
 
             return $service->handle($data, $object);
-        }
-
-        return false;
+        }, 5);
     }
 }

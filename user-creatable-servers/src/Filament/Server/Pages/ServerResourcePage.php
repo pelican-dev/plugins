@@ -50,9 +50,13 @@ class ServerResourcePage extends ServerFormPage
 
         $userResourceLimits = UserResourceLimits::where('user_id', $server->owner_id)->firstOrFail();
 
-        $maxCpu = $server->cpu + $userResourceLimits->getCpuLeft();
-        $maxMemory = $server->memory + $userResourceLimits->getMemoryLeft();
-        $maxDisk = $server->disk + $userResourceLimits->getDiskLeft();
+        $cpuLeft = $userResourceLimits->getCpuLeft();
+        $memoryLeft = $userResourceLimits->getMemoryLeft();
+        $diskLeft = $userResourceLimits->getDiskLeft();
+
+        $maxCpu = $cpuLeft === null ? null : $server->cpu + $cpuLeft;
+        $maxMemory = $memoryLeft === null ? null : $server->memory + $memoryLeft;
+        $maxDisk = $diskLeft === null ? null : $server->disk + $diskLeft;
 
         $suffix = config('panel.use_binary_prefix') ? 'MiB' : 'MB';
 
@@ -66,31 +70,31 @@ class ServerResourcePage extends ServerFormPage
                     ->label(trans('user-creatable-servers::strings.cpu'))
                     ->required()
                     ->live(onBlur: true)
-                    ->hint(fn ($state) => $userResourceLimits->cpu > 0 ? ($maxCpu - $state . '% ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
-                    ->hintColor(fn ($state) => $userResourceLimits->cpu > 0 && $maxCpu - $state < 0 ? 'danger' : null)
+                    ->hint(fn ($state) => $cpuLeft !== null ? ($maxCpu - $state . '% ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
+                    ->hintColor(fn ($state) => $cpuLeft !== null && $maxCpu - $state < 0 ? 'danger' : null)
                     ->numeric()
                     ->minValue($userResourceLimits->cpu > 0 ? 1 : 0)
-                    ->maxValue($userResourceLimits->cpu > 0 ? $maxCpu : null)
+                    ->maxValue($maxCpu)
                     ->suffix('%'),
                 TextInput::make('memory')
                     ->label(trans('user-creatable-servers::strings.memory'))
                     ->required()
                     ->live(onBlur: true)
-                    ->hint(fn ($state) => $userResourceLimits->memory > 0 ? ($maxMemory - $state . $suffix . ' ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
-                    ->hintColor(fn ($state) => $userResourceLimits->memory > 0 && $maxMemory - $state < 0 ? 'danger' : null)
+                    ->hint(fn ($state) => $memoryLeft !== null ? ($maxMemory - $state . $suffix . ' ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
+                    ->hintColor(fn ($state) => $memoryLeft !== null && $maxMemory - $state < 0 ? 'danger' : null)
                     ->numeric()
                     ->minValue($userResourceLimits->memory > 0 ? 1 : 0)
-                    ->maxValue($userResourceLimits->memory > 0 ? $maxMemory : null)
+                    ->maxValue($maxMemory)
                     ->suffix($suffix),
                 TextInput::make('disk')
                     ->label(trans('user-creatable-servers::strings.disk'))
                     ->required()
                     ->live(onBlur: true)
-                    ->hint(fn ($state) => $userResourceLimits->disk > 0 ? ($maxDisk - $state . $suffix . ' ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
-                    ->hintColor(fn ($state) => $userResourceLimits->disk > 0 && $maxDisk - $state < 0 ? 'danger' : null)
+                    ->hint(fn ($state) => $diskLeft !== null ? ($maxDisk - $state . $suffix . ' ' . trans('user-creatable-servers::strings.left')) : trans('user-creatable-servers::strings.unlimited'))
+                    ->hintColor(fn ($state) => $diskLeft !== null && $maxDisk - $state < 0 ? 'danger' : null)
                     ->numeric()
                     ->minValue($userResourceLimits->disk > 0 ? 1 : 0)
-                    ->maxValue($userResourceLimits->disk > 0 ? $maxDisk : null)
+                    ->maxValue($maxDisk)
                     ->suffix($suffix),
             ]);
     }
@@ -158,7 +162,9 @@ class ServerResourcePage extends ServerFormPage
         /** @var UserResourceLimits $userResourceLimits */
         $userResourceLimits = UserResourceLimits::where('user_id', $server->owner_id)->firstOrFail();
 
-        if (!$userResourceLimits->canUpdateServerResources($server, $data['cpu'], $data['memory'], $data['disk'])) {
+        $server = $userResourceLimits->updateServerResources($server, $data['cpu'], $data['memory'], $data['disk']);
+
+        if (!$server) {
             Notification::make()
                 ->title(trans('user-creatable-servers::strings.notifications.server_resources_updated'))
                 ->body(trans('user-creatable-servers::strings.notifications.resource_limit_reached'))
@@ -167,12 +173,6 @@ class ServerResourcePage extends ServerFormPage
 
             return;
         }
-
-        $server->update([
-            'cpu' => $data['cpu'],
-            'memory' => $data['memory'],
-            'disk' => $data['disk'],
-        ]);
 
         try {
             /** @var DaemonServerRepository $repository */
