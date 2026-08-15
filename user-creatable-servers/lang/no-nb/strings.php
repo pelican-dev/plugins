@@ -25,6 +25,7 @@ return [
 
     'notifications' => [
         'server_resources_updated' => 'Serverressursgrenser oppdatert',
+        'resource_limit_reached' => 'De forespurte ressursene overstiger tilgjengelig bruker- eller UCS-allokering.',
         'might_need_restart' => 'For å bruke de nye ressursgrensene kan det være nødvendig å starte serveren på nytt.',
         'manual_restart_needed' => 'Vennligst start serveren på nytt, manuelt, for å bruke de nye ressursgrensene.',
 

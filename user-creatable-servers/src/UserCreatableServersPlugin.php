@@ -70,6 +70,58 @@ class UserCreatableServersPlugin implements HasPluginSettings, Plugin
                         ->minValue(0)
                         ->default(fn () => config('user-creatable-servers.backup_limit')),
                 ]),
+            Section::make('Default per-user resource allocation')
+                ->description('Applied when assigning UCS resource limits to a user. 0 means unlimited.')
+                ->columns(3)
+                ->schema([
+                    TextInput::make('default_user_cpu')
+                        ->label('CPU')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0)
+                        ->suffix('%')
+                        ->default(fn () => config('user-creatable-servers.default_user_cpu')),
+                    TextInput::make('default_user_memory')
+                        ->label('Memory')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0)
+                        ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB')
+                        ->default(fn () => config('user-creatable-servers.default_user_memory')),
+                    TextInput::make('default_user_disk')
+                        ->label('Disk space')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0)
+                        ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB')
+                        ->default(fn () => config('user-creatable-servers.default_user_disk')),
+                ]),
+            Section::make('Maximum UCS resource allocation')
+                ->description('Caps the combined resources allocated to UCS users. 0 means unlimited and uses the available capacity of a deployment node.')
+                ->columns(3)
+                ->schema([
+                    TextInput::make('max_cpu')
+                        ->label('CPU')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0)
+                        ->suffix('%')
+                        ->default(fn () => config('user-creatable-servers.max_cpu')),
+                    TextInput::make('max_memory')
+                        ->label('Memory')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0)
+                        ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB')
+                        ->default(fn () => config('user-creatable-servers.max_memory')),
+                    TextInput::make('max_disk')
+                        ->label('Disk space')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0)
+                        ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB')
+                        ->default(fn () => config('user-creatable-servers.max_disk')),
+                ]),
             Section::make('User Settings')
                 ->columns()
                 ->schema([
@@ -119,6 +171,12 @@ class UserCreatableServersPlugin implements HasPluginSettings, Plugin
             'UCS_DEFAULT_DATABASE_LIMIT' => $data['database_limit'],
             'UCS_DEFAULT_ALLOCATION_LIMIT' => $data['allocation_limit'],
             'UCS_DEFAULT_BACKUP_LIMIT' => $data['backup_limit'],
+            'UCS_DEFAULT_USER_CPU' => $data['default_user_cpu'],
+            'UCS_DEFAULT_USER_MEMORY' => $data['default_user_memory'],
+            'UCS_DEFAULT_USER_DISK' => $data['default_user_disk'],
+            'UCS_MAX_CPU' => $data['max_cpu'],
+            'UCS_MAX_MEMORY' => $data['max_memory'],
+            'UCS_MAX_DISK' => $data['max_disk'],
             'UCS_CAN_USERS_UPDATE_SERVERS' => $data['can_users_update_servers'] ? 'true' : 'false',
             'UCS_CAN_USERS_DELETE_SERVERS' => $data['can_users_delete_servers'] ? 'true' : 'false',
             'UCS_DEPLOYMENT_TAGS' => implode(',', $data['deployment_tags']),

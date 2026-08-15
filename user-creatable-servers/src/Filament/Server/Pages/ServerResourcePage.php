@@ -155,6 +155,19 @@ class ServerResourcePage extends ServerFormPage
         /** @var Server $server */
         $server = Filament::getTenant();
 
+        /** @var UserResourceLimits $userResourceLimits */
+        $userResourceLimits = UserResourceLimits::where('user_id', $server->owner_id)->firstOrFail();
+
+        if (!$userResourceLimits->canUpdateServerResources($server, $data['cpu'], $data['memory'], $data['disk'])) {
+            Notification::make()
+                ->title(trans('user-creatable-servers::strings.notifications.server_resources_updated'))
+                ->body(trans('user-creatable-servers::strings.notifications.resource_limit_reached'))
+                ->danger()
+                ->send();
+
+            return;
+        }
+
         $server->update([
             'cpu' => $data['cpu'],
             'memory' => $data['memory'],

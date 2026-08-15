@@ -39,35 +39,46 @@ class UserResourceLimits extends Model
 
     public function getCpuLeft(): ?int
     {
+        $userCpuLeft = null;
+
         if ($this->cpu > 0) {
             $sum_cpu = $this->user->servers->sum('cpu');
 
-            return (int) max(0, $this->cpu - $sum_cpu);
+            $userCpuLeft = (int) max(0, $this->cpu - $sum_cpu);
         }
 
-        return null;
+        return $this->getLowestLimit($userCpuLeft, $this->getUcsResourceLeft('cpu'));
     }
 
     public function getMemoryLeft(): ?int
     {
+        $userMemoryLeft = null;
+
         if ($this->memory > 0) {
             $sum_memory = $this->user->servers->sum('memory');
 
-            return (int) max(0, $this->memory - $sum_memory);
+            $userMemoryLeft = (int) max(0, $this->memory - $sum_memory);
         }
 
-        return null;
+        return $this->getLowestLimit($userMemoryLeft, $this->getUcsResourceLeft('memory'));
     }
 
     public function getDiskLeft(): ?int
     {
+        $userDiskLeft = null;
+
         if ($this->disk > 0) {
             $sum_disk = $this->user->servers->sum('disk');
 
-            return (int) max(0, $this->disk - $sum_disk);
+            $userDiskLeft = (int) max(0, $this->disk - $sum_disk);
         }
 
-        return null;
+        return $this->getLowestLimit($userDiskLeft, $this->getUcsResourceLeft('disk'));
+    }
+
+    public function canUpdateServerResources(Server $server, int $cpu, int $memory, int $disk): bool
+    {
+        return $this->canAllocateResources($cpu, $memory, $disk, $server);
     }
 
     public function canCreateServer(int $cpu, int $memory, int $disk): bool
@@ -109,7 +120,49 @@ class UserResourceLimits extends Model
             }
         }
 
+        return $this->canAllocateResources($cpu, $memory, $disk);
+    }
+
+    private function canAllocateResources(int $cpu, int $memory, int $disk, ?Server $excludedServer = null): bool
+    {
+        foreach (['cpu' => $cpu, 'memory' => $memory, 'disk' => $disk] as $resource => $requested) {
+            $limit = (int) config("user-creatable-servers.max_{$resource}");
+
+            if ($limit > 0 && $this->getUcsAllocatedResource($resource, $excludedServer) + $requested > $limit) {
+                return false;
+            }
+        }
+
         return true;
+    }
+
+    private function getUcsResourceLeft(string $resource): ?int
+    {
+        $limit = (int) config("user-creatable-servers.max_{$resource}");
+
+        if ($limit <= 0) {
+            return null;
+        }
+
+        return (int) max(0, $limit - $this->getUcsAllocatedResource($resource));
+    }
+
+    private function getUcsAllocatedResource(string $resource, ?Server $excludedServer = null): int
+    {
+        $servers = Server::query()->whereIn('owner_id', self::query()->select('user_id'));
+
+        if ($excludedServer) {
+            $servers->whereKeyNot($excludedServer->getKey());
+        }
+
+        return (int) $servers->sum($resource);
+    }
+
+    private function getLowestLimit(?int ...$limits): ?int
+    {
+        $limits = array_filter($limits, fn (?int $limit) => $limit !== null);
+
+        return empty($limits) ? null : min($limits);
     }
 
     /** @param array<string, mixed> $variables */
