@@ -31,5 +31,16 @@ class UserCreatableServersPluginProvider extends ServiceProvider
     public function boot(): void
     {
         User::resolveRelationUsing('userResourceLimits', fn (User $user) => $user->belongsTo(UserResourceLimits::class, 'id', 'user_id'));
+
+        User::created(function (User $user) {
+            UserResourceLimits::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'cpu' => config('user-creatable-servers.default_user_cpu'),
+                    'memory' => config('user-creatable-servers.default_user_memory'),
+                    'disk' => config('user-creatable-servers.default_user_disk'),
+                ],
+            );
+        });
     }
 }

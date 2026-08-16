@@ -26,6 +26,7 @@ return [
     'notifications' => [
         'server_resources_updated' => 'Server Ressourcen Limits aktualisiert',
         'might_need_restart' => 'Um die neuen Ressourcen Limits vollständig zu nutzen, ist möglicherweise ein Neustart des Servers erforderlich.',
+        'resource_limit_reached' => 'Die angeforderten Ressourcen überschreiten die verfügbaren Benutzer- oder UCS-Zuweisungen.',
         'manual_restart_needed' => 'Bitte starte deinen Server manuell neu, um die neuen Ressourcen Limits zu übernehmen.',
 
         'server_deleted' => 'Server gelöscht',

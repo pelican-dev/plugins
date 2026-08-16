@@ -25,6 +25,7 @@ return [
 
     'notifications' => [
         'server_resources_updated' => 'Server Resource Limits updated',
+        'resource_limit_reached' => 'The requested resources exceed the available user or UCS allocation.',
         'might_need_restart' => 'To fully use the new resource limits a server restart might be required.',
         'manual_restart_needed' => 'Please manually restart your server to apply the new resource limits.',
 

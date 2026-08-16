@@ -65,7 +65,7 @@ class UserResourceLimitRelationManager extends RelationManager
                     ->required()
                     ->numeric()
                     ->minValue(0)
-                    ->default(0)
+                    ->default(fn () => config('user-creatable-servers.default_user_cpu'))
                     ->suffix('%')
                     ->hint(trans('user-creatable-servers::strings.hint_unlimited')),
                 TextInput::make('memory')
@@ -73,7 +73,7 @@ class UserResourceLimitRelationManager extends RelationManager
                     ->required()
                     ->numeric()
                     ->minValue(0)
-                    ->default(0)
+                    ->default(fn () => config('user-creatable-servers.default_user_memory'))
                     ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB')
                     ->hint(trans('user-creatable-servers::strings.hint_unlimited')),
                 TextInput::make('disk')
@@ -81,7 +81,7 @@ class UserResourceLimitRelationManager extends RelationManager
                     ->required()
                     ->numeric()
                     ->minValue(0)
-                    ->default(0)
+                    ->default(fn () => config('user-creatable-servers.default_user_disk'))
                     ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB')
                     ->hint(trans('user-creatable-servers::strings.hint_unlimited')),
                 TextInput::make('server_limit')
